@@ -1,7 +1,5 @@
-// import SafariLeaderboard from "./SafariLeaderboard";
-
-import SafariLeaderboard from "./SafariLeaderboardv2";
+import SafariLeaderBoard from "@/SafariLeaderBoard";
 
 export default function App() {
-  return <SafariLeaderboard />;
+  return <SafariLeaderBoard />;
 }

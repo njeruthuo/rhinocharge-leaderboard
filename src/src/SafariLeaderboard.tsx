@@ -39,6 +39,8 @@ function shuffleDrivers(drivers: Driver[]): Driver[] {
     .sort((a, b) => b.totalCps - a.totalCps);
 }
 
+// ─── Sub-components ───────────────────────────────────────────────────────────
+
 function CheckpointBadge({
   name,
   value,
@@ -92,7 +94,7 @@ function CheckpointBadge({
   );
 }
 
-const LeaderboardRow = ({ driver, rank }: { driver: Driver; rank: number }) => {
+function LeaderboardRow({ driver, rank }: { driver: Driver; rank: number }) {
   const [isOpen, setIsOpen] = useState(false);
   const totalCheckpoints = CHECKPOINTS.length;
   const progress = Math.round((driver.totalCps / totalCheckpoints) * 100);
@@ -274,9 +276,11 @@ const LeaderboardRow = ({ driver, rank }: { driver: Driver; rank: number }) => {
       </motion.div>
     </motion.div>
   );
-};
+}
 
-const SafariLeaderboard = () => {
+// ─── Main Component ───────────────────────────────────────────────────────────
+
+export default function SafariLeaderBoard() {
   const [drivers, setDrivers] = useState<Driver[]>(() =>
     [...INITIAL_DRIVERS].sort((a, b) => b.totalCps - a.totalCps),
   );
@@ -294,21 +298,146 @@ const SafariLeaderboard = () => {
 
   return (
     <>
-      {/* Google Font import */}
+      {/* Google Font import + background animations */}
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Oswald:wght@400;600;700&display=swap');
         body { margin: 0; background: #1C1917; }
+
+        @keyframes rhino-drift {
+          0%   { transform: translateX(0px) translateY(0px) rotate(-8deg); opacity: 0.028; }
+          50%  { transform: translateX(6px) translateY(-4px) rotate(-8deg); opacity: 0.038; }
+          100% { transform: translateX(0px) translateY(0px) rotate(-8deg); opacity: 0.028; }
+        }
+        @keyframes tread-scroll {
+          0%   { background-position: 0 0; }
+          100% { background-position: 72px 0; }
+        }
+        .rhino-ghost {
+          position: fixed; pointer-events: none; z-index: 0;
+          animation: rhino-drift 9s ease-in-out infinite;
+        }
+        .rhino-ghost-2 { animation-delay: -4.5s; animation-duration: 12s; }
+        .tread-bar {
+          position: fixed; left: 0; right: 0; height: 7px; z-index: 1; pointer-events: none;
+          background-image: repeating-linear-gradient(
+            90deg,
+            #D97706 0px, #D97706 18px,
+            #b45309 18px, #b45309 22px,
+            transparent 22px, transparent 30px,
+            #92400e 30px, #92400e 34px,
+            transparent 34px, transparent 36px,
+            #D97706 36px, #D97706 54px,
+            transparent 54px, transparent 72px
+          );
+          animation: tread-scroll 2.4s linear infinite;
+          opacity: 0.55;
+        }
+        .tread-top    { top: 0; }
+        .tread-bottom { bottom: 0; }
       `}</style>
+
+      {/* ── Tire tread strips ── */}
+      <div className="tread-bar tread-top" />
+      <div className="tread-bar tread-bottom" />
+
+      {/* ── Rhino silhouettes (pure SVG, fixed in bg) ── */}
+      <svg
+        className="rhino-ghost"
+        style={{ width: 520, height: 340, bottom: "8%", right: "-4%" }}
+        viewBox="0 0 520 340"
+        fill="none"
+        xmlns="http://www.w3.org/2000/svg"
+        aria-hidden="true"
+      >
+        {/* Body */}
+        <ellipse cx="260" cy="210" rx="170" ry="100" fill="#D97706" />
+        {/* Head */}
+        <ellipse cx="90" cy="185" rx="72" ry="58" fill="#D97706" />
+        {/* Neck connector */}
+        <path
+          d="M130 160 Q160 155 165 200 Q160 240 130 235 Q100 240 88 210Z"
+          fill="#D97706"
+        />
+        {/* Horn 1 (front) */}
+        <path d="M30 155 Q18 110 38 95 Q55 108 50 150Z" fill="#D97706" />
+        {/* Horn 2 (rear small) */}
+        <path d="M62 148 Q55 118 68 108 Q78 118 76 145Z" fill="#D97706" />
+        {/* Ear */}
+        <path d="M112 135 Q118 112 132 118 Q130 135 118 140Z" fill="#D97706" />
+        {/* Legs */}
+        <rect x="130" y="295" width="32" height="44" rx="8" fill="#D97706" />
+        <rect x="195" y="298" width="32" height="42" rx="8" fill="#D97706" />
+        <rect x="290" y="298" width="32" height="42" rx="8" fill="#D97706" />
+        <rect x="355" y="295" width="32" height="44" rx="8" fill="#D97706" />
+        {/* Tail */}
+        <path d="M425 195 Q460 180 470 200 Q460 218 430 215Z" fill="#D97706" />
+        {/* Eye */}
+        <circle cx="72" cy="178" r="7" fill="#1C1917" />
+        <circle cx="70" cy="176" r="2.5" fill="#D97706" />
+        {/* Skin fold lines */}
+        <path
+          d="M150 140 Q165 180 150 220"
+          stroke="#1C1917"
+          strokeWidth="3"
+          strokeLinecap="round"
+          opacity="0.3"
+          fill="none"
+        />
+        <path
+          d="M320 120 Q330 170 322 220"
+          stroke="#1C1917"
+          strokeWidth="2.5"
+          strokeLinecap="round"
+          opacity="0.25"
+          fill="none"
+        />
+        <path
+          d="M240 125 Q248 170 242 215"
+          stroke="#1C1917"
+          strokeWidth="2"
+          strokeLinecap="round"
+          opacity="0.2"
+          fill="none"
+        />
+      </svg>
+
+      {/* Smaller secondary rhino, top-left */}
+      <svg
+        className="rhino-ghost rhino-ghost-2"
+        style={{ width: 220, height: 145, top: "12%", left: "2%" }}
+        viewBox="0 0 520 340"
+        fill="none"
+        xmlns="http://www.w3.org/2000/svg"
+        aria-hidden="true"
+      >
+        <ellipse cx="260" cy="210" rx="170" ry="100" fill="#D97706" />
+        <ellipse cx="90" cy="185" rx="72" ry="58" fill="#D97706" />
+        <path
+          d="M130 160 Q160 155 165 200 Q160 240 130 235 Q100 240 88 210Z"
+          fill="#D97706"
+        />
+        <path d="M30 155 Q18 110 38 95 Q55 108 50 150Z" fill="#D97706" />
+        <path d="M62 148 Q55 118 68 108 Q78 118 76 145Z" fill="#D97706" />
+        <path d="M112 135 Q118 112 132 118 Q130 135 118 140Z" fill="#D97706" />
+        <rect x="130" y="295" width="32" height="44" rx="8" fill="#D97706" />
+        <rect x="195" y="298" width="32" height="42" rx="8" fill="#D97706" />
+        <rect x="290" y="298" width="32" height="42" rx="8" fill="#D97706" />
+        <rect x="355" y="295" width="32" height="44" rx="8" fill="#D97706" />
+        <path d="M425 195 Q460 180 470 200 Q460 218 430 215Z" fill="#D97706" />
+        <circle cx="72" cy="178" r="7" fill="#1C1917" />
+      </svg>
 
       <div
         className="min-h-screen text-stone-100 py-6 px-4"
         style={{
           background: "#1C1917",
           backgroundImage: `
-            repeating-linear-gradient(0deg, transparent, transparent 39px, rgba(217,119,6,0.03) 39px, rgba(217,119,6,0.03) 40px),
-            repeating-linear-gradient(90deg, transparent, transparent 39px, rgba(217,119,6,0.03) 39px, rgba(217,119,6,0.03) 40px),
-            radial-gradient(ellipse 70% 50% at 50% 0%, rgba(217,119,6,0.08) 0%, transparent 70%)
+            repeating-linear-gradient(0deg, transparent, transparent 39px, rgba(217,119,6,0.025) 39px, rgba(217,119,6,0.025) 40px),
+            repeating-linear-gradient(90deg, transparent, transparent 39px, rgba(217,119,6,0.025) 39px, rgba(217,119,6,0.025) 40px),
+            radial-gradient(ellipse 70% 50% at 50% 0%, rgba(217,119,6,0.07) 0%, transparent 70%)
           `,
+          position: "relative",
+          zIndex: 2,
         }}
       >
         <div className="max-w-3xl mx-auto">
@@ -318,7 +447,7 @@ const SafariLeaderboard = () => {
               className="text-[10px] font-bold tracking-[0.3em] text-amber-600 mb-1 uppercase"
               style={{ fontFamily: "'Oswald', sans-serif" }}
             >
-              WRC · Round 7 · 2025
+              Rhino Charge · Edition 2026
             </div>
             <div
               className="text-3xl sm:text-4xl font-black text-stone-100 leading-none mb-1"
@@ -327,10 +456,10 @@ const SafariLeaderboard = () => {
                 letterSpacing: "0.04em",
               }}
             >
-              RHINO CHARGE 2026
+              Rhino Charge Kenya
             </div>
             <div className="text-stone-500 text-xs tracking-widest uppercase">
-              Naivasha Service Park — Overall Classification
+              Ol Pejeta Conservancy — Overall Leaderboard
             </div>
 
             {/* Live pill + controls */}
@@ -443,5 +572,4 @@ const SafariLeaderboard = () => {
       </div>
     </>
   );
-};
-export default SafariLeaderboard;
+}
