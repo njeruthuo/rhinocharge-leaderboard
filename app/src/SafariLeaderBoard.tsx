@@ -11,9 +11,9 @@ function getRankStyle(rank: number): string {
 }
 
 function getRankLabel(rank: number): string {
-  if (rank === 1) return "P1";
-  if (rank === 2) return "P2";
-  if (rank === 3) return "P3";
+  // if (rank === 1) return "P1";
+  // if (rank === 2) return "P2";
+  // if (rank === 3) return "P3";
   return `P${rank}`;
 }
 
@@ -39,7 +39,7 @@ function shuffleDrivers(drivers: Driver[]): Driver[] {
     .sort((a, b) => b.totalCps - a.totalCps);
 }
 
-// ─── Sub-components ───────────────────────────────────────────────────────────
+// ─── Shared sub-components ────────────────────────────────────────────────────
 
 function CheckpointBadge({
   name,
@@ -49,7 +49,6 @@ function CheckpointBadge({
   value: string;
 }) {
   const status = getCheckpointStatus(value);
-
   const badgeStyle =
     status === "completed"
       ? "bg-amber-900/40 border-amber-600/50 text-amber-300"
@@ -87,12 +86,50 @@ function CheckpointBadge({
             ? "Done"
             : status === "active"
               ? "Active"
-              : "Pending"}
+              : "—"}
         </span>
       </div>
     </div>
   );
 }
+
+// ─── Desktop checkpoint cell ──────────────────────────────────────────────────
+
+function CheckpointCell({ value }: { value: string }) {
+  console.log(value, "value");
+
+  const status = getCheckpointStatus(value);
+  if (status === "completed")
+    return (
+      <div className="flex items-center justify-center">
+        <div className="w-6 h-6 rounded-full bg-amber-900/50 border border-amber-600/40 flex items-center justify-center">
+          <svg className="w-3 h-3 text-amber-400" viewBox="0 0 12 12">
+            <path
+              d="M2 6l3 3 5-5"
+              stroke="currentColor"
+              strokeWidth="1.5"
+              fill="none"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+          </svg>
+        </div>
+      </div>
+    );
+  if (status === "active")
+    return (
+      <div className="flex items-center justify-center">
+        <span className="w-2.5 h-2.5 rounded-full bg-sky-400 animate-pulse" />
+      </div>
+    );
+  return (
+    <div className="flex items-center justify-center">
+      <span className="w-1.5 h-1.5 rounded-full bg-stone-700" />
+    </div>
+  );
+}
+
+// ─── Mobile card layout (existing) ───────────────────────────────────────────
 
 function LeaderboardRow({ driver, rank }: { driver: Driver; rank: number }) {
   const [isOpen, setIsOpen] = useState(false);
@@ -101,13 +138,11 @@ function LeaderboardRow({ driver, rank }: { driver: Driver; rank: number }) {
 
   return (
     <motion.div layout className="relative">
-      {/* Engine-idle hover outer wrapper */}
       <motion.div
         whileHover={{ x: [0, -1, 1, -0.5, 0.5, 0] }}
         transition={{ duration: 0.4, ease: "easeInOut" }}
         className="relative"
       >
-        {/* Glow accent for top 3 */}
         {rank <= 3 && (
           <div
             className="absolute inset-0 rounded-xl opacity-20 pointer-events-none"
@@ -122,7 +157,6 @@ function LeaderboardRow({ driver, rank }: { driver: Driver; rank: number }) {
           />
         )}
 
-        {/* Main row */}
         <button
           onClick={() => setIsOpen((p) => !p)}
           className="w-full text-left"
@@ -138,14 +172,11 @@ function LeaderboardRow({ driver, rank }: { driver: Driver; rank: number }) {
               borderLeft: `3px solid ${rank === 1 ? "#D97706" : rank === 2 ? "#94a3b8" : rank === 3 ? "#92400e" : "#44403c"}`,
             }}
           >
-            {/* Rank */}
             <div
               className={`font-black text-lg w-8 shrink-0 font-mono ${getRankStyle(rank)}`}
             >
               {getRankLabel(rank)}
             </div>
-
-            {/* Car No */}
             <div
               className="shrink-0 font-black text-xs tracking-widest px-2 py-1 rounded"
               style={{
@@ -157,8 +188,6 @@ function LeaderboardRow({ driver, rank }: { driver: Driver; rank: number }) {
             >
               #{driver.carNo}
             </div>
-
-            {/* Driver + Team */}
             <div className="flex-1 min-w-0">
               <div
                 className="text-stone-100 font-bold text-sm truncate"
@@ -173,8 +202,6 @@ function LeaderboardRow({ driver, rank }: { driver: Driver; rank: number }) {
                 {driver.teamName}
               </div>
             </div>
-
-            {/* Progress bar (mobile hidden on wide screens) */}
             <div className="hidden sm:flex flex-col items-end gap-1 w-28 shrink-0">
               <div className="w-full h-1 rounded-full bg-stone-800">
                 <motion.div
@@ -188,8 +215,6 @@ function LeaderboardRow({ driver, rank }: { driver: Driver; rank: number }) {
                 {driver.totalCps}/{totalCheckpoints} CPS
               </span>
             </div>
-
-            {/* Total CPS badge */}
             <div
               className="shrink-0 font-black text-base px-3 py-1 rounded-lg"
               style={{
@@ -206,8 +231,6 @@ function LeaderboardRow({ driver, rank }: { driver: Driver; rank: number }) {
             >
               {driver.totalCps}
             </div>
-
-            {/* Expand arrow */}
             <motion.div
               animate={{ rotate: isOpen ? 180 : 0 }}
               transition={{ duration: 0.2 }}
@@ -227,7 +250,6 @@ function LeaderboardRow({ driver, rank }: { driver: Driver; rank: number }) {
           </div>
         </button>
 
-        {/* Collapsible detail card */}
         <AnimatePresence>
           {isOpen && (
             <motion.div
@@ -246,7 +268,6 @@ function LeaderboardRow({ driver, rank }: { driver: Driver; rank: number }) {
                   borderColor: "rgba(217,119,6,0.2)",
                 }}
               >
-                {/* Header */}
                 <div className="flex items-center justify-between mb-3">
                   <span
                     className="text-[10px] font-bold tracking-[0.2em] text-amber-600 uppercase"
@@ -258,8 +279,6 @@ function LeaderboardRow({ driver, rank }: { driver: Driver; rank: number }) {
                     {driver.totalCps} of {totalCheckpoints} completed
                   </span>
                 </div>
-
-                {/* Checkpoint grid */}
                 <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-2">
                   {CHECKPOINTS.map((cp) => (
                     <CheckpointBadge
@@ -275,6 +294,222 @@ function LeaderboardRow({ driver, rank }: { driver: Driver; rank: number }) {
         </AnimatePresence>
       </motion.div>
     </motion.div>
+  );
+}
+
+// ─── Desktop table row ────────────────────────────────────────────────────────
+
+function DesktopTableRow({ driver, rank }: { driver: Driver; rank: number }) {
+  const totalCheckpoints = CHECKPOINTS.length;
+  const progress = Math.round((driver.totalCps / totalCheckpoints) * 100);
+
+  return (
+    <>
+      {/* Left accent bar */}
+      <td style={{ width: 4, padding: 0 }}>
+        <div
+          style={{
+            width: 4,
+            minHeight: 48,
+            height: "100%",
+            borderRadius: "4px 0 0 4px",
+            background:
+              rank === 1
+                ? "#D97706"
+                : rank === 2
+                  ? "#94a3b8"
+                  : rank === 3
+                    ? "#92400e"
+                    : "#44403c",
+          }}
+        />
+      </td>
+
+      {/* Rank */}
+      <td className="py-3 pr-3 whitespace-nowrap">
+        <span
+          className={`font-black text-base font-mono ${getRankStyle(rank)}`}
+          style={{ fontFamily: "'Oswald', sans-serif" }}
+        >
+          {getRankLabel(rank)}
+        </span>
+      </td>
+
+      {/* Car No */}
+      <td className="py-3 pr-4 whitespace-nowrap">
+        <span
+          className="font-black text-xs tracking-widest px-2 py-1 rounded"
+          style={{
+            background: "rgba(217,119,6,0.15)",
+            color: "#D97706",
+            border: "1px solid rgba(217,119,6,0.3)",
+            fontFamily: "'Oswald', sans-serif",
+          }}
+        >
+          #{driver.carNo}
+        </span>
+      </td>
+
+      {/* Driver + Team */}
+      <td className="py-3 pr-6" style={{ minWidth: 160 }}>
+        <div
+          className="font-bold text-sm text-stone-100 leading-tight"
+          style={{
+            fontFamily: "'Oswald', sans-serif",
+            letterSpacing: "0.04em",
+          }}
+        >
+          {driver.entrantName}
+        </div>
+        <div className="text-[10px] text-stone-500 tracking-wider uppercase">
+          {driver.teamName}
+        </div>
+      </td>
+
+      {/* Checkpoint columns — width must match <th> exactly */}
+      {CHECKPOINTS.map((cp) => (
+        <td
+          key={cp}
+          style={{
+            width: 36,
+            minWidth: 36,
+            maxWidth: 36,
+            padding: "12px 0",
+            textAlign: "center",
+          }}
+        >
+          <CheckpointCell value={driver.checkpoints[cp] ?? ""} />
+        </td>
+      ))}
+
+      {/* Total CPS */}
+      <td className="py-3 pl-4 pr-3 whitespace-nowrap text-right">
+        <div className="flex flex-col items-end gap-1">
+          <span
+            className="font-black text-base"
+            style={{
+              fontFamily: "'Oswald', sans-serif",
+              color: rank === 1 ? "#fbbf24" : "#d6d3d1",
+            }}
+          >
+            {driver.totalCps}
+            <span className="text-[10px] text-stone-600 font-normal ml-1">
+              /{totalCheckpoints}
+            </span>
+          </span>
+          <div className="w-16 h-0.5 rounded-full bg-stone-800">
+            <motion.div
+              className="h-full rounded-full bg-amber-500"
+              initial={{ width: 0 }}
+              animate={{ width: `${progress}%` }}
+              transition={{ duration: 0.6, ease: "easeOut" }}
+            />
+          </div>
+        </div>
+      </td>
+    </>
+  );
+}
+
+// ─── Desktop table ─────────────────────────────────────────────────────────────
+
+function DesktopTable({ drivers }: { drivers: Driver[] }) {
+  return (
+    <div
+      className="w-full overflow-x-auto rounded-xl border"
+      style={{
+        borderColor: "rgba(217,119,6,0.15)",
+        background: "rgba(28,25,23,0.6)",
+        backdropFilter: "blur(8px)",
+      }}
+    >
+      <table className="w-full border-collapse">
+        <thead>
+          <tr style={{ borderBottom: "1px solid rgba(217,119,6,0.15)" }}>
+            {/* accent spacer */}
+            <th className="w-1" />
+            <th className="py-3 pr-3 text-left">
+              <span className="text-[9px] font-bold tracking-[0.2em] text-stone-600 uppercase">
+                Rank
+              </span>
+            </th>
+            <th className="py-3 pr-4 text-left">
+              <span className="text-[9px] font-bold tracking-[0.2em] text-stone-600 uppercase">
+                Car
+              </span>
+            </th>
+            <th className="py-3 pr-6 text-left">
+              <span className="text-[9px] font-bold tracking-[0.2em] text-stone-600 uppercase">
+                Driver / Team
+              </span>
+            </th>
+            {CHECKPOINTS.map((cp) => (
+              <th
+                key={cp}
+                style={{
+                  width: 36,
+                  minWidth: 36,
+                  maxWidth: 36,
+                  padding: "12px 0 8px",
+                  textAlign: "center",
+                  verticalAlign: "bottom",
+                }}
+              >
+                <div style={{ display: "flex", justifyContent: "center" }}>
+                  <span
+                    className="text-[9px] font-bold tracking-widest text-amber-700/70 uppercase"
+                    style={{
+                      writingMode: "vertical-rl",
+                      transform: "rotate(180deg)",
+                      display: "block",
+                      lineHeight: 1,
+                    }}
+                  >
+                    {cp}
+                  </span>
+                </div>
+              </th>
+            ))}
+            <th className="py-3 pl-4 pr-2 text-right">
+              <span className="text-[9px] font-bold tracking-[0.2em] text-stone-600 uppercase">
+                CPS
+              </span>
+            </th>
+          </tr>
+        </thead>
+        <AnimatePresence>
+          <tbody>
+            {drivers.map((driver, index) => {
+              const rank = index + 1;
+              return (
+                <motion.tr
+                  key={driver.id}
+                  layout
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.3 }}
+                  style={{
+                    borderBottom: "1px solid rgba(255,255,255,0.04)",
+                    background:
+                      rank === 1
+                        ? "rgba(217,119,6,0.06)"
+                        : rank === 2
+                          ? "rgba(148,163,184,0.04)"
+                          : rank === 3
+                            ? "rgba(146,64,14,0.05)"
+                            : "transparent",
+                  }}
+                  className="hover:bg-white/[0.02] transition-colors duration-100"
+                >
+                  <DesktopTableRow driver={driver} rank={rank} />
+                </motion.tr>
+              );
+            })}
+          </tbody>
+        </AnimatePresence>
+      </table>
+    </div>
   );
 }
 
@@ -298,7 +533,6 @@ export default function SafariLeaderBoard() {
 
   return (
     <>
-      {/* Google Font import + background animations */}
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Oswald:wght@400;600;700&display=swap');
         body { margin: 0; background: #1C1917; }
@@ -334,13 +568,15 @@ export default function SafariLeaderBoard() {
         }
         .tread-top    { top: 0; }
         .tread-bottom { bottom: 0; }
+
+        /* Desktop table: rotated headers need a fixed min-width per checkpoint col */
+        .cp-col { width: 36px; min-width: 36px; }
       `}</style>
 
-      {/* ── Tire tread strips ── */}
       <div className="tread-bar tread-top" />
       <div className="tread-bar tread-bottom" />
 
-      {/* ── Rhino silhouettes (pure SVG, fixed in bg) ── */}
+      {/* Rhino silhouettes — unchanged */}
       <svg
         className="rhino-ghost"
         style={{ width: 520, height: 340, bottom: "8%", right: "-4%" }}
@@ -349,32 +585,22 @@ export default function SafariLeaderBoard() {
         xmlns="http://www.w3.org/2000/svg"
         aria-hidden="true"
       >
-        {/* Body */}
         <ellipse cx="260" cy="210" rx="170" ry="100" fill="#D97706" />
-        {/* Head */}
         <ellipse cx="90" cy="185" rx="72" ry="58" fill="#D97706" />
-        {/* Neck connector */}
         <path
           d="M130 160 Q160 155 165 200 Q160 240 130 235 Q100 240 88 210Z"
           fill="#D97706"
         />
-        {/* Horn 1 (front) */}
         <path d="M30 155 Q18 110 38 95 Q55 108 50 150Z" fill="#D97706" />
-        {/* Horn 2 (rear small) */}
         <path d="M62 148 Q55 118 68 108 Q78 118 76 145Z" fill="#D97706" />
-        {/* Ear */}
         <path d="M112 135 Q118 112 132 118 Q130 135 118 140Z" fill="#D97706" />
-        {/* Legs */}
         <rect x="130" y="295" width="32" height="44" rx="8" fill="#D97706" />
         <rect x="195" y="298" width="32" height="42" rx="8" fill="#D97706" />
         <rect x="290" y="298" width="32" height="42" rx="8" fill="#D97706" />
         <rect x="355" y="295" width="32" height="44" rx="8" fill="#D97706" />
-        {/* Tail */}
         <path d="M425 195 Q460 180 470 200 Q460 218 430 215Z" fill="#D97706" />
-        {/* Eye */}
         <circle cx="72" cy="178" r="7" fill="#1C1917" />
         <circle cx="70" cy="176" r="2.5" fill="#D97706" />
-        {/* Skin fold lines */}
         <path
           d="M150 140 Q165 180 150 220"
           stroke="#1C1917"
@@ -401,7 +627,6 @@ export default function SafariLeaderBoard() {
         />
       </svg>
 
-      {/* Smaller secondary rhino, top-left */}
       <svg
         className="rhino-ghost rhino-ghost-2"
         style={{ width: 220, height: 145, top: "12%", left: "2%" }}
@@ -440,8 +665,9 @@ export default function SafariLeaderBoard() {
           zIndex: 2,
         }}
       >
-        <div className="max-w-3xl mx-auto">
-          {/* ── Header ── */}
+        {/* Wider container on desktop to accommodate the checkpoint columns */}
+        <div className="max-w-3xl xl:max-w-[95vw] 2xl:max-w-[1600px] mx-auto">
+          {/* ── Header — unchanged ── */}
           <div className="mb-8">
             <div
               className="text-[10px] font-bold tracking-[0.3em] text-amber-600 mb-1 uppercase"
@@ -462,7 +688,6 @@ export default function SafariLeaderBoard() {
               Ol Pejeta Conservancy — Overall Leaderboard
             </div>
 
-            {/* Live pill + controls */}
             <div className="flex items-center gap-3 mt-4 flex-wrap">
               <div className="flex items-center gap-2 px-3 py-1.5 rounded-full border border-amber-700/40 bg-amber-900/20">
                 <span className="w-2 h-2 rounded-full bg-amber-500 animate-pulse" />
@@ -503,57 +728,62 @@ export default function SafariLeaderBoard() {
             </div>
           </div>
 
-          {/* ── Column headers ── */}
-          <div className="hidden sm:grid grid-cols-[48px_56px_1fr_112px_56px_28px] gap-3 px-4 mb-2">
-            {["Rank", "Car", "Driver / Team", "Progress", "CPS", ""].map(
-              (h) => (
-                <div
-                  key={h}
-                  className="text-[9px] font-bold tracking-[0.2em] text-stone-600 uppercase"
-                >
-                  {h}
-                </div>
-              ),
-            )}
+          {/* ── Desktop table (lg+) ── */}
+          <div className="hidden lg:block mb-2">
+            <DesktopTable drivers={drivers} />
           </div>
 
-          {/* ── Reordered leaderboard ── */}
-          <Reorder.Group
-            axis="y"
-            values={drivers}
-            onReorder={setDrivers}
-            className="flex flex-col gap-2"
-            as="div"
-          >
-            <AnimatePresence>
-              {drivers.map((driver, index) => (
-                <Reorder.Item
-                  key={driver.id}
-                  value={driver}
-                  dragListener={false}
-                  as="div"
-                  layout
-                  initial={{ opacity: 0, y: -10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: 10 }}
-                  transition={{ duration: 0.35, ease: "easeOut" }}
-                >
-                  <LeaderboardRow driver={driver} rank={index + 1} />
-                </Reorder.Item>
-              ))}
-            </AnimatePresence>
-          </Reorder.Group>
+          {/* ── Mobile card layout (< lg) — Reorder.Group preserved exactly ── */}
+          <div className="lg:hidden">
+            <div className="hidden sm:grid grid-cols-[48px_56px_1fr_112px_56px_28px] gap-3 px-4 mb-2">
+              {["Rank", "Car", "Driver / Team", "Progress", "CPS", ""].map(
+                (h) => (
+                  <div
+                    key={h}
+                    className="text-[9px] font-bold tracking-[0.2em] text-stone-600 uppercase"
+                  >
+                    {h}
+                  </div>
+                ),
+              )}
+            </div>
+
+            <Reorder.Group
+              axis="y"
+              values={drivers}
+              onReorder={setDrivers}
+              className="flex flex-col gap-2"
+              as="div"
+            >
+              <AnimatePresence>
+                {drivers.map((driver, index) => (
+                  <Reorder.Item
+                    key={driver.id}
+                    value={driver}
+                    dragListener={false}
+                    as="div"
+                    layout
+                    initial={{ opacity: 0, y: -10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: 10 }}
+                    transition={{ duration: 0.35, ease: "easeOut" }}
+                  >
+                    <LeaderboardRow driver={driver} rank={index + 1} />
+                  </Reorder.Item>
+                ))}
+              </AnimatePresence>
+            </Reorder.Group>
+          </div>
 
           {/* ── Footer ── */}
           <div className="mt-8 flex items-center gap-4 flex-wrap">
             <div className="h-px flex-1 bg-stone-800" />
             <span className="text-[9px] tracking-widest text-stone-700 uppercase">
-              13 Checkpoints · {drivers.length} Entrants
+              {CHECKPOINTS.length} Checkpoints · {drivers.length} Entrants
             </span>
             <div className="h-px flex-1 bg-stone-800" />
           </div>
 
-          {/* Legend */}
           <div className="mt-4 flex items-center gap-4 flex-wrap justify-center">
             {[
               { color: "bg-amber-500", label: "Completed" },
