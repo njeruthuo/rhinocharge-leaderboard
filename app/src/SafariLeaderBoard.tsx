@@ -11,9 +11,9 @@ function getRankStyle(rank: number): string {
 }
 
 function getRankLabel(rank: number): string {
-  // if (rank === 1) return "P1";
-  // if (rank === 2) return "P2";
-  // if (rank === 3) return "P3";
+  if (rank === 1) return "P1";
+  if (rank === 2) return "P2";
+  if (rank === 3) return "P3";
   return `P${rank}`;
 }
 
@@ -38,8 +38,6 @@ function shuffleDrivers(drivers: Driver[]): Driver[] {
     })
     .sort((a, b) => b.totalCps - a.totalCps);
 }
-
-// ─── Shared sub-components ────────────────────────────────────────────────────
 
 function CheckpointBadge({
   name,
@@ -93,11 +91,7 @@ function CheckpointBadge({
   );
 }
 
-// ─── Desktop checkpoint cell ──────────────────────────────────────────────────
-
 function CheckpointCell({ value }: { value: string }) {
-  console.log(value, "value");
-
   const status = getCheckpointStatus(value);
   if (status === "completed")
     return (
@@ -118,18 +112,28 @@ function CheckpointCell({ value }: { value: string }) {
     );
   if (status === "active")
     return (
-      <div className="flex items-center justify-center">
-        <span className="w-2.5 h-2.5 rounded-full bg-sky-400 animate-pulse" />
+      <div className="flex flex-col items-center justify-center gap-0.5">
+        <span className="w-2 h-2 rounded-full bg-sky-400 animate-pulse" />
+        <span
+          className="text-[8px] font-bold tracking-wider uppercase"
+          style={{ color: "#38bdf8", lineHeight: 1 }}
+        >
+          {/* Active */}
+        </span>
       </div>
     );
   return (
-    <div className="flex items-center justify-center">
-      <span className="w-1.5 h-1.5 rounded-full bg-stone-700" />
+    <div className="flex flex-col items-center justify-center gap-0.5">
+      <span className="w-2 h-2 rounded-full bg-stone-600" />
+      <span
+        className="text-[8px] font-bold tracking-wider uppercase"
+        style={{ color: "#57534e", lineHeight: 1 }}
+      >
+        {/* Pending */}
+      </span>
     </div>
   );
 }
-
-// ─── Mobile card layout (existing) ───────────────────────────────────────────
 
 function LeaderboardRow({ driver, rank }: { driver: Driver; rank: number }) {
   const [isOpen, setIsOpen] = useState(false);
@@ -297,7 +301,12 @@ function LeaderboardRow({ driver, rank }: { driver: Driver; rank: number }) {
   );
 }
 
-// ─── Desktop table row ────────────────────────────────────────────────────────
+const TD_V = 12;
+const TD_CELL: React.CSSProperties = {
+  paddingTop: TD_V,
+  paddingBottom: TD_V,
+  verticalAlign: "middle",
+};
 
 function DesktopTableRow({ driver, rank }: { driver: Driver; rank: number }) {
   const totalCheckpoints = CHECKPOINTS.length;
@@ -305,12 +314,11 @@ function DesktopTableRow({ driver, rank }: { driver: Driver; rank: number }) {
 
   return (
     <>
-      {/* Left accent bar */}
-      <td style={{ width: 4, padding: 0 }}>
+      <td style={{ width: 4, padding: 0, verticalAlign: "middle" }}>
         <div
           style={{
             width: 4,
-            minHeight: 48,
+            minHeight: 52,
             height: "100%",
             borderRadius: "4px 0 0 4px",
             background:
@@ -325,8 +333,14 @@ function DesktopTableRow({ driver, rank }: { driver: Driver; rank: number }) {
         />
       </td>
 
-      {/* Rank */}
-      <td className="py-3 pr-3 whitespace-nowrap">
+      <td
+        style={{
+          ...TD_CELL,
+          paddingLeft: 12,
+          paddingRight: 12,
+          whiteSpace: "nowrap",
+        }}
+      >
         <span
           className={`font-black text-base font-mono ${getRankStyle(rank)}`}
           style={{ fontFamily: "'Oswald', sans-serif" }}
@@ -335,8 +349,7 @@ function DesktopTableRow({ driver, rank }: { driver: Driver; rank: number }) {
         </span>
       </td>
 
-      {/* Car No */}
-      <td className="py-3 pr-4 whitespace-nowrap">
+      <td style={{ ...TD_CELL, paddingRight: 16, whiteSpace: "nowrap" }}>
         <span
           className="font-black text-xs tracking-widest px-2 py-1 rounded"
           style={{
@@ -350,8 +363,7 @@ function DesktopTableRow({ driver, rank }: { driver: Driver; rank: number }) {
         </span>
       </td>
 
-      {/* Driver + Team */}
-      <td className="py-3 pr-6" style={{ minWidth: 160 }}>
+      <td style={{ ...TD_CELL, paddingRight: 24, minWidth: 160 }}>
         <div
           className="font-bold text-sm text-stone-100 leading-tight"
           style={{
@@ -366,15 +378,14 @@ function DesktopTableRow({ driver, rank }: { driver: Driver; rank: number }) {
         </div>
       </td>
 
-      {/* Checkpoint columns — width must match <th> exactly */}
       {CHECKPOINTS.map((cp) => (
         <td
           key={cp}
           style={{
+            ...TD_CELL,
             width: 36,
             minWidth: 36,
             maxWidth: 36,
-            padding: "12px 0",
             textAlign: "center",
           }}
         >
@@ -382,8 +393,15 @@ function DesktopTableRow({ driver, rank }: { driver: Driver; rank: number }) {
         </td>
       ))}
 
-      {/* Total CPS */}
-      <td className="py-3 pl-4 pr-3 whitespace-nowrap text-right">
+      <td
+        style={{
+          ...TD_CELL,
+          paddingLeft: 16,
+          paddingRight: 12,
+          whiteSpace: "nowrap",
+          textAlign: "right",
+        }}
+      >
         <div className="flex flex-col items-end gap-1">
           <span
             className="font-black text-base"
@@ -410,8 +428,6 @@ function DesktopTableRow({ driver, rank }: { driver: Driver; rank: number }) {
     </>
   );
 }
-
-// ─── Desktop table ─────────────────────────────────────────────────────────────
 
 function DesktopTable({ drivers }: { drivers: Driver[] }) {
   return (
@@ -513,8 +529,6 @@ function DesktopTable({ drivers }: { drivers: Driver[] }) {
   );
 }
 
-// ─── Main Component ───────────────────────────────────────────────────────────
-
 export default function SafariLeaderBoard() {
   const [drivers, setDrivers] = useState<Driver[]>(() =>
     [...INITIAL_DRIVERS].sort((a, b) => b.totalCps - a.totalCps),
@@ -576,7 +590,6 @@ export default function SafariLeaderBoard() {
       <div className="tread-bar tread-top" />
       <div className="tread-bar tread-bottom" />
 
-      {/* Rhino silhouettes — unchanged */}
       <svg
         className="rhino-ghost"
         style={{ width: 520, height: 340, bottom: "8%", right: "-4%" }}
@@ -665,7 +678,6 @@ export default function SafariLeaderBoard() {
           zIndex: 2,
         }}
       >
-        {/* Wider container on desktop to accommodate the checkpoint columns */}
         <div className="max-w-3xl xl:max-w-[95vw] 2xl:max-w-[1600px] mx-auto">
           {/* ── Header — unchanged ── */}
           <div className="mb-8">
@@ -728,12 +740,10 @@ export default function SafariLeaderBoard() {
             </div>
           </div>
 
-          {/* ── Desktop table (lg+) ── */}
           <div className="hidden lg:block mb-2">
             <DesktopTable drivers={drivers} />
           </div>
 
-          {/* ── Mobile card layout (< lg) — Reorder.Group preserved exactly ── */}
           <div className="lg:hidden">
             <div className="hidden sm:grid grid-cols-[48px_56px_1fr_112px_56px_28px] gap-3 px-4 mb-2">
               {["Rank", "Car", "Driver / Team", "Progress", "CPS", ""].map(
