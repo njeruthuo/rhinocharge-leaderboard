@@ -39,7 +39,7 @@ export const INITIAL_DRIVERS: Driver[] = [
       SOLEX: "NEXT",
       "SLATER & WHITTAKER": "START",
     },
-    totalCps: 11,
+    totalCps: 12,
   },
   {
     id: 2,
