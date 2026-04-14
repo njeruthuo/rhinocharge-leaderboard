@@ -39,6 +39,8 @@ function shuffleDrivers(drivers: Driver[]): Driver[] {
     .sort((a, b) => b.totalCps - a.totalCps);
 }
 
+// ─── Shared sub-components ────────────────────────────────────────────────────
+
 function CheckpointBadge({
   name,
   value,
@@ -91,6 +93,8 @@ function CheckpointBadge({
   );
 }
 
+// ─── Desktop checkpoint cell ──────────────────────────────────────────────────
+
 function CheckpointCell({ value }: { value: string }) {
   const status = getCheckpointStatus(value);
   if (status === "completed")
@@ -134,6 +138,8 @@ function CheckpointCell({ value }: { value: string }) {
     </div>
   );
 }
+
+// ─── Mobile card layout (existing) ───────────────────────────────────────────
 
 function LeaderboardRow({ driver, rank }: { driver: Driver; rank: number }) {
   const [isOpen, setIsOpen] = useState(false);
@@ -301,6 +307,9 @@ function LeaderboardRow({ driver, rank }: { driver: Driver; rank: number }) {
   );
 }
 
+// ─── Desktop table row ────────────────────────────────────────────────────────
+// TD_V/TD_H mirror the mobile card's px-4 py-3 (16px / 12px).
+// Every <td> uses TD_CELL so vertical rhythm is set in one place.
 const TD_V = 12;
 const TD_CELL: React.CSSProperties = {
   paddingTop: TD_V,
@@ -314,6 +323,7 @@ function DesktopTableRow({ driver, rank }: { driver: Driver; rank: number }) {
 
   return (
     <>
+      {/* Left accent bar — no padding so the bar fills the full row height */}
       <td style={{ width: 4, padding: 0, verticalAlign: "middle" }}>
         <div
           style={{
@@ -328,11 +338,12 @@ function DesktopTableRow({ driver, rank }: { driver: Driver; rank: number }) {
                   ? "#94a3b8"
                   : rank === 3
                     ? "#92400e"
-                    : "#44403c",
+                    : "#FBFBFB",
           }}
         />
       </td>
 
+      {/* Rank */}
       <td
         style={{
           ...TD_CELL,
@@ -349,6 +360,7 @@ function DesktopTableRow({ driver, rank }: { driver: Driver; rank: number }) {
         </span>
       </td>
 
+      {/* Car No */}
       <td style={{ ...TD_CELL, paddingRight: 16, whiteSpace: "nowrap" }}>
         <span
           className="font-black text-xs tracking-widest px-2 py-1 rounded"
@@ -363,6 +375,7 @@ function DesktopTableRow({ driver, rank }: { driver: Driver; rank: number }) {
         </span>
       </td>
 
+      {/* Driver + Team */}
       <td style={{ ...TD_CELL, paddingRight: 24, minWidth: 160 }}>
         <div
           className="font-bold text-sm text-[#716969] leading-tight"
@@ -378,6 +391,7 @@ function DesktopTableRow({ driver, rank }: { driver: Driver; rank: number }) {
         </div>
       </td>
 
+      {/* Checkpoint columns — fixed width, same vertical rhythm as every other cell */}
       {CHECKPOINTS.map((cp) => (
         <td
           key={cp}
@@ -393,6 +407,7 @@ function DesktopTableRow({ driver, rank }: { driver: Driver; rank: number }) {
         </td>
       ))}
 
+      {/* Total CPS */}
       <td
         style={{
           ...TD_CELL,
@@ -429,39 +444,72 @@ function DesktopTableRow({ driver, rank }: { driver: Driver; rank: number }) {
   );
 }
 
+// ─── Desktop table ─────────────────────────────────────────────────────────────
+
 function DesktopTable({ drivers }: { drivers: Driver[] }) {
   return (
+    // Outer wrapper: clips the rounded corners and handles horizontal overflow.
+    // overflow-y must stay visible here so the sticky thead isn't clipped.
     <div
-      className="w-full overflow-x-auto rounded-xl border"
+      className="w-full rounded-xl border"
       style={{
         borderColor: "rgba(217,119,6,0.15)",
-        // background: "#BCABAE",
-        // background: "#FBFBFB",
         // background: "rgba(28,25,23,0.6)",
         backdropFilter: "blur(8px)",
+        // Constrains vertical scroll to this box — page itself won't scroll.
+        overflowX: "auto",
+        overflowY: "auto",
+        maxHeight: "70vh",
       }}
     >
-      <table className="w-full border-separate">
+      {/*
+        border-separate (not border-collapse) is required for position:sticky
+        on <thead> to work — border-collapse merges borders in a way that
+        breaks the stacking context sticky needs.
+        border-spacing:0 keeps the visual appearance identical.
+      */}
+      <table
+        className="w-full"
+        style={{ borderCollapse: "separate", borderSpacing: 0 }}
+      >
         <thead>
           <tr
             style={{
-              borderBottom: "1px solid rgba(217,119,6,0.15)",
+              // Stick to the top of the scrollable container, not the page.
               position: "sticky",
+              top: 0,
+              zIndex: 10,
+              // Solid background so rows don't bleed through when scrolling.
+              background: "#D9D7D7",
+              // Bottom border drawn on each <th> individually below because
+              // border-separate means the <tr> border isn't painted.
             }}
           >
             {/* accent spacer */}
-            <th className="w-1" />
-            <th className="py-3 pr-3 text-left">
+            <th
+              className="w-1"
+              style={{ borderBottom: "1px solid rgba(217,119,6,0.15)" }}
+            />
+            <th
+              className="py-3 pr-3 text-left"
+              style={{ borderBottom: "1px solid rgba(217,119,6,0.15)" }}
+            >
               <span className="text-[9px] font-bold tracking-[0.2em] text-stone-600 uppercase">
                 Rank
               </span>
             </th>
-            <th className="py-3 pr-4 text-left">
+            <th
+              className="py-3 pr-4 text-left"
+              style={{ borderBottom: "1px solid rgba(217,119,6,0.15)" }}
+            >
               <span className="text-[9px] font-bold tracking-[0.2em] text-stone-600 uppercase">
                 Car
               </span>
             </th>
-            <th className="py-3 pr-6 text-left">
+            <th
+              className="py-3 pr-6 text-left"
+              style={{ borderBottom: "1px solid rgba(217,119,6,0.15)" }}
+            >
               <span className="text-[9px] font-bold tracking-[0.2em] text-stone-600 uppercase">
                 Driver / Team
               </span>
@@ -476,6 +524,7 @@ function DesktopTable({ drivers }: { drivers: Driver[] }) {
                   padding: "12px 0 8px",
                   textAlign: "center",
                   verticalAlign: "bottom",
+                  borderBottom: "1px solid rgba(217,119,6,0.15)",
                 }}
               >
                 <div style={{ display: "flex", justifyContent: "center" }}>
@@ -493,7 +542,10 @@ function DesktopTable({ drivers }: { drivers: Driver[] }) {
                 </div>
               </th>
             ))}
-            <th className="py-3 pl-4 pr-2 text-right">
+            <th
+              className="py-3 pl-4 pr-2 text-right"
+              style={{ borderBottom: "1px solid rgba(217,119,6,0.15)" }}
+            >
               <span className="text-[9px] font-bold tracking-[0.2em] text-stone-600 uppercase">
                 CPS
               </span>
@@ -535,6 +587,8 @@ function DesktopTable({ drivers }: { drivers: Driver[] }) {
     </div>
   );
 }
+
+// ─── Main Component ───────────────────────────────────────────────────────────
 
 export default function SafariLeaderBoard() {
   const [drivers, setDrivers] = useState<Driver[]>(() =>
@@ -597,6 +651,7 @@ export default function SafariLeaderBoard() {
       <div className="tread-bar tread-top" />
       <div className="tread-bar tread-bottom" />
 
+      {/* Rhino silhouettes — unchanged */}
       <svg
         className="rhino-ghost"
         style={{ width: 520, height: 340, bottom: "8%", right: "-4%" }}
@@ -649,7 +704,7 @@ export default function SafariLeaderBoard() {
 
       <svg
         className="rhino-ghost rhino-ghost-2"
-        style={{ width: 220, height: 145, top: "12%", left: "2%" }}
+        style={{ width: 220, height: 140, top: "12%", left: "2%" }}
         viewBox="0 0 520 340"
         fill="none"
         xmlns="http://www.w3.org/2000/svg"
@@ -673,7 +728,7 @@ export default function SafariLeaderBoard() {
       </svg>
 
       <div
-        className="min-h-screen text-stone-100 py-6 px-4"
+        className="min-h-screen text-stone-100 py-4 px-4"
         style={{
           background: "#FBFBFB",
           backgroundImage: `
@@ -685,9 +740,10 @@ export default function SafariLeaderBoard() {
           zIndex: 2,
         }}
       >
+        {/* Wider container on desktop to accommodate the checkpoint columns */}
         <div className="max-w-3xl xl:max-w-[95vw] 2xl:max-w-[1600px] mx-auto">
           {/* ── Header — unchanged ── */}
-          <div className="mb-8">
+          <div className="mb-4">
             <div
               className="text-[10px] font-bold tracking-[0.3em] text-amber-600 mb-1 uppercase"
               style={{ fontFamily: "'Oswald', sans-serif" }}
@@ -747,10 +803,12 @@ export default function SafariLeaderBoard() {
             </div>
           </div>
 
+          {/* ── Desktop table (lg+) ── */}
           <div className="hidden lg:block mb-2">
             <DesktopTable drivers={drivers} />
           </div>
 
+          {/* ── Mobile card layout (< lg) — Reorder.Group preserved exactly ── */}
           <div className="lg:hidden">
             <div className="hidden sm:grid grid-cols-[48px_56px_1fr_112px_56px_28px] gap-3 px-4 mb-2">
               {["Rank", "Car", "Driver / Team", "Progress", "CPS", ""].map(
