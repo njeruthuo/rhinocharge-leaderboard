@@ -365,7 +365,7 @@ function DesktopTableRow({ driver, rank }: { driver: Driver; rank: number }) {
 
       <td style={{ ...TD_CELL, paddingRight: 24, minWidth: 160 }}>
         <div
-          className="font-bold text-sm text-stone-100 leading-tight"
+          className="font-bold text-sm text-[#716969] leading-tight"
           style={{
             fontFamily: "'Oswald', sans-serif",
             letterSpacing: "0.04em",
@@ -435,13 +435,20 @@ function DesktopTable({ drivers }: { drivers: Driver[] }) {
       className="w-full overflow-x-auto rounded-xl border"
       style={{
         borderColor: "rgba(217,119,6,0.15)",
-        background: "rgba(28,25,23,0.6)",
+        // background: "#BCABAE",
+        // background: "#FBFBFB",
+        // background: "rgba(28,25,23,0.6)",
         backdropFilter: "blur(8px)",
       }}
     >
-      <table className="w-full border-collapse">
+      <table className="w-full border-separate">
         <thead>
-          <tr style={{ borderBottom: "1px solid rgba(217,119,6,0.15)" }}>
+          <tr
+            style={{
+              borderBottom: "1px solid rgba(217,119,6,0.15)",
+              position: "sticky",
+            }}
+          >
             {/* accent spacer */}
             <th className="w-1" />
             <th className="py-3 pr-3 text-left">
@@ -668,7 +675,7 @@ export default function SafariLeaderBoard() {
       <div
         className="min-h-screen text-stone-100 py-6 px-4"
         style={{
-          background: "#1C1917",
+          background: "#FBFBFB",
           backgroundImage: `
             repeating-linear-gradient(0deg, transparent, transparent 39px, rgba(217,119,6,0.025) 39px, rgba(217,119,6,0.025) 40px),
             repeating-linear-gradient(90deg, transparent, transparent 39px, rgba(217,119,6,0.025) 39px, rgba(217,119,6,0.025) 40px),
@@ -688,7 +695,7 @@ export default function SafariLeaderBoard() {
               Rhino Charge · Edition 2026
             </div>
             <div
-              className="text-3xl sm:text-4xl font-black text-stone-100 leading-none mb-1"
+              className="text-3xl sm:text-4xl font-black text-[#716969] leading-none mb-1"
               style={{
                 fontFamily: "'Oswald', sans-serif",
                 letterSpacing: "0.04em",
