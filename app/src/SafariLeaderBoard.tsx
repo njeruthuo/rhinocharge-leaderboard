@@ -1,21 +1,63 @@
-import { useState, useCallback } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { motion, AnimatePresence, Reorder } from "framer-motion";
-import type { Driver } from "./types";
+import type { CheckPoint, Driver } from "./types";
 import { CHECKPOINTS, INITIAL_DRIVERS, type CheckpointName } from "./data";
+import {
+  useGetCheckPointsMutation,
+  useGetPoisMutation,
+  useGetVehicleListQuery,
+} from "./state/rhinoApi";
+import { getParsedTime } from "./utils";
 
-function getRankStyle(rank: number): string {
-  if (rank === 1) return "text-amber-400";
-  if (rank === 2) return "text-slate-300";
-  if (rank === 3) return "text-amber-700";
-  return "text-stone-500";
-}
+const useCheckPoints = () => {
+  const [getPois, { data }] = useGetPoisMutation();
 
-function getRankLabel(rank: number): string {
-  if (rank === 1) return "P1";
-  if (rank === 2) return "P2";
-  if (rank === 3) return "P3";
-  return `P${rank}`;
-}
+  useEffect(() => {
+    getPois("");
+  }, [getPois]);
+
+  return data?.map((item) => item.town_name.toUpperCase()) || CHECKPOINTS;
+};
+
+const useDriverList = () => {
+  const { data: VehicleList, isLoading: LoadingVehicleList } =
+    useGetVehicleListQuery();
+  const [getCheckPoints, { data: CheckPoints, isLoading: LoadingCheckPoints }] =
+    useGetCheckPointsMutation();
+
+  useEffect(() => {
+    getCheckPoints();
+  }, [getCheckPoints]);
+
+  if (
+    !(LoadingVehicleList || LoadingCheckPoints) &&
+    VehicleList &&
+    CheckPoints
+  ) {
+    return VehicleList?.map((item, index) => {
+      const checkPointList = CheckPoints.filter(
+        (checkpoint) => checkpoint.vehicle === item.asset_name,
+      );
+
+      const checkPoints = checkPointList.map((checkpoint) => ({
+        point: checkpoint?.poi_name?.toUpperCase(),
+        odometer: checkpoint?.start_odo,
+        time: getParsedTime(checkpoint?.start_time),
+        next: "",
+      }));
+
+      return {
+        id: index,
+        carNo: item?.asset_name,
+        entrantName: item?.last_driver,
+        totalCps: (checkPointList || []).length,
+        teamName: "",
+        checkpoints: checkPoints,
+      };
+    });
+  }
+  return [];
+};
 
 function getCheckpointStatus(
   value: string,
@@ -24,22 +66,6 @@ function getCheckpointStatus(
   if (value === "START") return "completed";
   return "active";
 }
-
-function shuffleDrivers(drivers: Driver[]): Driver[] {
-  return drivers
-    .map((d) => {
-      const cpKeys = Object.keys(d.checkpoints);
-      const completedCount = Math.floor(Math.random() * (cpKeys.length + 1));
-      const newCheckpoints: Record<string, string> = {};
-      cpKeys.forEach((k, i) => {
-        newCheckpoints[k] = i < completedCount ? "START" : "";
-      });
-      return { ...d, checkpoints: newCheckpoints, totalCps: completedCount };
-    })
-    .sort((a, b) => b.totalCps - a.totalCps);
-}
-
-// ─── Shared sub-components ────────────────────────────────────────────────────
 
 function CheckpointBadge({
   name,
@@ -93,8 +119,6 @@ function CheckpointBadge({
   );
 }
 
-// ─── Desktop checkpoint cell ──────────────────────────────────────────────────
-
 function CheckpointCell({ value }: { value: string }) {
   const status = getCheckpointStatus(value);
   if (status === "completed")
@@ -139,12 +163,13 @@ function CheckpointCell({ value }: { value: string }) {
   );
 }
 
-// ─── Mobile card layout (existing) ───────────────────────────────────────────
-
 function LeaderboardRow({ driver, rank }: { driver: Driver; rank: number }) {
   const [isOpen, setIsOpen] = useState(false);
-  const totalCheckpoints = CHECKPOINTS.length;
+  const checkpoints = useCheckPoints();
+  const totalCheckpoints = checkpoints.length;
   const progress = Math.round((driver.totalCps / totalCheckpoints) * 100);
+
+  console.log(driver, "driver");
 
   return (
     <motion.div layout className="relative">
@@ -183,11 +208,6 @@ function LeaderboardRow({ driver, rank }: { driver: Driver; rank: number }) {
             }}
           >
             <div
-              className={`font-black text-lg w-8 shrink-0 font-mono ${getRankStyle(rank)}`}
-            >
-              {getRankLabel(rank)}
-            </div>
-            <div
               className="shrink-0 font-black text-xs tracking-widest px-2 py-1 rounded"
               style={{
                 background: "rgba(217,119,6,0.15)",
@@ -196,7 +216,7 @@ function LeaderboardRow({ driver, rank }: { driver: Driver; rank: number }) {
                 fontFamily: "'Oswald', sans-serif",
               }}
             >
-              #{driver.carNo}
+              {driver.carNo}
             </div>
             <div className="flex-1 min-w-0">
               <div
@@ -290,11 +310,11 @@ function LeaderboardRow({ driver, rank }: { driver: Driver; rank: number }) {
                   </span>
                 </div>
                 <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-2">
-                  {CHECKPOINTS.map((cp) => (
+                  {checkpoints?.map((cp: CheckPoint) => (
                     <CheckpointBadge
-                      key={cp}
-                      name={cp}
-                      value={driver.checkpoints[cp] ?? ""}
+                      key={cp.point.toLowerCase()}
+                      name={cp.point.toLowerCase()}
+                      value={driver.checkpoints[cp.point.toLowerCase()] ?? ""}
                     />
                   ))}
                 </div>
@@ -307,9 +327,6 @@ function LeaderboardRow({ driver, rank }: { driver: Driver; rank: number }) {
   );
 }
 
-// ─── Desktop table row ────────────────────────────────────────────────────────
-// TD_V/TD_H mirror the mobile card's px-4 py-3 (16px / 12px).
-// Every <td> uses TD_CELL so vertical rhythm is set in one place.
 const TD_V = 12;
 const TD_CELL: React.CSSProperties = {
   paddingTop: TD_V,
@@ -318,7 +335,8 @@ const TD_CELL: React.CSSProperties = {
 };
 
 function DesktopTableRow({ driver, rank }: { driver: Driver; rank: number }) {
-  const totalCheckpoints = CHECKPOINTS.length;
+  const checkpoints = useCheckPoints();
+  const totalCheckpoints = checkpoints.length;
   const progress = Math.round((driver.totalCps / totalCheckpoints) * 100);
 
   return (
@@ -343,27 +361,17 @@ function DesktopTableRow({ driver, rank }: { driver: Driver; rank: number }) {
         />
       </td>
 
-      {/* Rank */}
       <td
         style={{
           ...TD_CELL,
-          paddingLeft: 12,
-          paddingRight: 12,
+          paddingRight: 16,
           whiteSpace: "nowrap",
+          paddingTop: 3,
+          paddingBottom: 3,
         }}
       >
         <span
-          className={`font-black text-base font-mono ${getRankStyle(rank)}`}
-          style={{ fontFamily: "'Oswald', sans-serif" }}
-        >
-          {getRankLabel(rank)}
-        </span>
-      </td>
-
-      {/* Car No */}
-      <td style={{ ...TD_CELL, paddingRight: 16, whiteSpace: "nowrap" }}>
-        <span
-          className="font-black text-xs tracking-widest px-2 py-1 rounded"
+          className="font-black text-xs tracking-widest px-2 rounded py-3 pr-3 "
           style={{
             background: "rgba(217,119,6,0.15)",
             color: "#D97706",
@@ -391,8 +399,7 @@ function DesktopTableRow({ driver, rank }: { driver: Driver; rank: number }) {
         </div>
       </td>
 
-      {/* Checkpoint columns — fixed width, same vertical rhythm as every other cell */}
-      {CHECKPOINTS.map((cp) => (
+      {checkpoints.map((cp) => (
         <td
           key={cp}
           style={{
@@ -444,8 +451,6 @@ function DesktopTableRow({ driver, rank }: { driver: Driver; rank: number }) {
   );
 }
 
-// ─── Desktop table ─────────────────────────────────────────────────────────────
-
 function DesktopTable({ drivers }: { drivers: Driver[] }) {
   return (
     // Outer wrapper: clips the rounded corners and handles horizontal overflow.
@@ -469,35 +474,27 @@ function DesktopTable({ drivers }: { drivers: Driver[] }) {
         border-spacing:0 keeps the visual appearance identical.
       */}
       <table
-        className="w-full"
-        style={{ borderCollapse: "separate", borderSpacing: 0 }}
+        className="w-full "
+        style={{
+          borderCollapse: "separate",
+          borderSpacing: 0,
+          scrollbarWidth: "none",
+        }}
       >
         <thead>
           <tr
             style={{
-              // Stick to the top of the scrollable container, not the page.
               position: "sticky",
               top: 0,
               zIndex: 10,
-              // Solid background so rows don't bleed through when scrolling.
               background: "#D9D7D7",
-              // Bottom border drawn on each <th> individually below because
-              // border-separate means the <tr> border isn't painted.
             }}
           >
-            {/* accent spacer */}
             <th
               className="w-1"
               style={{ borderBottom: "1px solid rgba(217,119,6,0.15)" }}
             />
-            <th
-              className="py-3 pr-3 text-left"
-              style={{ borderBottom: "1px solid rgba(217,119,6,0.15)" }}
-            >
-              <span className="text-[9px] font-bold tracking-[0.2em] text-stone-600 uppercase">
-                Rank
-              </span>
-            </th>
+
             <th
               className="py-3 pr-4 text-left"
               style={{ borderBottom: "1px solid rgba(217,119,6,0.15)" }}
@@ -514,7 +511,7 @@ function DesktopTable({ drivers }: { drivers: Driver[] }) {
                 Driver / Team
               </span>
             </th>
-            {CHECKPOINTS.map((cp) => (
+            {useCheckPoints().map((cp) => (
               <th
                 key={cp}
                 style={{
@@ -588,23 +585,13 @@ function DesktopTable({ drivers }: { drivers: Driver[] }) {
   );
 }
 
-// ─── Main Component ───────────────────────────────────────────────────────────
-
 export default function SafariLeaderBoard() {
-  const [drivers, setDrivers] = useState<Driver[]>(() =>
-    [...INITIAL_DRIVERS].sort((a, b) => b.totalCps - a.totalCps),
-  );
-  const [isShuffling, setIsShuffling] = useState(false);
-  const [shuffleCount, setShuffleCount] = useState(0);
+  const data = useDriverList();
 
-  const handleShuffle = useCallback(() => {
-    setIsShuffling(true);
-    setTimeout(() => {
-      setDrivers(shuffleDrivers(drivers));
-      setShuffleCount((c) => c + 1);
-      setIsShuffling(false);
-    }, 150);
-  }, [drivers]);
+  const drivers = useMemo(() => {
+    const listToSort = data || INITIAL_DRIVERS;
+    return [...listToSort].sort((a, b) => b.totalCps - a.totalCps);
+  }, [data]);
 
   return (
     <>
@@ -651,7 +638,6 @@ export default function SafariLeaderBoard() {
       <div className="tread-bar tread-top" />
       <div className="tread-bar tread-bottom" />
 
-      {/* Rhino silhouettes — unchanged */}
       <svg
         className="rhino-ghost"
         style={{ width: 520, height: 340, bottom: "8%", right: "-4%" }}
@@ -740,98 +726,58 @@ export default function SafariLeaderBoard() {
           zIndex: 2,
         }}
       >
-        {/* Wider container on desktop to accommodate the checkpoint columns */}
         <div className="max-w-3xl xl:max-w-[95vw] 2xl:max-w-[1600px] mx-auto">
-          {/* ── Header — unchanged ── */}
-          <div className="mb-4">
-            <div
-              className="text-[10px] font-bold tracking-[0.3em] text-amber-600 mb-1 uppercase"
-              style={{ fontFamily: "'Oswald', sans-serif" }}
-            >
-              Rhino Charge · Edition 2026
-            </div>
-            <div
-              className="text-3xl sm:text-4xl font-black text-[#716969] leading-none mb-1"
-              style={{
-                fontFamily: "'Oswald', sans-serif",
-                letterSpacing: "0.04em",
-              }}
-            >
-              Rhino Charge Kenya
-            </div>
-            <div className="text-stone-500 text-xs tracking-widest uppercase">
-              Ol Pejeta Conservancy — Overall Leaderboard
+          <div className="mb-4 flex place-content-start">
+            <div>
+              <div
+                className="text-2xl sm:text-4xl font-black text-[#716969] leading-none mb-1"
+                style={{
+                  fontFamily: "'Oswald', sans-serif",
+                  letterSpacing: "0.04em",
+                }}
+              >
+                Rhino Charge Kenya
+              </div>
+              <div className="text-stone-500 text-xs tracking-widest uppercase">
+                Ol Pejeta Conservancy — Overall Leaderboard
+              </div>
             </div>
 
-            <div className="flex items-center gap-3 mt-4 flex-wrap">
+            <div className="flex items-center gap-3 flex-wrap ml-auto">
               <div className="flex items-center gap-2 px-3 py-1.5 rounded-full border border-amber-700/40 bg-amber-900/20">
                 <span className="w-2 h-2 rounded-full bg-amber-500 animate-pulse" />
                 <span className="text-[10px] font-bold tracking-widest text-amber-500 uppercase">
                   Live
                 </span>
               </div>
-
-              <button
-                onClick={handleShuffle}
-                disabled={isShuffling}
-                className="flex items-center gap-2 px-4 py-1.5 rounded-lg border font-bold text-xs tracking-widest uppercase transition-all duration-150 disabled:opacity-50"
-                style={{
-                  fontFamily: "'Oswald', sans-serif",
-                  borderColor: "rgba(217,119,6,0.4)",
-                  color: "#D97706",
-                  background: isShuffling
-                    ? "rgba(217,119,6,0.2)"
-                    : "transparent",
-                  letterSpacing: "0.12em",
-                }}
-              >
-                <motion.span
-                  animate={{ rotate: isShuffling ? 360 : 0 }}
-                  transition={{ duration: 0.4 }}
-                  className="inline-block"
-                >
-                  ⚡
-                </motion.span>
-                {isShuffling ? "Updating..." : "Shuffle Stage"}
-              </button>
-
-              {shuffleCount > 0 && (
-                <span className="text-[10px] text-stone-600">
-                  Update #{shuffleCount}
-                </span>
-              )}
             </div>
           </div>
 
-          {/* ── Desktop table (lg+) ── */}
           <div className="hidden lg:block mb-2">
-            <DesktopTable drivers={drivers} />
+            <DesktopTable drivers={drivers || []} />
           </div>
 
-          {/* ── Mobile card layout (< lg) — Reorder.Group preserved exactly ── */}
           <div className="lg:hidden">
             <div className="hidden sm:grid grid-cols-[48px_56px_1fr_112px_56px_28px] gap-3 px-4 mb-2">
-              {["Rank", "Car", "Driver / Team", "Progress", "CPS", ""].map(
-                (h) => (
-                  <div
-                    key={h}
-                    className="text-[9px] font-bold tracking-[0.2em] text-stone-600 uppercase"
-                  >
-                    {h}
-                  </div>
-                ),
-              )}
+              {["Car", "Driver / Team", "Progress", "CPS", ""].map((h) => (
+                <div
+                  key={h}
+                  className="text-[9px] font-bold tracking-[0.2em] text-stone-600 uppercase"
+                >
+                  {h}
+                </div>
+              ))}
             </div>
 
             <Reorder.Group
               axis="y"
-              values={drivers}
-              onReorder={setDrivers}
+              values={drivers || []}
+              onReorder={() => {}}
               className="flex flex-col gap-2"
               as="div"
             >
               <AnimatePresence>
-                {drivers.map((driver, index) => (
+                {drivers?.map((driver, index) => (
                   <Reorder.Item
                     key={driver.id}
                     value={driver}
@@ -850,11 +796,11 @@ export default function SafariLeaderBoard() {
             </Reorder.Group>
           </div>
 
-          {/* ── Footer ── */}
           <div className="mt-8 flex items-center gap-4 flex-wrap">
             <div className="h-px flex-1 bg-stone-800" />
             <span className="text-[9px] tracking-widest text-stone-700 uppercase">
-              {CHECKPOINTS.length} Checkpoints · {drivers.length} Entrants
+              {useCheckPoints().length} Checkpoints · {(drivers || []).length}{" "}
+              Entrants
             </span>
             <div className="h-px flex-1 bg-stone-800" />
           </div>
