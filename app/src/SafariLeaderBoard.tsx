@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo, useRef } from "react";
 import { motion, AnimatePresence, Reorder } from "framer-motion";
 import type { CheckPoint, Driver } from "./types";
-import { CHECKPOINTS, INITIAL_DRIVERS } from "./data";
+import { CHECKPOINTS } from "./data";
 import {
   useGetCheckPointsMutation,
   useGetVehicleListQuery,
@@ -218,7 +218,7 @@ function LeaderboardRow({
 }: {
   driver: Driver;
   rank: number;
-  checkpoints: string[];
+  checkpoints: CheckPoint[];
 }) {
   const [isOpen, setIsOpen] = useState(false);
   const totalCheckpoints = checkpoints.length;
@@ -641,8 +641,7 @@ export default function SafariLeaderBoard() {
   const data = useDriverList();
 
   const drivers = useMemo(() => {
-    const listToSort = data || INITIAL_DRIVERS;
-    return [...listToSort].sort((a, b) => b.totalCps - a.totalCps);
+    return [...data].sort((a, b) => b.totalCps - a.totalCps);
   }, [data]);
 
   return (
