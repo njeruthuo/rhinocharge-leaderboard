@@ -1,22 +1,18 @@
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useRef } from "react";
 import { motion, AnimatePresence, Reorder } from "framer-motion";
 import type { CheckPoint, Driver } from "./types";
-import { CHECKPOINTS, INITIAL_DRIVERS, type CheckpointName } from "./data";
+import { CHECKPOINTS, INITIAL_DRIVERS } from "./data";
 import {
   useGetCheckPointsMutation,
-  useGetPoisMutation,
   useGetVehicleListQuery,
 } from "./state/rhinoApi";
 import { getParsedTime } from "./utils";
 
-const useCheckPoints = () => {
-  const [getPois, { data }] = useGetPoisMutation();
-
-  useEffect(() => {
-    getPois("");
-  }, [getPois]);
-
-  return data?.map((item) => item.town_name.toUpperCase()) || CHECKPOINTS;
+const TD_V = 12;
+const TD_CELL: React.CSSProperties = {
+  paddingTop: TD_V,
+  paddingBottom: TD_V,
+  verticalAlign: "middle",
 };
 
 const useDriverList = () => {
@@ -24,10 +20,13 @@ const useDriverList = () => {
     useGetVehicleListQuery();
   const [getCheckPoints, { data: CheckPoints, isLoading: LoadingCheckPoints }] =
     useGetCheckPointsMutation();
+  const fired = useRef(false);
 
   useEffect(() => {
+    if (fired.current) return;
+    fired.current = true;
     getCheckPoints();
-  }, [getCheckPoints]);
+  }, []); // empty — fire exactly once
 
   if (
     !(LoadingVehicleList || LoadingCheckPoints) &&
@@ -60,21 +59,16 @@ const useDriverList = () => {
 };
 
 function getCheckpointStatus(
-  value: string,
+  cp: CheckPoint,
 ): "completed" | "active" | "pending" {
-  if (!value) return "pending";
-  if (value === "START") return "completed";
-  return "active";
+  if (cp?.next && cp?.next !== "") return "active";
+  if (cp?.time && cp?.time !== "") return "completed";
+  return "pending";
 }
 
-function CheckpointBadge({
-  name,
-  value,
-}: {
-  name: CheckpointName;
-  value: string;
-}) {
-  const status = getCheckpointStatus(value);
+function CheckpointBadge({ cp }: { cp: CheckPoint }) {
+  const status = getCheckpointStatus(cp);
+
   const badgeStyle =
     status === "completed"
       ? "bg-amber-900/40 border-amber-600/50 text-amber-300"
@@ -82,94 +76,153 @@ function CheckpointBadge({
         ? "bg-sky-900/40 border-sky-500/50 text-sky-300"
         : "bg-stone-800/50 border-stone-700/40 text-stone-600";
 
-  const icon =
-    status === "completed" ? (
-      <svg className="w-3 h-3" viewBox="0 0 12 12" fill="currentColor">
-        <path
-          d="M10 3L5 8.5 2 5.5"
-          stroke="currentColor"
-          strokeWidth="1.5"
-          fill="none"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        />
-      </svg>
-    ) : status === "active" ? (
-      <span className="w-2 h-2 rounded-full bg-sky-400 animate-pulse inline-block" />
-    ) : (
-      <span className="w-2 h-2 rounded-full bg-stone-600 inline-block" />
-    );
-
   return (
-    <div className={`flex flex-col gap-1 border rounded-md p-2 ${badgeStyle}`}>
+    <div
+      className={`flex flex-col gap-1 border rounded-md p-2 transition-all ${badgeStyle}`}
+    >
       <span className="text-[9px] font-bold tracking-widest uppercase leading-none opacity-70 truncate">
-        {name}
+        {cp.point}
       </span>
-      <div className="flex items-center gap-1">
-        {icon}
-        <span className="text-[10px] font-semibold tracking-wider">
-          {status === "completed"
-            ? "Done"
-            : status === "active"
-              ? "Active"
-              : "—"}
-        </span>
+
+      <div className="flex flex-col gap-0.5 mt-1">
+        {status === "completed" ? (
+          <>
+            <span className="text-[10px] font-bold">{cp.time}</span>
+            <span className="text-[8px] opacity-60 font-mono">
+              {cp.odometer} KM
+            </span>
+          </>
+        ) : status === "active" ? (
+          <div className="flex items-center gap-1.5">
+            <span className="w-1.5 h-1.5 rounded-full bg-sky-400 animate-pulse" />
+            <span className="text-[10px] font-bold italic">NEXT</span>
+          </div>
+        ) : (
+          <span className="text-[10px] opacity-30">—</span>
+        )}
       </div>
     </div>
   );
 }
 
-function CheckpointCell({ value }: { value: string }) {
-  const status = getCheckpointStatus(value);
-  if (status === "completed")
+function CheckpointCell({ cp }: { cp: CheckPoint }) {
+  const status = getCheckpointStatus(cp);
+
+  if (status === "completed") {
     return (
-      <div className="flex items-center justify-center">
-        <div className="w-6 h-6 rounded-full bg-amber-900/50 border border-amber-600/40 flex items-center justify-center">
-          <svg className="w-3 h-3 text-amber-400" viewBox="0 0 12 12">
-            <path
-              d="M2 6l3 3 5-5"
-              stroke="currentColor"
-              strokeWidth="1.5"
-              fill="none"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            />
-          </svg>
+      <div className="flex flex-col items-center justify-center min-w-[40px] gap-0.5">
+        {/* Time Stamp - High Visibility */}
+        <div className="bg-amber-500/10 border border-amber-600/30 rounded px-1 py-0.5 w-full">
+          <span className="text-amber-500 font-black text-[9px] block leading-none text-center">
+            {cp.time.replace(/\s?[AP]M/, "")}{" "}
+            {/* Stripping AM/PM to save space if needed */}
+          </span>
         </div>
+
+        {/* Odometer - Secondary Data */}
+        <div className="w-full">
+          <span className="text-stone-400 font-mono text-[8px] block leading-none text-center opacity-80">
+            {cp.odometer}
+          </span>
+        </div>
+
+        {/* Success Indicator Line */}
+        <div className="w-full h-0.5 bg-amber-600/40 rounded-full mt-0.5" />
       </div>
     );
-  if (status === "active")
+  }
+
+  if (status === "active") {
     return (
-      <div className="flex flex-col items-center justify-center gap-0.5">
-        <span className="w-2 h-2 rounded-full bg-sky-400 animate-pulse" />
-        <span
-          className="text-[8px] font-bold tracking-wider uppercase"
-          style={{ color: "#38bdf8", lineHeight: 1 }}
-        >
-          {/* Active */}
+      <div className="flex flex-col items-center justify-center py-2">
+        <div className="relative">
+          {/* Pulsing ring for the "Live" vehicle location */}
+          <span className="absolute inset-0 rounded-full bg-sky-400 animate-ping opacity-20" />
+          <div className="w-3 h-3 rounded-full bg-sky-500 border border-sky-300 flex items-center justify-center shadow-[0_0_12px_#38bdf8]">
+            <span className="w-1 h-1 rounded-full bg-white" />
+          </div>
+        </div>
+        <span className="text-sky-400 text-[7px] font-black mt-1 tracking-tighter">
+          NEXT
         </span>
       </div>
     );
+  }
+
+  // Pending State
   return (
-    <div className="flex flex-col items-center justify-center gap-0.5">
-      <span className="w-2 h-2 rounded-full bg-stone-600" />
-      <span
-        className="text-[8px] font-bold tracking-wider uppercase"
-        style={{ color: "#57534e", lineHeight: 1 }}
-      >
-        {/* Pending */}
-      </span>
+    <div className="flex items-center justify-center opacity-20">
+      <div className="w-1 h-4 bg-stone-700 rounded-full" />
     </div>
   );
 }
 
-function LeaderboardRow({ driver, rank }: { driver: Driver; rank: number }) {
+// function CheckpointCell({ cp }: { cp: CheckPoint }) {
+//   const status = getCheckpointStatus(cp);
+
+//   if (status === "completed") {
+//     return (
+//       <div className="flex flex-col items-center justify-center group relative">
+//         <div className="w-6 h-6 rounded-full bg-amber-900/50 border border-amber-600/40 flex items-center justify-center shadow-[0_0_10px_rgba(217,119,6,0.2)]">
+//           {/* {cp.time} • {cp.odometer}km */}
+
+//           <span className="bottom-full mb-2 bg-stone-900 text-amber-200 text-[8px] p-1 rounded border border-amber-600 z-50 whitespace-nowrap">
+//             {cp.time}
+//           </span>
+//           <span className=" absolute bottom-full mb-2 bg-stone-900 text-amber-200 text-[8px] p-1 rounded border border-amber-600 z-50 whitespace-nowrap">
+//             {cp.odometer}
+//           </span>
+//           {/* <svg
+//             className="w-3 h-3 text-amber-400"
+//             viewBox="0 0 12 12"
+//             fill="none"
+//             stroke="currentColor"
+//           >
+//             <path
+//               d="M2 6l3 3 5-5"
+//               strokeWidth="2"
+//               strokeLinecap="round"
+//               strokeLinejoin="round"
+//             />
+//           </svg> */}
+//         </div>
+//         {/* Tooltip on hover */}
+//         {/* <div className="hidden group-hover:block absolute bottom-full mb-2 bg-stone-900 text-amber-200 text-[8px] p-1 rounded border border-amber-600 z-50 whitespace-nowrap">
+//           {cp.time} • {cp.odometer}km
+//         </div> */}
+//       </div>
+//     );
+//   }
+
+//   if (status === "active") {
+//     return (
+//       <div className="flex items-center justify-center">
+//         <div className="w-4 h-4 rounded-full bg-sky-500/20 border border-sky-400/50 flex items-center justify-center">
+//           <span className="w-2 h-2 rounded-full bg-sky-400 animate-pulse shadow-[0_0_8px_#38bdf8]" />
+//         </div>
+//       </div>
+//     );
+//   }
+
+//   return (
+//     <div className="flex items-center justify-center">
+//       <div className="w-1.5 h-1.5 rounded-full bg-stone-700/50" />
+//     </div>
+//   );
+// }
+
+function LeaderboardRow({
+  driver,
+  rank,
+  checkpoints,
+}: {
+  driver: Driver;
+  rank: number;
+  checkpoints: string[];
+}) {
   const [isOpen, setIsOpen] = useState(false);
-  const checkpoints = useCheckPoints();
   const totalCheckpoints = checkpoints.length;
   const progress = Math.round((driver.totalCps / totalCheckpoints) * 100);
-
-  console.log(driver, "driver");
 
   return (
     <motion.div layout className="relative">
@@ -191,7 +244,6 @@ function LeaderboardRow({ driver, rank }: { driver: Driver; rank: number }) {
             }}
           />
         )}
-
         <button
           onClick={() => setIsOpen((p) => !p)}
           className="w-full text-left"
@@ -309,13 +361,18 @@ function LeaderboardRow({ driver, rank }: { driver: Driver; rank: number }) {
                     {driver.totalCps} of {totalCheckpoints} completed
                   </span>
                 </div>
-                <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-2">
-                  {checkpoints?.map((cp: CheckPoint) => (
+                {/* <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-2">
+                  {checkpoints.map((cp: string) => (
                     <CheckpointBadge
-                      key={cp.point.toLowerCase()}
-                      name={cp.point.toLowerCase()}
+                      key={cp.toLowerCase()}
+                      name={cp.toLowerCase() as CheckpointName}
                       value={driver.checkpoints[cp.point.toLowerCase()] ?? ""}
                     />
+                  ))}
+                </div> */}
+                <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-2">
+                  {driver.checkpoints.map((cp: CheckPoint) => (
+                    <CheckpointBadge key={`${cp.point}-${cp.time}`} cp={cp} />
                   ))}
                 </div>
               </div>
@@ -327,21 +384,22 @@ function LeaderboardRow({ driver, rank }: { driver: Driver; rank: number }) {
   );
 }
 
-const TD_V = 12;
-const TD_CELL: React.CSSProperties = {
-  paddingTop: TD_V,
-  paddingBottom: TD_V,
-  verticalAlign: "middle",
-};
+function DesktopTableRow({
+  driver,
+  rank,
+  checkpoints,
+}: {
+  driver: Driver;
+  rank: number;
+  checkpoints: CheckPoint[];
+}) {
+  // console.log(JSON.stringify(checkpoints), "checkpoints");
 
-function DesktopTableRow({ driver, rank }: { driver: Driver; rank: number }) {
-  const checkpoints = useCheckPoints();
   const totalCheckpoints = checkpoints.length;
   const progress = Math.round((driver.totalCps / totalCheckpoints) * 100);
 
   return (
     <>
-      {/* Left accent bar — no padding so the bar fills the full row height */}
       <td style={{ width: 4, padding: 0, verticalAlign: "middle" }}>
         <div
           style={{
@@ -360,7 +418,6 @@ function DesktopTableRow({ driver, rank }: { driver: Driver; rank: number }) {
           }}
         />
       </td>
-
       <td
         style={{
           ...TD_CELL,
@@ -371,7 +428,7 @@ function DesktopTableRow({ driver, rank }: { driver: Driver; rank: number }) {
         }}
       >
         <span
-          className="font-black text-xs tracking-widest px-2 rounded py-3 pr-3 "
+          className="font-black text-xs tracking-widest px-2 rounded py-3 pr-3"
           style={{
             background: "rgba(217,119,6,0.15)",
             color: "#D97706",
@@ -382,8 +439,6 @@ function DesktopTableRow({ driver, rank }: { driver: Driver; rank: number }) {
           #{driver.carNo}
         </span>
       </td>
-
-      {/* Driver + Team */}
       <td style={{ ...TD_CELL, paddingRight: 24, minWidth: 160 }}>
         <div
           className="font-bold text-sm text-[#716969] leading-tight"
@@ -398,23 +453,26 @@ function DesktopTableRow({ driver, rank }: { driver: Driver; rank: number }) {
           {driver.teamName}
         </div>
       </td>
+      {CHECKPOINTS.map((cpName, index) => {
+        // Find if this driver has data for this specific checkpoint name
+        const cpData = driver.checkpoints.find(
+          (c) => c.point === cpName.toUpperCase(),
+        ) || {
+          point: cpName,
+          odometer: 0,
+          time: "",
+          next: "",
+        };
 
-      {checkpoints.map((cp) => (
-        <td
-          key={cp}
-          style={{
-            ...TD_CELL,
-            width: 36,
-            minWidth: 36,
-            maxWidth: 36,
-            textAlign: "center",
-          }}
-        >
-          <CheckpointCell value={driver.checkpoints[cp] ?? ""} />
-        </td>
-      ))}
-
-      {/* Total CPS */}
+        return (
+          <td
+            key={index}
+            style={{ ...TD_CELL, width: 36, textAlign: "center" }}
+          >
+            <CheckpointCell cp={cpData} />
+          </td>
+        );
+      })}
       <td
         style={{
           ...TD_CELL,
@@ -434,7 +492,7 @@ function DesktopTableRow({ driver, rank }: { driver: Driver; rank: number }) {
           >
             {driver.totalCps}
             <span className="text-[10px] text-stone-600 font-normal ml-1">
-              /{totalCheckpoints}
+              /{CHECKPOINTS.length}
             </span>
           </span>
           <div className="w-16 h-0.5 rounded-full bg-stone-800">
@@ -453,28 +511,18 @@ function DesktopTableRow({ driver, rank }: { driver: Driver; rank: number }) {
 
 function DesktopTable({ drivers }: { drivers: Driver[] }) {
   return (
-    // Outer wrapper: clips the rounded corners and handles horizontal overflow.
-    // overflow-y must stay visible here so the sticky thead isn't clipped.
     <div
       className="w-full rounded-xl border"
       style={{
         borderColor: "rgba(217,119,6,0.15)",
-        // background: "rgba(28,25,23,0.6)",
         backdropFilter: "blur(8px)",
-        // Constrains vertical scroll to this box — page itself won't scroll.
         overflowX: "auto",
         overflowY: "auto",
         maxHeight: "70vh",
       }}
     >
-      {/*
-        border-separate (not border-collapse) is required for position:sticky
-        on <thead> to work — border-collapse merges borders in a way that
-        breaks the stacking context sticky needs.
-        border-spacing:0 keeps the visual appearance identical.
-      */}
       <table
-        className="w-full "
+        className="w-full"
         style={{
           borderCollapse: "separate",
           borderSpacing: 0,
@@ -494,7 +542,6 @@ function DesktopTable({ drivers }: { drivers: Driver[] }) {
               className="w-1"
               style={{ borderBottom: "1px solid rgba(217,119,6,0.15)" }}
             />
-
             <th
               className="py-3 pr-4 text-left"
               style={{ borderBottom: "1px solid rgba(217,119,6,0.15)" }}
@@ -511,7 +558,8 @@ function DesktopTable({ drivers }: { drivers: Driver[] }) {
                 Driver / Team
               </span>
             </th>
-            {useCheckPoints().map((cp) => (
+            {/* ✅ plain array.map — no hook */}
+            {CHECKPOINTS.map((cp) => (
               <th
                 key={cp}
                 style={{
@@ -574,7 +622,11 @@ function DesktopTable({ drivers }: { drivers: Driver[] }) {
                   }}
                   className="hover:bg-white/[0.02] transition-colors duration-100"
                 >
-                  <DesktopTableRow driver={driver} rank={rank} />
+                  <DesktopTableRow
+                    driver={driver}
+                    rank={rank}
+                    checkpoints={driver.checkpoints}
+                  />
                 </motion.tr>
               );
             })}
@@ -598,7 +650,6 @@ export default function SafariLeaderBoard() {
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Oswald:wght@400;600;700&display=swap');
         body { margin: 0; background: #1C1917; }
-
         @keyframes rhino-drift {
           0%   { transform: translateX(0px) translateY(0px) rotate(-8deg); opacity: 0.028; }
           50%  { transform: translateX(6px) translateY(-4px) rotate(-8deg); opacity: 0.038; }
@@ -608,36 +659,21 @@ export default function SafariLeaderBoard() {
           0%   { background-position: 0 0; }
           100% { background-position: 72px 0; }
         }
-        .rhino-ghost {
-          position: fixed; pointer-events: none; z-index: 0;
-          animation: rhino-drift 9s ease-in-out infinite;
-        }
+        .rhino-ghost { position: fixed; pointer-events: none; z-index: 0; animation: rhino-drift 9s ease-in-out infinite; }
         .rhino-ghost-2 { animation-delay: -4.5s; animation-duration: 12s; }
         .tread-bar {
           position: fixed; left: 0; right: 0; height: 7px; z-index: 1; pointer-events: none;
-          background-image: repeating-linear-gradient(
-            90deg,
-            #D97706 0px, #D97706 18px,
-            #b45309 18px, #b45309 22px,
-            transparent 22px, transparent 30px,
-            #92400e 30px, #92400e 34px,
-            transparent 34px, transparent 36px,
-            #D97706 36px, #D97706 54px,
-            transparent 54px, transparent 72px
-          );
-          animation: tread-scroll 2.4s linear infinite;
-          opacity: 0.55;
+          background-image: repeating-linear-gradient(90deg, #D97706 0px, #D97706 18px, #b45309 18px, #b45309 22px, transparent 22px, transparent 30px, #92400e 30px, #92400e 34px, transparent 34px, transparent 36px, #D97706 36px, #D97706 54px, transparent 54px, transparent 72px);
+          animation: tread-scroll 2.4s linear infinite; opacity: 0.55;
         }
-        .tread-top    { top: 0; }
-        .tread-bottom { bottom: 0; }
-
-        /* Desktop table: rotated headers need a fixed min-width per checkpoint col */
+        .tread-top { top: 0; } .tread-bottom { bottom: 0; }
         .cp-col { width: 36px; min-width: 36px; }
       `}</style>
 
       <div className="tread-bar tread-top" />
       <div className="tread-bar tread-bottom" />
 
+      {/* SVG decorations unchanged */}
       <svg
         className="rhino-ghost"
         style={{ width: 520, height: 340, bottom: "8%", right: "-4%" }}
@@ -687,7 +723,6 @@ export default function SafariLeaderBoard() {
           fill="none"
         />
       </svg>
-
       <svg
         className="rhino-ghost rhino-ghost-2"
         style={{ width: 220, height: 140, top: "12%", left: "2%" }}
@@ -742,7 +777,6 @@ export default function SafariLeaderBoard() {
                 Ol Pejeta Conservancy — Overall Leaderboard
               </div>
             </div>
-
             <div className="flex items-center gap-3 flex-wrap ml-auto">
               <div className="flex items-center gap-2 px-3 py-1.5 rounded-full border border-amber-700/40 bg-amber-900/20">
                 <span className="w-2 h-2 rounded-full bg-amber-500 animate-pulse" />
@@ -754,7 +788,7 @@ export default function SafariLeaderBoard() {
           </div>
 
           <div className="hidden lg:block mb-2">
-            <DesktopTable drivers={drivers || []} />
+            <DesktopTable drivers={drivers} />
           </div>
 
           <div className="lg:hidden">
@@ -768,16 +802,15 @@ export default function SafariLeaderBoard() {
                 </div>
               ))}
             </div>
-
             <Reorder.Group
               axis="y"
-              values={drivers || []}
+              values={drivers}
               onReorder={() => {}}
               className="flex flex-col gap-2"
               as="div"
             >
               <AnimatePresence>
-                {drivers?.map((driver, index) => (
+                {drivers.map((driver, index) => (
                   <Reorder.Item
                     key={driver.id}
                     value={driver}
@@ -789,18 +822,23 @@ export default function SafariLeaderBoard() {
                     exit={{ opacity: 0, y: 10 }}
                     transition={{ duration: 0.35, ease: "easeOut" }}
                   >
-                    <LeaderboardRow driver={driver} rank={index + 1} />
+                    {/* ✅ checkpoints passed as prop */}
+                    <LeaderboardRow
+                      driver={driver}
+                      rank={index + 1}
+                      checkpoints={driver.checkpoints}
+                    />
                   </Reorder.Item>
                 ))}
               </AnimatePresence>
             </Reorder.Group>
           </div>
 
+          {/* ✅ use already-computed checkpoints variable, no hook call */}
           <div className="mt-8 flex items-center gap-4 flex-wrap">
             <div className="h-px flex-1 bg-stone-800" />
             <span className="text-[9px] tracking-widest text-stone-700 uppercase">
-              {useCheckPoints().length} Checkpoints · {(drivers || []).length}{" "}
-              Entrants
+              {CHECKPOINTS.length} Checkpoints · {drivers.length} Entrants
             </span>
             <div className="h-px flex-1 bg-stone-800" />
           </div>
