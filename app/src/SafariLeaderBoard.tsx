@@ -16,8 +16,11 @@ const TD_CELL: React.CSSProperties = {
 };
 
 const useDriverList = () => {
+  const [tokenReady] = useState(() => !!localStorage.getItem("token"));
   const { data: VehicleList, isLoading: LoadingVehicleList } =
-    useGetVehicleListQuery();
+    useGetVehicleListQuery(undefined, {
+      skip: !tokenReady,
+    });
   const [getCheckPoints, { data: CheckPoints, isLoading: LoadingCheckPoints }] =
     useGetCheckPointsMutation();
   const fired = useRef(false);
@@ -25,8 +28,10 @@ const useDriverList = () => {
   useEffect(() => {
     if (fired.current) return;
     fired.current = true;
-    getCheckPoints();
-  }, []); // empty — fire exactly once
+    if (tokenReady) {
+      getCheckPoints();
+    }
+  }, [tokenReady, getCheckPoints]);
 
   if (
     !(LoadingVehicleList || LoadingCheckPoints) &&
