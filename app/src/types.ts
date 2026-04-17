@@ -2,7 +2,7 @@ export interface Driver {
   id: number;
   carNo: string;
   entrantName: string;
-  teamName: string;
+  team_name: string;
   checkpoints: CheckPoint[];
   totalCps: number;
 }

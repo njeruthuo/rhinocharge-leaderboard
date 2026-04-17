@@ -62,6 +62,7 @@ export interface Asset {
   driver: string | null;
   year_of_manufacture: number | null;
   usage: string | null;
+  team_name: string;
   asset_status: string;
   last_polled: string; // ISO format string or YYYY-MM-DD HH:mm:ss
   device_type: string | null;

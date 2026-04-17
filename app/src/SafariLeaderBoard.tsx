@@ -54,8 +54,8 @@ const useDriverList = () => {
         id: index,
         carNo: item?.asset_name,
         entrantName: item?.last_driver,
+        team_name: item?.team_name,
         totalCps: (checkPointList || []).length,
-        teamName: "",
         checkpoints: checkPoints,
       };
     });
@@ -390,7 +390,7 @@ function DesktopTableRow({
           {driver.entrantName}
         </div>
         <div className="text-[10px] text-stone-500 tracking-wider uppercase">
-          {driver.teamName}
+          {driver.team_name}
         </div>
       </td>
       {CHECKPOINTS.map((cpName, index) => {
