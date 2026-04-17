@@ -119,15 +119,15 @@ function CheckpointCell({ cp }: { cp: CheckPoint }) {
         {/* Time Stamp - High Visibility */}
         <div className="bg-amber-500/10 border border-amber-600/30 rounded px-1 py-0.5 w-full">
           <span className="text-amber-500 font-black text-[9px] block leading-none text-center">
-            {cp.time.replace(/\s?[AP]M/, "")}{" "}
+            {cp.time} {/* {cp.time.replace(/\s?[AP]M/, "")}{" "} */}
             {/* Stripping AM/PM to save space if needed */}
           </span>
         </div>
 
         {/* Odometer - Secondary Data */}
         <div className="w-full">
-          <span className="text-stone-400 font-mono text-[8px] block leading-none text-center opacity-80">
-            {cp.odometer}
+          <span className="text-stone-500 font-mono text-[10px] block leading-none text-center opacity-80">
+            {new Intl.NumberFormat("en-US").format(cp.odometer)}
           </span>
         </div>
 
@@ -161,60 +161,6 @@ function CheckpointCell({ cp }: { cp: CheckPoint }) {
     </div>
   );
 }
-
-// function CheckpointCell({ cp }: { cp: CheckPoint }) {
-//   const status = getCheckpointStatus(cp);
-
-//   if (status === "completed") {
-//     return (
-//       <div className="flex flex-col items-center justify-center group relative">
-//         <div className="w-6 h-6 rounded-full bg-amber-900/50 border border-amber-600/40 flex items-center justify-center shadow-[0_0_10px_rgba(217,119,6,0.2)]">
-//           {/* {cp.time} • {cp.odometer}km */}
-
-//           <span className="bottom-full mb-2 bg-stone-900 text-amber-200 text-[8px] p-1 rounded border border-amber-600 z-50 whitespace-nowrap">
-//             {cp.time}
-//           </span>
-//           <span className=" absolute bottom-full mb-2 bg-stone-900 text-amber-200 text-[8px] p-1 rounded border border-amber-600 z-50 whitespace-nowrap">
-//             {cp.odometer}
-//           </span>
-//           {/* <svg
-//             className="w-3 h-3 text-amber-400"
-//             viewBox="0 0 12 12"
-//             fill="none"
-//             stroke="currentColor"
-//           >
-//             <path
-//               d="M2 6l3 3 5-5"
-//               strokeWidth="2"
-//               strokeLinecap="round"
-//               strokeLinejoin="round"
-//             />
-//           </svg> */}
-//         </div>
-//         {/* Tooltip on hover */}
-//         {/* <div className="hidden group-hover:block absolute bottom-full mb-2 bg-stone-900 text-amber-200 text-[8px] p-1 rounded border border-amber-600 z-50 whitespace-nowrap">
-//           {cp.time} • {cp.odometer}km
-//         </div> */}
-//       </div>
-//     );
-//   }
-
-//   if (status === "active") {
-//     return (
-//       <div className="flex items-center justify-center">
-//         <div className="w-4 h-4 rounded-full bg-sky-500/20 border border-sky-400/50 flex items-center justify-center">
-//           <span className="w-2 h-2 rounded-full bg-sky-400 animate-pulse shadow-[0_0_8px_#38bdf8]" />
-//         </div>
-//       </div>
-//     );
-//   }
-
-//   return (
-//     <div className="flex items-center justify-center">
-//       <div className="w-1.5 h-1.5 rounded-full bg-stone-700/50" />
-//     </div>
-//   );
-// }
 
 function LeaderboardRow({
   driver,
@@ -366,15 +312,7 @@ function LeaderboardRow({
                     {driver.totalCps} of {totalCheckpoints} completed
                   </span>
                 </div>
-                {/* <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-2">
-                  {checkpoints.map((cp: string) => (
-                    <CheckpointBadge
-                      key={cp.toLowerCase()}
-                      name={cp.toLowerCase() as CheckpointName}
-                      value={driver.checkpoints[cp.point.toLowerCase()] ?? ""}
-                    />
-                  ))}
-                </div> */}
+
                 <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-2">
                   {driver.checkpoints.map((cp: CheckPoint) => (
                     <CheckpointBadge key={`${cp.point}-${cp.time}`} cp={cp} />
@@ -398,9 +336,7 @@ function DesktopTableRow({
   rank: number;
   checkpoints: CheckPoint[];
 }) {
-  // console.log(JSON.stringify(checkpoints), "checkpoints");
-
-  const totalCheckpoints = checkpoints.length;
+  const totalCheckpoints = checkpoints.length || 0;
   const progress = Math.round((driver.totalCps / totalCheckpoints) * 100);
 
   return (
@@ -472,7 +408,12 @@ function DesktopTableRow({
         return (
           <td
             key={index}
-            style={{ ...TD_CELL, width: 36, textAlign: "center" }}
+            style={{
+              ...TD_CELL,
+              width: 36,
+              textAlign: "center",
+              margin: 20,
+            }}
           >
             <CheckpointCell cp={cpData} />
           </td>
@@ -497,7 +438,7 @@ function DesktopTableRow({
           >
             {driver.totalCps}
             <span className="text-[10px] text-stone-600 font-normal ml-1">
-              /{CHECKPOINTS.length}
+              /{CHECKPOINTS.length + 1 || 0}
             </span>
           </span>
           <div className="w-16 h-0.5 rounded-full bg-stone-800">
@@ -563,15 +504,14 @@ function DesktopTable({ drivers }: { drivers: Driver[] }) {
                 Driver / Team
               </span>
             </th>
-            {/* ✅ plain array.map — no hook */}
             {CHECKPOINTS.map((cp) => (
               <th
                 key={cp}
                 style={{
-                  width: 36,
-                  minWidth: 36,
-                  maxWidth: 36,
-                  padding: "12px 0 8px",
+                  // width: 36,
+                  minWidth: 79,
+                  padding: "12px 16px 8px",
+
                   textAlign: "center",
                   verticalAlign: "bottom",
                   borderBottom: "1px solid rgba(217,119,6,0.15)",
@@ -581,6 +521,8 @@ function DesktopTable({ drivers }: { drivers: Driver[] }) {
                   <span
                     className="text-[9px] font-bold tracking-widest text-amber-700/70 uppercase"
                     style={{
+                      marginRight: 12,
+                      marginLeft: 12,
                       writingMode: "vertical-rl",
                       transform: "rotate(180deg)",
                       display: "block",
@@ -775,10 +717,10 @@ export default function SafariLeaderBoard() {
                   letterSpacing: "0.04em",
                 }}
               >
-                Rhino Charge Kenya
+                Rhino Charge 2026
               </div>
               <div className="text-stone-500 text-xs tracking-widest uppercase">
-                Ol Pejeta Conservancy — Overall Leaderboard
+                Overall Leaderboard
               </div>
             </div>
             <div className="flex items-center gap-3 flex-wrap ml-auto">
@@ -842,7 +784,8 @@ export default function SafariLeaderBoard() {
           <div className="mt-8 flex items-center gap-4 flex-wrap">
             <div className="h-px flex-1 bg-stone-800" />
             <span className="text-[9px] tracking-widest text-stone-700 uppercase">
-              {CHECKPOINTS.length} Checkpoints · {drivers.length} Entrants
+              {CHECKPOINTS ? CHECKPOINTS.length + 1 : 0} Checkpoints ·{" "}
+              {drivers.length} Entrants
             </span>
             <div className="h-px flex-1 bg-stone-800" />
           </div>
