@@ -330,13 +330,12 @@ function LeaderboardRow({
 function DesktopTableRow({
   driver,
   rank,
-  checkpoints,
 }: {
   driver: Driver;
   rank: number;
   checkpoints: CheckPoint[];
 }) {
-  const totalCheckpoints = checkpoints.length || 0;
+  const totalCheckpoints = CHECKPOINTS.length + 1 || 0;
   const progress = Math.round((driver.totalCps / totalCheckpoints) * 100);
 
   return (
@@ -794,7 +793,9 @@ export default function SafariLeaderBoard() {
             {[
               { color: "bg-amber-500", label: "Completed" },
               { color: "bg-sky-400", label: "Active" },
-              { color: "bg-stone-600", label: "Pending" },
+              { color: "bg-gray-300", label: "Pending" },
+              { color: "bg-[#BF1363]", label: "Start" },
+              { color: "bg-[#7DDE92]", label: "Finish" },
             ].map(({ color, label }) => (
               <div key={label} className="flex items-center gap-1.5">
                 <span className={`w-2 h-2 rounded-full ${color}`} />
