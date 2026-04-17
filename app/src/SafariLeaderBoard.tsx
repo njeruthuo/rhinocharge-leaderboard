@@ -232,7 +232,7 @@ function LeaderboardRow({
                 {driver.entrantName}
               </div>
               <div className="text-stone-500 text-[10px] tracking-wider truncate uppercase">
-                {driver.teamName}
+                {driver.team_name}
               </div>
             </div>
             <div className="hidden sm:flex flex-col items-end gap-1 w-28 shrink-0">
