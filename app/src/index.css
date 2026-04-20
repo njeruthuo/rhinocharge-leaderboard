@@ -1,1 +1,6 @@
 @import "tailwindcss";
+
+body {
+  /* zoom: 0.75;
+  height: 100vh; */
+}

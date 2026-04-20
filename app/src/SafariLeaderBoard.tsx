@@ -507,8 +507,8 @@ function DesktopTable({ drivers }: { drivers: Driver[] }) {
               <th
                 key={cp}
                 style={{
-                  // width: 36,
-                  minWidth: 79,
+                  width: 36,
+                  minWidth: 66,
                   padding: "12px 16px 8px",
 
                   textAlign: "center",
