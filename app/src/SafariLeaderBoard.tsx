@@ -7,6 +7,7 @@ import {
   useGetVehicleListQuery,
 } from "./state/rhinoApi";
 import { getParsedTime } from "./utils";
+import { spinner } from "./constants";
 
 const TD_V = 12;
 const TD_CELL: React.CSSProperties = {
@@ -86,56 +87,8 @@ const useDriverList = () => {
     });
   }, [VehicleList, CheckPoints, LoadingVehicleList, LoadingCheckPoints]);
 
-  return { data: driverList, refetch };
+  return { data: driverList, refetch, LoadingVehicleList, LoadingCheckPoints };
 };
-
-// const useDriverList = () => {
-//   const [tokenReady] = useState(() => !!localStorage.getItem("token"));
-//   const { data: VehicleList, isLoading: LoadingVehicleList } =
-//     useGetVehicleListQuery(undefined, {
-//       skip: !tokenReady,
-//     });
-//   const [getCheckPoints, { data: CheckPoints, isLoading: LoadingCheckPoints }] =
-//     useGetCheckPointsMutation();
-//   const fired = useRef(false);
-
-//   useEffect(() => {
-//     if (fired.current) return;
-//     fired.current = true;
-//     if (tokenReady) {
-//       getCheckPoints();
-//     }
-//   }, [tokenReady, getCheckPoints]);
-
-//   if (
-//     !(LoadingVehicleList || LoadingCheckPoints) &&
-//     VehicleList &&
-//     CheckPoints
-//   ) {
-//     return VehicleList?.map((item, index) => {
-//       const checkPointList = CheckPoints.filter(
-//         (checkpoint) => checkpoint.vehicle === item.asset_name,
-//       );
-
-//       const checkPoints = checkPointList.map((checkpoint) => ({
-//         point: checkpoint?.poi_name?.toUpperCase(),
-//         odometer: checkpoint?.start_odo,
-//         time: getParsedTime(checkpoint?.start_time),
-//         next: "",
-//       }));
-
-//       return {
-//         id: index,
-//         carNo: item?.asset_name,
-//         entrantName: item?.last_driver,
-//         team_name: item?.team_name,
-//         totalCps: (checkPointList || []).length,
-//         checkpoints: checkPoints,
-//       };
-//     });
-//   }
-//   return [];
-// };
 
 function getCheckpointStatus(
   cp: CheckPoint,
@@ -658,7 +611,7 @@ function DesktopTable({ drivers }: { drivers: Driver[] }) {
 }
 
 export default function SafariLeaderBoard() {
-  const { data } = useDriverList();
+  const { data, LoadingVehicleList, LoadingCheckPoints } = useDriverList();
 
   const drivers = useMemo(() => {
     return [...data].sort((a, b) => b.totalCps - a.totalCps);
@@ -807,7 +760,26 @@ export default function SafariLeaderBoard() {
           </div>
 
           <div className="hidden lg:block mb-2">
-            <DesktopTable drivers={drivers} />
+            {LoadingVehicleList || LoadingCheckPoints ? (
+              <div
+                className="flex justify-center items-center"
+                style={{
+                  borderColor: "rgba(217,119,6,0.15)",
+                  backdropFilter: "blur(8px)",
+                  overflowX: "auto",
+                  overflowY: "auto",
+                  minHeight: "78vh",
+                }}
+              >
+                <img
+                  src={spinner}
+                  alt="loading..."
+                  className="animate-spin h-10 w-10 text-gray-900"
+                />
+              </div>
+            ) : (
+              <DesktopTable drivers={drivers} />
+            )}
           </div>
 
           <div className="lg:hidden">

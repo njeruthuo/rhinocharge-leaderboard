@@ -1,5 +1,3 @@
-
-
 export const CHECKPOINTS = [
   "KWS",
   "TOOLCRAFTS",
@@ -14,8 +12,7 @@ export const CHECKPOINTS = [
   "FLOWERWATCH",
   "SOLEX",
   "SLATER & WHITTAKER",
+  // "GAUNTLET",
 ] as const;
 
 export type CheckpointName = (typeof CHECKPOINTS)[number];
-
-
