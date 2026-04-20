@@ -537,7 +537,7 @@ function DesktopTable({ drivers }: { drivers: Driver[] }) {
         backdropFilter: "blur(8px)",
         overflowX: "auto",
         overflowY: "auto",
-        maxHeight: "70vh",
+        maxHeight: "78vh",
       }}
     >
       <table
