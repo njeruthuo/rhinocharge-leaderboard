@@ -305,7 +305,7 @@ function LeaderboardRow({
               >
                 {driver.entrantName}
               </div>
-              <div className="text-stone-500 text-[10px] tracking-wider truncate uppercase">
+              <div className="text-gray-300 text-[10px] tracking-wider truncate uppercase">
                 {driver.team_name}
               </div>
             </div>
@@ -382,7 +382,7 @@ function LeaderboardRow({
                   >
                     Checkpoint Breakdown
                   </span>
-                  <span className="text-[10px] text-stone-500">
+                  <span className="text-[10px] text-gray-300">
                     {driver.totalCps} of {totalCheckpoints} completed
                   </span>
                 </div>
