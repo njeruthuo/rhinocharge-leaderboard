@@ -7,7 +7,7 @@ import {
   useGetVehicleListQuery,
 } from "./state/rhinoApi";
 import { getParsedTime } from "./utils";
-import { spinner } from "./constants";
+import { colors, spinner } from "./constants";
 
 const TD_V = 12;
 const TD_CELL: React.CSSProperties = {
@@ -144,8 +144,10 @@ function CheckpointCell({ cp }: { cp: CheckPoint }) {
     return (
       <div className="flex flex-col items-center justify-center min-w-[40px] gap-0.5">
         {/* Time Stamp - High Visibility */}
-        <div className="bg-amber-500/10 border border-amber-600/30 rounded px-1 py-0.5 w-full">
-          <span className="text-amber-500 font-black text-[9px] block leading-none text-center">
+        <div className={`${colors.bgPale} rounded px-1 py-0.5 w-full`}>
+          <span
+            className={`font-black text-[9px] block leading-none text-center ${colors.primary}`}
+          >
             {cp.time} {/* {cp.time.replace(/\s?[AP]M/, "")}{" "} */}
             {/* Stripping AM/PM to save space if needed */}
           </span>
@@ -159,7 +161,7 @@ function CheckpointCell({ cp }: { cp: CheckPoint }) {
         </div>
 
         {/* Success Indicator Line */}
-        <div className="w-full h-0.5 bg-amber-600/40 rounded-full mt-0.5" />
+        <div className={`w-full h-0.5  rounded-full mt-0.5 ${colors.pale}`} />
       </div>
     );
   }
@@ -265,7 +267,7 @@ function LeaderboardRow({
             <div className="hidden sm:flex flex-col items-end gap-1 w-28 shrink-0">
               <div className="w-full h-1 rounded-full bg-stone-800">
                 <motion.div
-                  className="h-full rounded-full bg-amber-500"
+                  className={`h-full rounded-full ${colors.bgPrimary}`}
                   initial={{ width: 0 }}
                   animate={{ width: `${progress}%` }}
                   transition={{ duration: 0.6, ease: "easeOut" }}
@@ -469,7 +471,7 @@ function DesktopTableRow({
           </span>
           <div className="w-16 h-0.5 rounded-full bg-stone-800">
             <motion.div
-              className="h-full rounded-full bg-amber-500"
+              className={`h-full rounded-full ${colors.bgPrimary}`}
               initial={{ width: 0 }}
               animate={{ width: `${progress}%` }}
               transition={{ duration: 0.6, ease: "easeOut" }}
@@ -750,9 +752,15 @@ export default function SafariLeaderBoard() {
               </div>
             </div>
             <div className="flex items-center gap-3 flex-wrap ml-auto">
-              <div className="flex items-center gap-2 px-3 py-1.5 rounded-full border border-amber-700/40 bg-amber-900/20">
-                <span className="w-2 h-2 rounded-full bg-amber-500 animate-pulse" />
-                <span className="text-[10px] font-bold tracking-widest text-amber-500 uppercase">
+              <div
+                className={`flex items-center gap-2 px-3 py-1.5 rounded-full border ${colors.bgPale}`}
+              >
+                <span
+                  className={`w-2 h-2 rounded-full  animate-pulse ${colors.bgPrimary}`}
+                />
+                <span
+                  className={`text-[10px] font-bold tracking-widest  uppercase ${colors.primary}`}
+                >
                   Live
                 </span>
               </div>
@@ -837,7 +845,7 @@ export default function SafariLeaderBoard() {
 
           <div className="mt-4 flex items-center gap-4 flex-wrap justify-center">
             {[
-              { color: "bg-amber-500", label: "Completed" },
+              { color: colors.bgPrimary, label: "Completed" },
               { color: "bg-sky-400", label: "Active" },
               { color: "bg-gray-300", label: "Pending" },
               { color: "bg-[#BF1363]", label: "Start" },
