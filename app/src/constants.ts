@@ -5,8 +5,8 @@ export { spinner };
 
 export const colors = {
   pale: "bg-amber-600/40",
-  bgPale: "bg-amber-900/20 border-amber-700/40",
+  bgPale: "bg-[#FDFAEC]",
 
-  primary: "text-amber-500",
-  bgPrimary: "bg-amber-500",
+  primary: "text-[#000]",
+  bgPrimary: "bg-[#fff]",
 };

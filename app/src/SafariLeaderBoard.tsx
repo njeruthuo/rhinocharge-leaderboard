@@ -146,16 +146,15 @@ function CheckpointCell({ cp }: { cp: CheckPoint }) {
         {/* Time Stamp - High Visibility */}
         <div className={`${colors.bgPale} rounded px-1 py-0.5 w-full`}>
           <span
-            className={`font-black text-[9px] block leading-none text-center ${colors.primary}`}
+            className={`font-black text-[11px] block leading-none text-center ${colors.primary}`}
           >
-            {cp.time} {/* {cp.time.replace(/\s?[AP]M/, "")}{" "} */}
-            {/* Stripping AM/PM to save space if needed */}
+            {cp.time}
           </span>
         </div>
 
         {/* Odometer - Secondary Data */}
         <div className="w-full">
-          <span className="text-stone-500 font-mono text-[10px] block leading-none text-center opacity-80">
+          <span className="text-stone-500 font-mono text-[13px] block leading-none text-center opacity-80">
             {new Intl.NumberFormat("en-US").format(cp.odometer)}
           </span>
         </div>
@@ -170,7 +169,6 @@ function CheckpointCell({ cp }: { cp: CheckPoint }) {
     return (
       <div className="flex flex-col items-center justify-center py-2">
         <div className="relative">
-          {/* Pulsing ring for the "Live" vehicle location */}
           <span className="absolute inset-0 rounded-full bg-sky-400 animate-ping opacity-20" />
           <div className="w-3 h-3 rounded-full bg-sky-500 border border-sky-300 flex items-center justify-center shadow-[0_0_12px_#38bdf8]">
             <span className="w-1 h-1 rounded-full bg-white" />
@@ -759,7 +757,7 @@ export default function SafariLeaderBoard() {
                   className={`w-2 h-2 rounded-full  animate-pulse ${colors.bgPrimary}`}
                 />
                 <span
-                  className={`text-[10px] font-bold tracking-widest  uppercase ${colors.primary}`}
+                  className={`text-[10px] font-bold tracking-widest  uppercase text-amber-500`}
                 >
                   Live
                 </span>
@@ -821,7 +819,6 @@ export default function SafariLeaderBoard() {
                     exit={{ opacity: 0, y: 10 }}
                     transition={{ duration: 0.35, ease: "easeOut" }}
                   >
-                    {/* ✅ checkpoints passed as prop */}
                     <LeaderboardRow
                       driver={driver}
                       rank={index + 1}
