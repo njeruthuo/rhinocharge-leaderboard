@@ -16,7 +16,7 @@ const TD_CELL: React.CSSProperties = {
   verticalAlign: "middle",
 };
 
-const REFETCH_INTERVAL = 5 * 60 * 1000; // 5 minutes
+const REFETCH_INTERVAL = 60 * 60 * 1000;
 
 const useDriverList = () => {
   const [tokenReady] = useState(() => !!localStorage.getItem("token"));
@@ -40,7 +40,6 @@ const useDriverList = () => {
     }
   }, [tokenReady, getCheckPoints]);
 
-  // Periodic refetch for checkpoints
   useEffect(() => {
     if (!tokenReady) return;
     const interval = setInterval(() => {
