@@ -268,7 +268,7 @@ function LeaderboardRow({
                   transition={{ duration: 0.6, ease: "easeOut" }}
                 />
               </div>
-              <span className="text-[9px] text-stone-500 tracking-widest">
+              <span className="text-[14px] text-stone-500 tracking-widest">
                 {driver.totalCps}/{totalCheckpoints} CPS
               </span>
             </div>
@@ -392,10 +392,10 @@ function DesktopTableRow({
         }}
       >
         <span
-          className="font-black text-xs tracking-widest px-2 rounded py-3 pr-3"
+          className="font-black text-sm tracking-widest px-2 rounded py-3 pr-3 text-[#46237A]"
           style={{
             background: "rgba(217,119,6,0.15)",
-            color: "#D97706",
+            // color: "#ED6A5E",
             border: "1px solid rgba(217,119,6,0.3)",
             fontFamily: "'Oswald', sans-serif",
           }}
@@ -418,7 +418,6 @@ function DesktopTableRow({
         </div>
       </td>
       {CHECKPOINTS.map((cpName, index) => {
-        // Find if this driver has data for this specific checkpoint name
         const cpData = driver.checkpoints.find(
           (c) => c.point === cpName.toUpperCase(),
         ) || {
@@ -456,11 +455,11 @@ function DesktopTableRow({
             className="font-black text-base"
             style={{
               fontFamily: "'Oswald', sans-serif",
-              color: rank === 1 ? "#fbbf24" : "#d6d3d1",
+              color: rank === 1 ? "#3DDC97" : "#d6d3d1",
             }}
           >
             {driver.totalCps}
-            <span className="text-[10px] text-stone-600 font-normal ml-1">
+            <span className="text-[14px] font-semibold text-stone-600 ml-1">
               /{CHECKPOINTS.length + 1 || 0}
             </span>
           </span>
@@ -506,6 +505,7 @@ function DesktopTable({ drivers }: { drivers: Driver[] }) {
               zIndex: 10,
               background: "#D9D7D7",
             }}
+            className="text-sky-600"
           >
             <th
               className="w-1"
@@ -515,7 +515,7 @@ function DesktopTable({ drivers }: { drivers: Driver[] }) {
               className="py-3 pr-4 text-left"
               style={{ borderBottom: "1px solid rgba(217,119,6,0.15)" }}
             >
-              <span className="text-[9px] font-bold tracking-[0.2em] text-stone-600 uppercase">
+              <span className="text-[9px] font-bold tracking-[0.2em]  uppercase">
                 Car
               </span>
             </th>
@@ -523,12 +523,13 @@ function DesktopTable({ drivers }: { drivers: Driver[] }) {
               className="py-3 pr-6 text-left"
               style={{ borderBottom: "1px solid rgba(217,119,6,0.15)" }}
             >
-              <span className="text-[9px] font-bold tracking-[0.2em] text-stone-600 uppercase">
+              <span className="text-[9px] font-bold tracking-[0.2em]  uppercase">
                 Driver / Team
               </span>
             </th>
             {CHECKPOINTS.map((cp) => (
               <th
+                className=""
                 key={cp}
                 style={{
                   width: 36,
@@ -542,14 +543,16 @@ function DesktopTable({ drivers }: { drivers: Driver[] }) {
               >
                 <div style={{ display: "flex", justifyContent: "center" }}>
                   <span
-                    className="text-[9px] font-bold tracking-widest text-amber-700/70 uppercase"
+                    className="text-[9px] font-bold tracking-widest uppercase text-sky-600"
                     style={{
-                      marginRight: 12,
-                      marginLeft: 12,
-                      writingMode: "vertical-rl",
-                      transform: "rotate(180deg)",
                       display: "block",
                       lineHeight: 1,
+                      writingMode: "vertical-rl",
+                      transform: "rotate(210deg)",
+                      transformOrigin: "center center",
+                      whiteSpace: "nowrap",
+                      marginRight: 8,
+                      marginLeft: 8,
                     }}
                   >
                     {cp}
@@ -561,7 +564,7 @@ function DesktopTable({ drivers }: { drivers: Driver[] }) {
               className="py-3 pl-4 pr-2 text-right"
               style={{ borderBottom: "1px solid rgba(217,119,6,0.15)" }}
             >
-              <span className="text-[9px] font-bold tracking-[0.2em] text-stone-600 uppercase">
+              <span className="text-[9px] font-bold tracking-[0.2em] uppercase">
                 CPS
               </span>
             </th>
