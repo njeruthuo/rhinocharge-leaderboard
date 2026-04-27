@@ -6,7 +6,7 @@ import {
   useGetCheckPointsMutation,
   useGetVehicleListQuery,
 } from "./state/rhinoApi";
-import { getParsedTime } from "./utils";
+import { convertTo24Hour, getParsedTime } from "./utils";
 import { colors, spinner } from "./constants";
 
 const TD_V = 12;
@@ -143,23 +143,20 @@ function CheckpointCell({ cp }: { cp: CheckPoint }) {
   if (status === "completed") {
     return (
       <div className="flex flex-col items-center justify-center min-w-[40px] gap-0.5">
-        {/* Time Stamp - High Visibility */}
         <div className={`${colors.bgPale} rounded px-1 py-0.5 w-full`}>
           <span
             className={`font-black text-[11px] block leading-none text-center ${colors.primary}`}
           >
-            {cp.time}
+            {convertTo24Hour(cp?.time)}
           </span>
         </div>
 
-        {/* Odometer - Secondary Data */}
         <div className="w-full">
-          <span className="text-stone-500 font-mono text-[13px] block leading-none text-center opacity-80">
+          <span className="text-stone-500 font-mono text-[11px] block leading-none text-center opacity-80">
             {new Intl.NumberFormat("en-US").format(cp.odometer)}
           </span>
         </div>
 
-        {/* Success Indicator Line */}
         <div className={`w-full h-0.5  rounded-full mt-0.5 ${colors.pale}`} />
       </div>
     );

@@ -1,6 +1,6 @@
 export const CHECKPOINTS = [
   "KWS",
-  "TOOLCRAFTS",
+  "TOOLCRAFT",
   "AUTO XPRESS",
   "SATAO",
   "OCEAN AGRICULTURE",
