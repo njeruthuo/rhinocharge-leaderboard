@@ -16,7 +16,7 @@ const TD_CELL: React.CSSProperties = {
   verticalAlign: "middle",
 };
 
-const REFETCH_INTERVAL = 60 * 60 * 1000;
+const REFETCH_INTERVAL = 15 * 60 * 1000;
 
 const useDriverList = () => {
   const [tokenReady] = useState(() => !!localStorage.getItem("token"));
@@ -521,23 +521,16 @@ function DesktopTable({ drivers }: { drivers: Driver[] }) {
         maxHeight: "78vh",
       }}
     >
-      <table
-        className="overflow-x-auto no-scrollbar w-full"
-        // style={{
-        //   borderCollapse: "separate",
-        //   borderSpacing: 0,
-        //   scrollbarWidth: "none",
-        // }}
-      >
+      <table className="overflow-x-auto no-scrollbar w-full">
         <thead>
           <tr
             style={{
               position: "sticky",
               top: 0,
               zIndex: 10,
-              background: "#D9D7D7",
+              // background: "#D9D7D7",
             }}
-            className="text-sky-600"
+            className="text-sky-600 bg-gray-200"
           >
             <th
               className="w-1"
@@ -565,7 +558,7 @@ function DesktopTable({ drivers }: { drivers: Driver[] }) {
                 key={cp}
                 style={{
                   width: 36,
-                  minWidth: 66,
+                  minWidth: 60,
                   padding: "12px 16px 8px",
 
                   textAlign: "center",
@@ -583,8 +576,8 @@ function DesktopTable({ drivers }: { drivers: Driver[] }) {
                       transform: "rotate(210deg)",
                       transformOrigin: "center center",
                       whiteSpace: "nowrap",
-                      marginRight: 8,
-                      marginLeft: 8,
+                      marginRight: 4,
+                      marginLeft: 4,
                     }}
                   >
                     {cp}
@@ -594,23 +587,23 @@ function DesktopTable({ drivers }: { drivers: Driver[] }) {
             ))}
 
             <th
-              className="py-3 pl-4 pr-2 text-right"
+              className="py-3 pl-2 pr-2 text-right"
               style={{ borderBottom: "1px solid rgba(217,119,6,0.15)" }}
             >
               <span className="text-[9px] font-bold tracking-[0.2em] uppercase">
-                mileage
+                mil.
               </span>
             </th>
             <th
-              className="py-3 pl-4 pr-2 text-right"
+              className="py-3 pl-2 pr-2 text-right"
               style={{ borderBottom: "1px solid rgba(217,119,6,0.15)" }}
             >
               <span className="text-[9px] font-bold tracking-[0.2em] uppercase">
-                penalties
+                penalty
               </span>
             </th>
             <th
-              className="py-3 pl-4 pr-2 text-right"
+              className="py-3 pl-2 pr-1 text-right"
               style={{ borderBottom: "1px solid rgba(217,119,6,0.15)" }}
             >
               <span className="text-[9px] font-bold tracking-[0.2em] uppercase">
@@ -665,8 +658,6 @@ export default function SafariLeaderBoard() {
   const drivers = useMemo(() => {
     return [...data].sort((a, b) => b.totalCps - a.totalCps);
   }, [data]);
-
-  console.log(data, "data");
 
   return (
     <>
