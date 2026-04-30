@@ -5,6 +5,8 @@ export interface Driver {
   team_name: string;
   checkpoints: CheckPoint[];
   totalCps: number;
+  mileage: number;
+  penalties: number;
 }
 
 export type CheckPoint = {

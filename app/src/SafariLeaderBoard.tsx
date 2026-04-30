@@ -78,6 +78,8 @@ const useDriverList = () => {
       return {
         id: index,
         carNo: item?.asset_name,
+        mileage: item?.realOdometer,
+        penalties: 0,
         entrantName: item?.last_driver,
         team_name: item?.team_name,
         totalCps: checkPointList.length,
@@ -440,6 +442,37 @@ function DesktopTableRow({
           </td>
         );
       })}
+
+      <td
+        style={{
+          ...TD_CELL,
+          paddingRight: 16,
+          whiteSpace: "nowrap",
+          paddingTop: 3,
+          paddingBottom: 3,
+          textAlign: "right",
+        }}
+      >
+        <span className="font-black text-sm tracking-widest rounded py-3 text-[#46237A]">
+          {new Intl.NumberFormat("en-US").format(driver?.mileage ?? 0)}
+        </span>
+      </td>
+
+      <td
+        style={{
+          ...TD_CELL,
+          paddingRight: 16,
+          whiteSpace: "nowrap",
+          paddingTop: 3,
+          paddingBottom: 3,
+          textAlign: "right",
+        }}
+      >
+        <span className="font-black text-sm tracking-widest rounded py-3 pr-3 text-[#46237A]">
+          {driver?.penalties ?? 0}
+        </span>
+      </td>
+
       <td
         style={{
           ...TD_CELL,
@@ -464,7 +497,7 @@ function DesktopTableRow({
           </span>
           <div className="w-16 h-0.5 rounded-full bg-stone-800">
             <motion.div
-              className={`h-full rounded-full ${colors.bgPrimary}`}
+              className={`h-full rounded-full bg-green-500`}
               initial={{ width: 0 }}
               animate={{ width: `${progress}%` }}
               transition={{ duration: 0.6, ease: "easeOut" }}
@@ -489,7 +522,7 @@ function DesktopTable({ drivers }: { drivers: Driver[] }) {
       }}
     >
       <table
-        className="w-full"
+        className="overflow-x-auto no-scrollbar w-full"
         style={{
           borderCollapse: "separate",
           borderSpacing: 0,
@@ -559,6 +592,23 @@ function DesktopTable({ drivers }: { drivers: Driver[] }) {
                 </div>
               </th>
             ))}
+
+            <th
+              className="py-3 pl-4 pr-2 text-right"
+              style={{ borderBottom: "1px solid rgba(217,119,6,0.15)" }}
+            >
+              <span className="text-[9px] font-bold tracking-[0.2em] uppercase">
+                mileage
+              </span>
+            </th>
+            <th
+              className="py-3 pl-4 pr-2 text-right"
+              style={{ borderBottom: "1px solid rgba(217,119,6,0.15)" }}
+            >
+              <span className="text-[9px] font-bold tracking-[0.2em] uppercase">
+                penalties
+              </span>
+            </th>
             <th
               className="py-3 pl-4 pr-2 text-right"
               style={{ borderBottom: "1px solid rgba(217,119,6,0.15)" }}
@@ -616,6 +666,8 @@ export default function SafariLeaderBoard() {
     return [...data].sort((a, b) => b.totalCps - a.totalCps);
   }, [data]);
 
+  console.log(data, "data");
+
   return (
     <>
       <style>{`
@@ -644,7 +696,6 @@ export default function SafariLeaderBoard() {
       <div className="tread-bar tread-top" />
       <div className="tread-bar tread-bottom" />
 
-      {/* SVG decorations unchanged */}
       <svg
         className="rhino-ghost"
         style={{ width: 520, height: 340, bottom: "8%", right: "-4%" }}
