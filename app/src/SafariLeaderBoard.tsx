@@ -523,11 +523,11 @@ function DesktopTable({ drivers }: { drivers: Driver[] }) {
     >
       <table
         className="overflow-x-auto no-scrollbar w-full"
-        style={{
-          borderCollapse: "separate",
-          borderSpacing: 0,
-          scrollbarWidth: "none",
-        }}
+        // style={{
+        //   borderCollapse: "separate",
+        //   borderSpacing: 0,
+        //   scrollbarWidth: "none",
+        // }}
       >
         <thead>
           <tr
@@ -801,13 +801,13 @@ export default function SafariLeaderBoard() {
             </div>
             <div className="flex items-center gap-3 flex-wrap ml-auto">
               <div
-                className={`flex items-center gap-2 px-3 py-1.5 rounded-full border ${colors.bgPale}`}
+                className={`flex items-center gap-2 px-3 py-1.5 rounded-full border text-red-500`}
               >
                 <span
-                  className={`w-2 h-2 rounded-full  animate-pulse ${colors.bgPrimary}`}
+                  className={`w-2 h-2 rounded-full  animate-pulse text-red-500`}
                 />
                 <span
-                  className={`text-[10px] font-bold tracking-widest  uppercase text-amber-500`}
+                  className={`text-[10px] font-bold tracking-widest  uppercase text-red-400`}
                 >
                   Live
                 </span>
