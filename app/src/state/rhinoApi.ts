@@ -23,6 +23,14 @@ export const rhinoApi = createApi({
       transformResponse: (arg: RhinoResponse) => arg.data.clientPois,
     }),
 
+    getPoiSummary: build.query<unknown, PoiSummary>({
+      query: (body) => ({
+        url: "AnalyticsService/GetPoiSummary",
+        method: "POST",
+        body,
+      }),
+    }),
+
     getVehicleList: build.query<AssetListResponse, void>({
       query: () => `settings/AssetManagement/GetAssets?userId=1263`,
     }),
@@ -45,3 +53,10 @@ export const {
   useGetVehicleListQuery,
   useGetCheckPointsMutation,
 } = rhinoApi;
+
+type PoiSummary = {
+  start_date: string;
+  end_date: string;
+  user_id: number;
+  unit_id: string;
+};
