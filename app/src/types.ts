@@ -15,3 +15,14 @@ export type CheckPoint = {
   time: string;
   next: string;
 };
+
+export type RowStatus = { [id: number]: boolean };
+
+export type DesktopRowType = {
+  driver: Driver;
+  rank: number;
+  checkpoints: CheckPoint[];
+  open: boolean;
+  id: number;
+  setOpen: React.Dispatch<React.SetStateAction<RowStatus>>;
+};

@@ -1,3 +1,5 @@
+import type { CheckPoint, RowStatus } from "./types";
+
 export function getParsedTime(dateTime: string) {
   const regex = /(\d{1,2}:\d{2})(?::\d{2})?\s+([AP]M)/;
 
@@ -24,4 +26,19 @@ export function convertTo24Hour(timeStr: string) {
   const paddedHours = hours.toString().padStart(2, "0");
 
   return `${paddedHours}:${minutes}`;
+}
+
+export function isOpen(
+  index: number,
+  rowStatus: RowStatus,
+  pathname: string = "",
+) {
+  return Boolean(rowStatus?.[index]) && pathname === "/management/admin";
+}
+export function getCheckpointStatus(
+  cp: CheckPoint,
+): "completed" | "active" | "pending" {
+  if (cp?.next && cp?.next !== "") return "active";
+  if (cp?.time && cp?.time !== "") return "completed";
+  return "pending";
 }
