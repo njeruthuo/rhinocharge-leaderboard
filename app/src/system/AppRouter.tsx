@@ -1,5 +1,5 @@
 import { BrowserRouter, Route, Routes } from "react-router-dom";
-import SafariLeaderBoard from "../SafariLeaderBoard";
+import SafariLeaderBoard from "@/pages/SafariLeaderBoard";
 
 const AppRouter = () => {
   return (
