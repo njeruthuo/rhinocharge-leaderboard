@@ -10,3 +10,6 @@ export const colors = {
   primary: "text-[#000]",
   bgPrimary: "bg-[#fff]",
 };
+
+
+export const REFETCH_INTERVAL = 15 * 60 * 1000;
