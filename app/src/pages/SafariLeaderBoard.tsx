@@ -1,12 +1,11 @@
 import { useState, useMemo } from "react";
 import { motion, AnimatePresence, Reorder } from "framer-motion";
-
-import { CHECKPOINTS } from "./data";
-import { getCheckpointStatus } from "./utils";
-import { colors, spinner } from "./constants";
+import type { CheckPoint, Driver } from "@/types";
 import useDriverList from "@/hooks/useDriverList";
-import type { CheckPoint, Driver } from "./types";
-import DesktopTable from "./components/DesktopTable";
+import { colors, spinner } from "@/constants";
+import DesktopTable from "@/components/DesktopTable";
+import { CHECKPOINTS } from "@/data";
+import { getCheckpointStatus } from "@/utils";
 
 function CheckpointBadge({ cp }: { cp: CheckPoint }) {
   const status = getCheckpointStatus(cp);
