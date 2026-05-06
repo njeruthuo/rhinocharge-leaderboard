@@ -181,11 +181,10 @@ export default function AdminPage() {
   const [toast, setToast] = useState<string | null>(null);
   const [selections, setSelections] = useState<Record<number, string>>({});
 
-  // console.log(selectioatans");, "selections");
-  // console.log(data, "d
+  const [isInitialized, setIsInitialized] = useState(false);
 
   const payload = useMemo(() => {
-    const checkpoints = Object.entries(selections ?? {}).map(
+    const checkpoints = Object.entries(selections ?? {})?.map(
       ([key, value]) => ({
         column_id: 1,
         column_value: value,
@@ -197,8 +196,6 @@ export default function AdminPage() {
 
     return [...checkpoints, { column_id: 2, column_value: time }];
   }, [selections, time]);
-
-  // console.log(payload, "payload");
 
   const filtered = useMemo(() => {
     const q = search.toLowerCase();
@@ -226,6 +223,19 @@ export default function AdminPage() {
       console.log(error);
     }
   };
+
+  if (data.length > 0 && !isInitialized) {
+    const initialSelections = data.reduce(
+      (acc, item) => {
+        acc[item.asset_id] = item?.start_cp || "";
+        return acc;
+      },
+      {} as Record<number, string>,
+    );
+
+    setSelections(initialSelections);
+    setIsInitialized(true);
+  }
 
   return (
     <>

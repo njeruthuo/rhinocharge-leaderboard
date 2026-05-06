@@ -59,6 +59,7 @@ export interface Asset {
   asset_type_details: string | null; // Replace 'string' if you have a specific type
   asset_usage_details: string | null;
   asset_type: string | null;
+  start_cp: string;
   driver: string | null;
   year_of_manufacture: number | null;
   usage: string | null;
@@ -78,6 +79,7 @@ export interface Asset {
   backup_device_id: string | null;
   asset_model: string | null;
   photo: string | null;
+  more_asset_details: null | ColumnData;
 }
 
 export type AssetListResponse = Asset[];
@@ -109,6 +111,7 @@ export type PoiSummary = {
 export type ColumnData = {
   column_id: number;
   column_value: string;
+  column_name?: string;
   assetId?: string;
 }[];
 
