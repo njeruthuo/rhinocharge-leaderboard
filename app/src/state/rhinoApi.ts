@@ -2,7 +2,7 @@ import { createApi } from "@reduxjs/toolkit/query/react";
 import { baseQueryWithReauth } from "./baseQuery";
 import type {
   AssetListResponse,
-  ColumnDataList,
+  ColumnData,
   Poi,
   PoiSummary,
   RhinoResponse,
@@ -49,9 +49,9 @@ export const rhinoApi = createApi({
       },
     }),
 
-    configStartPoint: build.mutation<unknown, ColumnDataList>({
-      query: ({ body, assetId }) => ({
-        url: `AssetManagement/UpdateAsset/${assetId}`,
+    configStartPoint: build.mutation<unknown, ColumnData>({
+      query: (body) => ({
+        url: `AssetManagement/UpdateAsset/`,
         method: "PUT",
         body,
       }),

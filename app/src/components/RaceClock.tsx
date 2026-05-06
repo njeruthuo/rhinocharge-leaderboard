@@ -1,13 +1,20 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 
-function TimePicker({
+function DatePicker({
   value,
   onChange,
 }: {
-  value: string;
-  onChange: (time: string) => void;
+  value: string; // "YYYY-MM-DD"
+  onChange: (date: string) => void;
 }) {
   const [open, setOpen] = useState(false);
+  const date = useMemo(() => {
+    if (!value) {
+      const d = new Date();
+      return `${d.getHours()}:${d.getMinutes()}`;
+    }
+    return value;
+  }, [value]);
 
   function handleConfirm() {
     setOpen(false);
@@ -16,7 +23,7 @@ function TimePicker({
   return (
     <>
       <style>{`
-        input[type="time"].tp-input::-webkit-calendar-picker-indicator {
+        input[type="date"].dp-input::-webkit-calendar-picker-indicator {
           filter: invert(0.45);
           cursor: pointer;
         }
@@ -37,14 +44,14 @@ function TimePicker({
             className="text-sm font-bold tracking-wider"
             style={{ color: "#D97706" }}
           >
-            {value}
+            {date}
           </span>
 
           <span
             className="text-[9px] uppercase font-bold tracking-widest"
             style={{ color: "#D97706", opacity: 0.7 }}
           >
-            Time
+            Date
           </span>
         </button>
 
@@ -69,9 +76,9 @@ function TimePicker({
             >
               <input
                 type="time"
-                value={value}
+                value={date}
                 onChange={(e) => onChange(e.target.value)}
-                className="tp-input rounded-lg px-3 py-2 text-sm outline-none w-full"
+                className="dp-input rounded-lg px-3 py-2 text-sm outline-none w-full"
                 style={{
                   background: "rgba(255,255,255,0.04)",
                   border: "1px solid rgba(255,255,255,0.1)",
@@ -109,4 +116,5 @@ function TimePicker({
     </>
   );
 }
-export default TimePicker;
+
+export default DatePicker;
