@@ -106,9 +106,11 @@ export type PoiSummary = {
   unit_id: string;
 };
 
-type ColumnData = {
+export type ColumnData = {
   column_id: number;
   column_value: string;
-};
+  assetId?: string;
+}[];
 
-export type ColumnDataList = { body: ColumnData[]; assetId: number };
+export type ColumnDataList = { body: ColumnData; assetId: number };
+export type FilterTypes = "all" | "partial" | "none";
