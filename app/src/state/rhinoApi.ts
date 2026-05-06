@@ -12,6 +12,7 @@ import type {
 export const rhinoApi = createApi({
   reducerPath: "rhinoApi",
   baseQuery: baseQueryWithReauth,
+  tagTypes: ["VehicleList"],
   endpoints: (build) => ({
     getPois: build.mutation<Poi[], string>({
       query: () => ({
@@ -36,6 +37,7 @@ export const rhinoApi = createApi({
 
     getVehicleList: build.query<AssetListResponse, void>({
       query: () => `settings/AssetManagement/GetAssets?userId=1263`,
+      providesTags: ["VehicleList"],
     }),
 
     getCheckPoints: build.mutation<TripRecord[], void>({
@@ -51,10 +53,11 @@ export const rhinoApi = createApi({
 
     configStartPoint: build.mutation<unknown, ColumnData>({
       query: (body) => ({
-        url: `AssetManagement/UpdateAsset/`,
+        url: `settings/AssetManagement/UpdateMoreAssetDetails`,
         method: "PUT",
         body,
       }),
+      invalidatesTags: ["VehicleList"],
     }),
   }),
 });

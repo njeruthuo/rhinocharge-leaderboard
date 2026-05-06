@@ -16,6 +16,9 @@ const useDriverList = () => {
     skip: !tokenReady,
     pollingInterval: REFETCH_INTERVAL,
   });
+
+  console.log(VehicleList, "VehicleList");
+
   const [getCheckPoints, { data: CheckPoints, isLoading: LoadingCheckPoints }] =
     useGetCheckPointsMutation();
   const fired = useRef(false);
@@ -65,6 +68,7 @@ const useDriverList = () => {
 
       return {
         id: index,
+        asset_id: item?.asset_id,
         carNo: item?.asset_name,
         mileage: item?.realOdometer,
         penalties: 0,

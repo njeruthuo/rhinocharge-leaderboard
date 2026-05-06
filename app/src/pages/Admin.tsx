@@ -1,12 +1,15 @@
 import { useState, useMemo } from "react";
 import { AnimatePresence } from "framer-motion";
+
 import type { Driver } from "@/types";
-import useDriverList from "@/hooks/useDriverList";
 import { CHECKPOINTS } from "@/data";
-import TimePicker from "@/components/RaceClock";
 import Toast from "@/components/Toast";
-import { useConfigStartPointMutation } from "@/state/rhinoApi";
+import TimePicker from "@/components/RaceClock";
 import type { FilterTypes } from "@/state/types";
+import useDriverList from "@/hooks/useDriverList";
+import { useConfigStartPointMutation } from "@/state/rhinoApi";
+
+const d = new Date();
 
 function cpCount(car: Driver): number {
   return car.checkpoints?.filter((cp) => cp.time).length ?? 0;
@@ -170,8 +173,6 @@ export default function AdminPage() {
   const isLoading =
     LoadingVehicleList || LoadingCheckPoints || LoadingCreateStart;
 
-  const d = new Date();
-
   const [time, setTime] = useState(`${d.getHours()}:${d.getMinutes()}`);
 
   const [expanded, setExpanded] = useState<number | null>(null);
@@ -180,12 +181,15 @@ export default function AdminPage() {
   const [toast, setToast] = useState<string | null>(null);
   const [selections, setSelections] = useState<Record<number, string>>({});
 
+  // console.log(selectioatans");, "selections");
+  // console.log(data, "d
+
   const payload = useMemo(() => {
     const checkpoints = Object.entries(selections ?? {}).map(
       ([key, value]) => ({
         column_id: 1,
         column_value: value,
-        assetId: key,
+        asset_id: key,
       }),
     );
 
@@ -193,6 +197,8 @@ export default function AdminPage() {
 
     return [...checkpoints, { column_id: 2, column_value: time }];
   }, [selections, time]);
+
+  // console.log(payload, "payload");
 
   const filtered = useMemo(() => {
     const q = search.toLowerCase();
@@ -410,18 +416,21 @@ export default function AdminPage() {
                     <AnimatePresence mode="popLayout">
                       {filtered.map((car) => (
                         <CarRow
-                          key={car.id}
+                          key={car.asset_id}
                           car={car}
-                          isExpanded={expanded === car.id}
+                          isExpanded={expanded === car.asset_id}
                           onToggle={() =>
                             setExpanded((prev) =>
-                              prev === car.id ? null : car.id,
+                              prev === car.asset_id ? null : car.asset_id,
                             )
                           }
                           // onLog={(carId, cp) => handleLog(carId, cp)}
-                          selectedCp={selections[car.id] ?? ""}
+                          selectedCp={selections[car.asset_id] ?? ""}
                           onSelectCp={(cp) =>
-                            setSelections((prev) => ({ ...prev, [car.id]: cp }))
+                            setSelections((prev) => ({
+                              ...prev,
+                              [car?.asset_id]: cp,
+                            }))
                           }
                         />
                       ))}
