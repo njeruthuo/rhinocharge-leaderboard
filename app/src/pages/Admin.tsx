@@ -4,6 +4,7 @@ import type { Driver } from "@/types";
 import useDriverList from "@/hooks/useDriverList";
 import { CHECKPOINTS } from "@/data";
 import TimePicker from "@/components/RaceClock";
+import Toast from "@/components/Toast";
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -155,45 +156,42 @@ function LogModal({
   );
 }
 
-// ─── Toast ────────────────────────────────────────────────────────────────────
-
-function Toast({ message, onDone }: { message: string; onDone: () => void }) {
-  return (
-    <motion.div
-      initial={{ opacity: 0, y: 20, scale: 0.95 }}
-      animate={{ opacity: 1, y: 0, scale: 1 }}
-      exit={{ opacity: 0, y: 10 }}
-      onAnimationComplete={() => setTimeout(onDone, 2800)}
-      className="fixed bottom-6 right-4 z-50 flex items-center gap-3 rounded-xl px-4 py-3 border text-xs font-bold tracking-wider"
-      style={{
-        background: "#1C1917",
-        borderColor: "rgba(74,222,128,0.4)",
-        color: "#4ade80",
-        fontFamily: "'Oswald', sans-serif",
-        letterSpacing: "0.05em",
-        boxShadow: "0 8px 32px rgba(0,0,0,0.5)",
-      }}
-    >
-      <span
-        className="w-2 h-2 rounded-full flex-shrink-0"
-        style={{ background: "#4ade80" }}
-      />
-      {message}
-    </motion.div>
-  );
-}
+// function Toast({ message, onDone }: { message: string; onDone: () => void }) {
+//   return (
+//     <motion.div
+//       initial={{ opacity: 0, y: 20, scale: 0.95 }}
+//       animate={{ opacity: 1, y: 0, scale: 1 }}
+//       exit={{ opacity: 0, y: 10 }}
+//       onAnimationComplete={() => setTimeout(onDone, 2800)}
+//       className="fixed bottom-6 right-4 z-50 flex items-center gap-3 rounded-xl px-4 py-3 border text-xs font-bold tracking-wider"
+//       style={{
+//         background: "#1C1917",
+//         borderColor: "rgba(74,222,128,0.4)",
+//         color: "#4ade80",
+//         fontFamily: "'Oswald', sans-serif",
+//         letterSpacing: "0.05em",
+//         boxShadow: "0 8px 32px rgba(0,0,0,0.5)",
+//       }}
+//     >
+//       <span
+//         className="w-2 h-2 rounded-full flex-shrink-0"
+//         style={{ background: "#4ade80" }}
+//       />
+//       {message}
+//     </motion.div>
+//   );
+// }
 
 // ─── CP Column Header ─────────────────────────────────────────────────────────
 
 function CpColumnHeader({ cp }: { cp: string }) {
-  const isFinish = cp === "FINISH";
   return (
     <th className="text-center py-3 px-1" style={{ minWidth: 64 }}>
       <div
         className="text-[8px] font-black tracking-[0.15em] uppercase leading-none"
         style={{
           fontFamily: "'Oswald', sans-serif",
-          color: isFinish ? "#4ade80" : "#57534e",
+          color: "white",
         }}
       >
         {cp}
@@ -485,10 +483,9 @@ export default function AdminPage() {
       className="px-3 py-2 rounded-lg text-[10px] font-bold tracking-[0.15em] uppercase transition-all"
       style={{
         fontFamily: "'Oswald', sans-serif",
-        background:
-          filter === value ? "rgba(217,119,6,0.15)" : "rgba(28,25,23,0.7)",
+        background: filter === value ? "#FBF9E7" : "rgba(28,25,23,0.7)",
         border: `1px solid ${filter === value ? "rgba(217,119,6,0.4)" : "rgba(255,255,255,0.06)"}`,
-        color: filter === value ? "#D97706" : "#78716c",
+        color: filter === value ? "rgba(28,25,23,0.7)" : "#FCFCFC",
       }}
     >
       {label}
@@ -585,11 +582,11 @@ export default function AdminPage() {
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 placeholder="Search by car no. or driver…"
-                className="w-full pl-9 pr-4 py-2 rounded-lg text-sm outline-none"
+                className="w-full pl-9 pr-4 py-2 rounded-lg text-lg outline-none"
                 style={{
-                  background: "rgba(28,25,23,0.7)",
-                  border: "1px solid rgba(255,255,255,0.06)",
-                  color: "#e7e5e4",
+                  background: "#FBF9E7",
+                  border: "1px solid rgba(217,119,6,0.4)",
+                  color: "#000",
                   fontFamily: "'Oswald', sans-serif",
                 }}
               />
@@ -604,8 +601,8 @@ export default function AdminPage() {
             className="rounded-xl border overflow-hidden"
             style={{
               borderColor: "rgba(255,255,255,0.06)",
-              background: "rgba(28,25,23,0.5)",
-              backdropFilter: "blur(8px)",
+              background: "#FBF9E7",
+              backdropFilter: "blur(20px)",
             }}
           >
             {isLoading ? (
@@ -630,15 +627,19 @@ export default function AdminPage() {
                       style={{
                         borderColor: "rgba(255,255,255,0.06)",
                         background: "rgba(0,0,0,0.3)",
+                        position: "sticky",
+                        top: 0,
+                        zIndex: 10,
+                        color: "white",
                       }}
                     >
                       {/* Fixed left columns */}
                       <th className="w-8 pl-4 pr-2 py-3" />
                       <th className="pr-2 py-3 w-14 text-left">
                         <span
-                          className="text-[9px] font-black tracking-[0.2em] uppercase"
+                          className="text-[9px] tracking-[0.2em] uppercase"
                           style={{
-                            color: "#57534e",
+                            color: "white",
                             fontFamily: "'Oswald', sans-serif",
                           }}
                         >
@@ -652,7 +653,7 @@ export default function AdminPage() {
                         <span
                           className="text-[9px] font-black tracking-[0.2em] uppercase"
                           style={{
-                            color: "#57534e",
+                            color: "white",
                             fontFamily: "'Oswald', sans-serif",
                           }}
                         >
