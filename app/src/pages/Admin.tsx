@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import type { Driver } from "@/types";
 import useDriverList from "@/hooks/useDriverList";
 import { CHECKPOINTS } from "@/data";
+import TimePicker from "@/components/RaceClock";
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -496,11 +497,13 @@ export default function AdminPage() {
 
   const isLoading = LoadingVehicleList || LoadingCheckPoints;
 
+  const [time, setTime] = useState("08:30");
+
   return (
     <>
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Oswald:wght@400;600;700&display=swap');
-        body { margin: 0; background: #1C1917; }
+        
         @keyframes tread-scroll { 0% { background-position: 0 0; } 100% { background-position: 72px 0; } }
         .tread-bar {
           position: fixed; left: 0; right: 0; height: 6px; z-index: 10; pointer-events: none;
@@ -516,13 +519,13 @@ export default function AdminPage() {
         .sticky-col-3 { position: sticky; left: 80px; z-index: 2; background: #1C1917; }
       `}</style>
 
-      <div className="tread-bar" style={{ top: 0 }} />
-      <div className="tread-bar" style={{ bottom: 0 }} />
+      {/* <div className="tread-bar" style={{ top: 0 }} />
+      <div className="tread-bar" style={{ bottom: 0 }} /> */}
 
       <div
         className="min-h-screen text-stone-100 pt-8 pb-16 px-4"
         style={{
-          background: "#1C1917",
+          background: "#fff",
           backgroundImage:
             "repeating-linear-gradient(0deg,transparent,transparent 39px,rgba(217,119,6,0.018) 39px,rgba(217,119,6,0.018) 40px),repeating-linear-gradient(90deg,transparent,transparent 39px,rgba(217,119,6,0.018) 39px,rgba(217,119,6,0.018) 40px)",
         }}
@@ -548,21 +551,10 @@ export default function AdminPage() {
                 Admin · Checkpoint Control
               </p>
             </div>
-            <div
-              className="flex items-center gap-2 px-3 py-1.5 rounded-full border text-[10px] font-bold tracking-widest uppercase"
-              style={{
-                borderColor: "rgba(217,119,6,0.4)",
-                background: "rgba(217,119,6,0.1)",
-                color: "#D97706",
-                fontFamily: "'Oswald', sans-serif",
-              }}
-            >
-              <span
-                className="w-2 h-2 rounded-full animate-pulse"
-                style={{ background: "#D97706" }}
-              />
-              Admin
-            </div>
+            <TimePicker
+              value={time}
+              onChange={(selectedTime) => setTime(selectedTime)}
+            />
           </div>
 
           {/* ── Search + Filters ── */}
@@ -627,7 +619,7 @@ export default function AdminPage() {
                 />
               </div>
             ) : (
-              <div style={{ overflowX: "auto" }}>
+              <div style={{ overflowX: "auto", height: "75vh" }}>
                 <table
                   className="w-full border-collapse"
                   style={{ minWidth: 900 }}
