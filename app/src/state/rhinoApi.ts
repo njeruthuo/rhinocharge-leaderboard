@@ -2,10 +2,13 @@ import { createApi } from "@reduxjs/toolkit/query/react";
 import { baseQueryWithReauth } from "./baseQuery";
 import type {
   AssetListResponse,
+  ColumnDataList,
   Poi,
+  PoiSummary,
   RhinoResponse,
   TripRecord,
 } from "./types";
+
 export const rhinoApi = createApi({
   reducerPath: "rhinoApi",
   baseQuery: baseQueryWithReauth,
@@ -45,6 +48,14 @@ export const rhinoApi = createApi({
         return data.data;
       },
     }),
+
+    configStartPoint: build.mutation<unknown, ColumnDataList>({
+      query: ({ body, assetId }) => ({
+        url: `AssetManagement/UpdateAsset/${assetId}`,
+        method: "PUT",
+        body,
+      }),
+    }),
   }),
 });
 
@@ -52,11 +63,5 @@ export const {
   useGetPoisMutation,
   useGetVehicleListQuery,
   useGetCheckPointsMutation,
+  useConfigStartPointMutation,
 } = rhinoApi;
-
-type PoiSummary = {
-  start_date: string;
-  end_date: string;
-  user_id: number;
-  unit_id: string;
-};

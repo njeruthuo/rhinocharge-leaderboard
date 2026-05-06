@@ -98,3 +98,17 @@ export interface TripRecord {
   end_time: string;
   mileage: number;
 }
+
+export type PoiSummary = {
+  start_date: string;
+  end_date: string;
+  user_id: number;
+  unit_id: string;
+};
+
+type ColumnData = {
+  column_id: number;
+  column_value: string;
+};
+
+export type ColumnDataList = { body: ColumnData[]; assetId: number };
