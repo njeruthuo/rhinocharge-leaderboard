@@ -442,7 +442,7 @@ export default function SafariLeaderBoard() {
 
           <div className="mt-4 flex items-center gap-4 flex-wrap justify-center">
             {[
-              { color: colors.bgPrimary, label: "Completed" },
+              { color: "bg-[#EF476F]", label: "Completed" },
               { color: "bg-sky-400", label: "Active" },
               { color: "bg-gray-300", label: "Pending" },
               { color: "bg-[#BF1363]", label: "Start" },

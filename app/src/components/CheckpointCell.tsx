@@ -2,8 +2,40 @@ import { colors } from "@/constants";
 import type { CheckPoint } from "@/types";
 import { convertTo24Hour, getCheckpointStatus } from "@/utils";
 
-function CheckpointCell({ cp }: { cp: CheckPoint }) {
+function CheckpointCell({
+  cp,
+  start_cp,
+}: {
+  cp: CheckPoint;
+  start_cp: string;
+}) {
+  console.log(start_cp, "start_cp");
+
+  console.log(cp, "check point");
+
   const status = getCheckpointStatus(cp);
+
+  if (start_cp === cp.point) {
+    return (
+      <div className="flex flex-col items-center justify-center min-w-[40px] gap-0.5">
+        <div className={`bg-[#EF476F] rounded px-1 py-0.5 w-full`}>
+          <span
+            className={`font-black text-[11px] block leading-none text-center text-`}
+          >
+            {convertTo24Hour(cp?.time)}
+          </span>
+        </div>
+
+        <div className="w-full">
+          <span className="text-[#EF476F] font-mono text-[11px] block leading-none text-center opacity-80">
+            {new Intl.NumberFormat("en-US").format(cp.odometer)}
+          </span>
+        </div>
+
+        <div className={`w-full h-0.5  rounded-full mt-0.5 bg-[#EF476F]`} />
+      </div>
+    );
+  }
 
   if (status === "completed") {
     return (
@@ -31,8 +63,8 @@ function CheckpointCell({ cp }: { cp: CheckPoint }) {
     return (
       <div className="flex flex-col items-center justify-center py-2">
         <div className="relative">
-          <span className="absolute inset-0 rounded-full bg-sky-400 animate-ping opacity-20" />
-          <div className="w-3 h-3 rounded-full bg-sky-500 border border-sky-300 flex items-center justify-center shadow-[0_0_12px_#38bdf8]">
+          <span className="absolute inset-0 rounded-full bg-[#EF476F] animate-ping opacity-20" />
+          <div className="w-3 h-3 rounded-full bg-[#EF476F] border border-[#EF476F] flex items-center justify-center shadow-[0_0_12px_#38bdf8]">
             <span className="w-1 h-1 rounded-full bg-white" />
           </div>
         </div>

@@ -7,6 +7,7 @@ export interface Driver {
   totalCps: number;
   mileage: number;
   penalties: number;
+  start_cp?: string;
 }
 
 export type CheckPoint = {
