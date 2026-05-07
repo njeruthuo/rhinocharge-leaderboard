@@ -108,12 +108,15 @@ export type PoiSummary = {
   unit_id: string;
 };
 
-export type ColumnData = {
+export type ConfigType = {
   column_id: number;
   column_value: string;
   column_name?: string;
-  assetId?: string;
-}[];
+  assetId?: number;
+  asset_id?: number;
+};
+
+export type ColumnData = ConfigType[];
 
 export type ColumnDataList = { body: ColumnData; assetId: number };
 export type FilterTypes = "all" | "partial" | "none";

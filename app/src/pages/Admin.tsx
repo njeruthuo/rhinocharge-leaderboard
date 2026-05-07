@@ -8,6 +8,7 @@ import TimePicker from "@/components/RaceClock";
 import type { FilterTypes } from "@/state/types";
 import useDriverList from "@/hooks/useDriverList";
 import { useConfigStartPointMutation } from "@/state/rhinoApi";
+import Upload from "@/components/Upload";
 
 const d = new Date();
 
@@ -167,6 +168,7 @@ const FilterBtn = ({
 );
 
 export default function AdminPage() {
+  const [file, setFile] = useState<File | null>(null);
   const { data, LoadingVehicleList, LoadingCheckPoints } = useDriverList();
   const [configStartPoint, { isLoading: LoadingCreateStart }] =
     useConfigStartPointMutation();
@@ -237,6 +239,23 @@ export default function AdminPage() {
     setIsInitialized(true);
   }
 
+  const handleUpload = async () => {
+    if (!file) return;
+
+    const formData = new FormData();
+    formData.append("file", file);
+
+    try {
+      console.log(file);
+
+      alert("Upload successful!");
+    } catch (error) {
+      console.error("Upload failed", error);
+    }
+  };
+
+  console.log(handleUpload, "handleUpload");
+
   return (
     <>
       <style>{`
@@ -286,10 +305,14 @@ export default function AdminPage() {
                 Admin · Checkpoint Control
               </p>
             </div>
-            <TimePicker
-              value={time}
-              onChange={(selectedTime) => setTime(selectedTime)}
-            />
+
+            <div className="flex space-x-2">
+              <Upload file={file} setFile={setFile} />
+              <TimePicker
+                value={time}
+                onChange={(selectedTime) => setTime(selectedTime)}
+              />
+            </div>
           </div>
 
           {/* ── Search + Filters ── */}
