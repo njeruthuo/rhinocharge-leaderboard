@@ -1,6 +1,8 @@
 import { useState, useMemo } from "react";
 import { AnimatePresence } from "framer-motion";
 
+import * as Papa from "papaparse";
+
 import type { Driver } from "@/types";
 import { CHECKPOINTS } from "@/data";
 import Toast from "@/components/Toast";
@@ -175,6 +177,8 @@ export default function AdminPage() {
   const isLoading =
     LoadingVehicleList || LoadingCheckPoints || LoadingCreateStart;
 
+  console.log(data, "data");
+
   const [time, setTime] = useState(`${d.getHours()}:${d.getMinutes()}`);
 
   const [expanded, setExpanded] = useState<number | null>(null);
@@ -198,8 +202,6 @@ export default function AdminPage() {
 
     return checkpoints;
   }, [selections, time]);
-
-  console.log(payload.length, data.length);
 
   const disabled = useMemo(() => {
     return payload && data && payload.length !== data.length;
@@ -248,17 +250,33 @@ export default function AdminPage() {
   const handleUpload = async () => {
     if (!file) return;
 
+    Papa.parse(file, {
+      complete: function (results) {
+        setSelections((prev) => ({
+          ...Object.fromEntries(
+            results?.data?.map((selection) => [
+              Number(selection[0]) || 0,
+              selection[1] || "",
+            ]) || [],
+          ),
+        }));
+        console.log(selections, "selections");
+      },
+    });
+
     const formData = new FormData();
     formData.append("file", file);
 
     try {
-      console.log(file);
+      console.log(data);
 
       alert("Upload successful!");
     } catch (error) {
       console.error("Upload failed", error);
     }
   };
+
+  console.log(selections, "selections");
 
   return (
     <>
