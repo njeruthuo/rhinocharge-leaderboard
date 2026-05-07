@@ -16,8 +16,6 @@ function DesktopTableRow({ driver, rank }: DesktopRowType) {
   const totalCheckpoints = CHECKPOINTS.length + 1 || 0;
   const progress = Math.round((driver.totalCps / totalCheckpoints) * 100);
 
-  console.log(driver, "driver");
-
   return (
     <>
       <td style={{ width: 4, padding: 0, verticalAlign: "middle" }}>
@@ -82,8 +80,6 @@ function DesktopTableRow({ driver, rank }: DesktopRowType) {
           time: "",
           next: "",
         };
-
-        console.log(cpData, "cpData");
 
         return (
           <td

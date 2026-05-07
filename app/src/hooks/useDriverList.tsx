@@ -62,11 +62,16 @@ const useDriverList = () => {
           (item) => item?.column_name === "start_cp",
         )?.column_value || "";
 
+      calculateHistory(checkPointList, start_cp, item.asset_name);
+
+      // console.log(alternativeCheckpoints, "alternativeCheckpoints");
+      // return;
+
       const checkPoints = checkPointList.map((checkpoint) => ({
         point: checkpoint?.poi_name?.toUpperCase(),
         odometer: checkpoint?.start_odo,
         time: getParsedTime(checkpoint?.start_time),
-        calculated_odometer: calculateHistory(checkpoint, start_cp),
+        calculated_odometer: 0,
         next: "",
       }));
 

@@ -45,6 +45,26 @@ export function getCheckpointStatus(
   return "pending";
 }
 
-export function calculateHistory(checkpoint: TripRecord, start_cp: string) {
-  console.log(checkpoint, start_cp, "checkpoint");
+export function calculateHistory(
+  checkpointList: TripRecord[],
+  start_cp: string,
+  name: string,
+) {
+  // console.log(checkpointList, start_cp, name);
+
+  // Find the starting point
+  const startCheckPoint = checkpointList?.find(
+    (checkpoint) =>
+      checkpoint.poi_name.toLowerCase().trim() ===
+      start_cp.toLowerCase().trim(),
+  );
+
+  // Order the checkpoints using time
+  const orderedCheckPoints = checkpointList.sort((a, b) => {
+    const timeA = new Date(a.start_time);
+    const timeB = new Date(b.start_time);
+    return timeB.getTime() - timeA.getTime();
+  });
+
+  console.log(orderedCheckPoints, "orderedCheckPoints");
 }
