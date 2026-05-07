@@ -190,14 +190,20 @@ export default function AdminPage() {
       ([key, value]) => ({
         column_id: 1,
         column_value: value,
-        asset_id: key,
+        asset_id: Number(key) || 0,
       }),
     );
 
     if (checkpoints.length === 0 && !time) return [];
 
-    return [...checkpoints, { column_id: 2, column_value: time }];
+    return checkpoints;
   }, [selections, time]);
+
+  console.log(payload.length, data.length);
+
+  const disabled = useMemo(() => {
+    return payload && data && payload.length !== data.length;
+  }, [payload, data]);
 
   const filtered = useMemo(() => {
     const q = search.toLowerCase();
@@ -504,22 +510,15 @@ export default function AdminPage() {
             </span>
             <div className="h-px flex-1" style={{ background: "#292524" }} />
           </div>
-          {/* <button className="ml-auto shrink-0">Hello world</button> */}
           <button
             onClick={handleSaveStart}
-            disabled={payload.length - 1 !== data.length || isLoading}
+            disabled={disabled || isLoading}
             className="px-3 py-2 rounded-lg text-[10px] ml-auto shrink-0 font-bold tracking-[0.15em] uppercase transition-all disabled:cursor-not-allowed cursor-pointer"
             style={{
               fontFamily: "'Oswald', sans-serif",
-              background:
-                payload.length - 1 !== data.length
-                  ? "#FBF9E7"
-                  : "rgba(28,25,23,0.7)",
-              border: `1px solid ${payload.length - 1 !== data.length || isLoading ? "rgba(217,119,6,0.4)" : "rgba(255,255,255,0.06)"}`,
-              color:
-                payload.length - 1 !== data.length || isLoading
-                  ? "rgba(28,25,23,0.7)"
-                  : "#FCFCFC",
+              background: disabled ? "#FBF9E7" : "rgba(28,25,23,0.7)",
+              border: `1px solid ${disabled || isLoading ? "rgba(217,119,6,0.4)" : "rgba(255,255,255,0.06)"}`,
+              color: disabled || isLoading ? "rgba(28,25,23,0.7)" : "#FCFCFC",
             }}
           >
             Save start entries
