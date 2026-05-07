@@ -260,8 +260,6 @@ export default function AdminPage() {
     }
   };
 
-  console.log(handleUpload, "handleUpload");
-
   return (
     <>
       <style>{`
@@ -313,7 +311,11 @@ export default function AdminPage() {
             </div>
 
             <div className="flex space-x-2">
-              <Upload file={file} setFile={setFile} />
+              <Upload
+                file={file}
+                setFile={setFile}
+                handleUpload={handleUpload}
+              />
               <TimePicker
                 value={time}
                 onChange={(selectedTime) => setTime(selectedTime)}

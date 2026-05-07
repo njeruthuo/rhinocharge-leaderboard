@@ -3,11 +3,12 @@ import { useRef, useState, type ChangeEvent } from "react";
 type UploadProps = {
   file: File | null;
   setFile: React.Dispatch<React.SetStateAction<File | null>>;
+  handleUpload: () => void;
 };
 
-const Upload = ({ file, setFile }: UploadProps) => {
+const Upload = ({ file, setFile, handleUpload }: UploadProps) => {
   const [open, setOpen] = useState(false);
-  const fileInputRef = useRef(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files.length > 0) {
