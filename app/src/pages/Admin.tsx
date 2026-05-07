@@ -264,19 +264,7 @@ export default function AdminPage() {
         });
       },
     });
-
-    const formData = new FormData();
-    formData.append("file", file);
-
-    try {
-      // console.log(data);
-      // alert("Upload successful!");
-    } catch (error) {
-      console.error("Upload failed", error);
-    }
   };
-
-  console.log(Object.entries(selections).length, "selections number");
 
   return (
     <>
