@@ -41,7 +41,7 @@ function DesktopTableRow({ driver, rank }: DesktopRowType) {
       <td
         style={{
           ...TD_CELL,
-          paddingRight: 16,
+          paddingRight: 10,
           whiteSpace: "nowrap",
           paddingTop: 3,
           paddingBottom: 3,
@@ -56,7 +56,7 @@ function DesktopTableRow({ driver, rank }: DesktopRowType) {
             fontFamily: "'Oswald', sans-serif",
           }}
         >
-          #{driver.carNo}
+          {driver.carNo}
         </span>
       </td>
       <td style={{ ...TD_CELL, paddingRight: 24, minWidth: 160 }}>
@@ -82,6 +82,8 @@ function DesktopTableRow({ driver, rank }: DesktopRowType) {
           time: "",
           next: "",
         };
+
+        console.log(cpData, "cpData");
 
         return (
           <td

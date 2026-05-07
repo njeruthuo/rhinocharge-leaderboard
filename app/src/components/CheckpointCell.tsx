@@ -9,10 +9,6 @@ function CheckpointCell({
   cp: CheckPoint;
   start_cp: string;
 }) {
-  console.log(start_cp, "start_cp");
-
-  console.log(cp, "check point");
-
   const status = getCheckpointStatus(cp);
 
   if (start_cp === cp.point) {
@@ -22,13 +18,15 @@ function CheckpointCell({
           <span
             className={`font-black text-[11px] block leading-none text-center text-`}
           >
-            {convertTo24Hour(cp?.time)}
+            {cp.time ? convertTo24Hour(cp?.time) : "00:00"}
           </span>
         </div>
 
         <div className="w-full">
           <span className="text-[#EF476F] font-mono text-[11px] block leading-none text-center opacity-80">
-            {new Intl.NumberFormat("en-US").format(cp.odometer)}
+            {start_cp !== cp.point
+              ? new Intl.NumberFormat("en-US").format(cp.odometer)
+              : 0}
           </span>
         </div>
 

@@ -1,6 +1,8 @@
 import { useState, useMemo } from "react";
 import { AnimatePresence } from "framer-motion";
 
+import * as Papa from "papaparse";
+
 import type { Driver } from "@/types";
 import { CHECKPOINTS } from "@/data";
 import Toast from "@/components/Toast";
@@ -175,6 +177,8 @@ export default function AdminPage() {
   const isLoading =
     LoadingVehicleList || LoadingCheckPoints || LoadingCreateStart;
 
+  // console.log(data, "data");
+
   const [time, setTime] = useState(`${d.getHours()}:${d.getMinutes()}`);
 
   const [expanded, setExpanded] = useState<number | null>(null);
@@ -198,8 +202,6 @@ export default function AdminPage() {
 
     return checkpoints;
   }, [selections, time]);
-
-  console.log(payload.length, data.length);
 
   const disabled = useMemo(() => {
     return payload && data && payload.length !== data.length;
@@ -248,16 +250,20 @@ export default function AdminPage() {
   const handleUpload = async () => {
     if (!file) return;
 
-    const formData = new FormData();
-    formData.append("file", file);
-
-    try {
-      console.log(file);
-
-      alert("Upload successful!");
-    } catch (error) {
-      console.error("Upload failed", error);
-    }
+    Papa.parse<[string, string]>(file, {
+      complete: function (results: Papa.ParseResult<[string, string]>) {
+        results.data.forEach(([item1, item2]: [string, string]) => {
+          const car = data.find(
+            (asset) =>
+              asset?.carNo ===
+              `CAR${Number(item1).toString().padStart(2, "0")}`,
+          );
+          if (car) {
+            setSelections((prev) => ({ ...prev, [car.asset_id]: item2 }));
+          }
+        });
+      },
+    });
   };
 
   return (
