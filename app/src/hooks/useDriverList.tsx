@@ -16,6 +16,7 @@ const useDriverList = () => {
     skip: !tokenReady,
     pollingInterval: REFETCH_INTERVAL,
   });
+
   const [getCheckPoints, { data: CheckPoints, isLoading: LoadingCheckPoints }] =
     useGetCheckPointsMutation();
   const fired = useRef(false);
@@ -65,9 +66,13 @@ const useDriverList = () => {
 
       return {
         id: index,
+        asset_id: item?.asset_id,
         carNo: item?.asset_name,
         mileage: item?.realOdometer,
         penalties: 0,
+        start_cp: item?.more_asset_details?.find(
+          (item) => item?.column_name === "start_cp",
+        )?.column_value,
         entrantName: item?.last_driver,
         team_name: item?.team_name,
         totalCps: checkPointList.length,

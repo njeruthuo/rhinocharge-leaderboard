@@ -3,6 +3,7 @@ import { baseQueryWithReauth } from "./baseQuery";
 import type {
   AssetListResponse,
   ColumnData,
+  ConfigType,
   Poi,
   PoiSummary,
   RhinoResponse,
@@ -12,6 +13,7 @@ import type {
 export const rhinoApi = createApi({
   reducerPath: "rhinoApi",
   baseQuery: baseQueryWithReauth,
+  tagTypes: ["VehicleList", "Time"],
   endpoints: (build) => ({
     getPois: build.mutation<Poi[], string>({
       query: () => ({
@@ -32,10 +34,12 @@ export const rhinoApi = createApi({
         method: "POST",
         body,
       }),
+      providesTags: ["VehicleList", "Time"],
     }),
 
     getVehicleList: build.query<AssetListResponse, void>({
       query: () => `settings/AssetManagement/GetAssets?userId=1263`,
+      providesTags: ["VehicleList", "Time"],
     }),
 
     getCheckPoints: build.mutation<TripRecord[], void>({
@@ -49,12 +53,22 @@ export const rhinoApi = createApi({
       },
     }),
 
-    configStartPoint: build.mutation<unknown, ColumnData>({
+    configStartPoint: build.mutation<ColumnData, ColumnData>({
       query: (body) => ({
-        url: `AssetManagement/UpdateAsset/`,
+        url: `settings/AssetManagement/UpdateMoreAssetDetails`,
         method: "PUT",
         body,
       }),
+      invalidatesTags: ["VehicleList"],
+    }),
+
+    updateStartTime: build.mutation<ConfigType, ConfigType>({
+      query: (body) => ({
+        url: `/settings/AssetManagement/UpdateMoreAssetDetails/1263`,
+        method: "PUT",
+        body,
+      }),
+      invalidatesTags: ["Time", "VehicleList"],
     }),
   }),
 });
@@ -64,4 +78,6 @@ export const {
   useGetVehicleListQuery,
   useGetCheckPointsMutation,
   useConfigStartPointMutation,
+
+  useUpdateStartTimeMutation,
 } = rhinoApi;

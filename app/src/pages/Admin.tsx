@@ -1,12 +1,16 @@
 import { useState, useMemo } from "react";
 import { AnimatePresence } from "framer-motion";
+
 import type { Driver } from "@/types";
-import useDriverList from "@/hooks/useDriverList";
 import { CHECKPOINTS } from "@/data";
-import TimePicker from "@/components/RaceClock";
 import Toast from "@/components/Toast";
-import { useConfigStartPointMutation } from "@/state/rhinoApi";
+import TimePicker from "@/components/RaceClock";
 import type { FilterTypes } from "@/state/types";
+import useDriverList from "@/hooks/useDriverList";
+import { useConfigStartPointMutation } from "@/state/rhinoApi";
+import Upload from "@/components/Upload";
+
+const d = new Date();
 
 function cpCount(car: Driver): number {
   return car.checkpoints?.filter((cp) => cp.time).length ?? 0;
@@ -164,13 +168,12 @@ const FilterBtn = ({
 );
 
 export default function AdminPage() {
+  const [file, setFile] = useState<File | null>(null);
   const { data, LoadingVehicleList, LoadingCheckPoints } = useDriverList();
   const [configStartPoint, { isLoading: LoadingCreateStart }] =
     useConfigStartPointMutation();
   const isLoading =
     LoadingVehicleList || LoadingCheckPoints || LoadingCreateStart;
-
-  const d = new Date();
 
   const [time, setTime] = useState(`${d.getHours()}:${d.getMinutes()}`);
 
@@ -180,19 +183,27 @@ export default function AdminPage() {
   const [toast, setToast] = useState<string | null>(null);
   const [selections, setSelections] = useState<Record<number, string>>({});
 
+  const [isInitialized, setIsInitialized] = useState(false);
+
   const payload = useMemo(() => {
-    const checkpoints = Object.entries(selections ?? {}).map(
+    const checkpoints = Object.entries(selections ?? {})?.map(
       ([key, value]) => ({
         column_id: 1,
         column_value: value,
-        assetId: key,
+        asset_id: Number(key) || 0,
       }),
     );
 
     if (checkpoints.length === 0 && !time) return [];
 
-    return [...checkpoints, { column_id: 2, column_value: time }];
+    return checkpoints;
   }, [selections, time]);
+
+  console.log(payload.length, data.length);
+
+  const disabled = useMemo(() => {
+    return payload && data && payload.length !== data.length;
+  }, [payload, data]);
 
   const filtered = useMemo(() => {
     const q = search.toLowerCase();
@@ -218,6 +229,34 @@ export default function AdminPage() {
       await configStartPoint(payload).unwrap();
     } catch (error) {
       console.log(error);
+    }
+  };
+
+  if (data.length > 0 && !isInitialized) {
+    const initialSelections = data.reduce(
+      (acc, item) => {
+        acc[item.asset_id] = item?.start_cp || "";
+        return acc;
+      },
+      {} as Record<number, string>,
+    );
+
+    setSelections(initialSelections);
+    setIsInitialized(true);
+  }
+
+  const handleUpload = async () => {
+    if (!file) return;
+
+    const formData = new FormData();
+    formData.append("file", file);
+
+    try {
+      console.log(file);
+
+      alert("Upload successful!");
+    } catch (error) {
+      console.error("Upload failed", error);
     }
   };
 
@@ -270,10 +309,18 @@ export default function AdminPage() {
                 Admin · Checkpoint Control
               </p>
             </div>
-            <TimePicker
-              value={time}
-              onChange={(selectedTime) => setTime(selectedTime)}
-            />
+
+            <div className="flex space-x-2">
+              <Upload
+                file={file}
+                setFile={setFile}
+                handleUpload={handleUpload}
+              />
+              <TimePicker
+                value={time}
+                onChange={(selectedTime) => setTime(selectedTime)}
+              />
+            </div>
           </div>
 
           {/* ── Search + Filters ── */}
@@ -410,18 +457,21 @@ export default function AdminPage() {
                     <AnimatePresence mode="popLayout">
                       {filtered.map((car) => (
                         <CarRow
-                          key={car.id}
+                          key={car.asset_id}
                           car={car}
-                          isExpanded={expanded === car.id}
+                          isExpanded={expanded === car.asset_id}
                           onToggle={() =>
                             setExpanded((prev) =>
-                              prev === car.id ? null : car.id,
+                              prev === car.asset_id ? null : car.asset_id,
                             )
                           }
                           // onLog={(carId, cp) => handleLog(carId, cp)}
-                          selectedCp={selections[car.id] ?? ""}
+                          selectedCp={selections[car.asset_id] ?? ""}
                           onSelectCp={(cp) =>
-                            setSelections((prev) => ({ ...prev, [car.id]: cp }))
+                            setSelections((prev) => ({
+                              ...prev,
+                              [car?.asset_id]: cp,
+                            }))
                           }
                         />
                       ))}
@@ -462,22 +512,15 @@ export default function AdminPage() {
             </span>
             <div className="h-px flex-1" style={{ background: "#292524" }} />
           </div>
-          {/* <button className="ml-auto shrink-0">Hello world</button> */}
           <button
             onClick={handleSaveStart}
-            disabled={payload.length - 1 !== data.length || isLoading}
+            disabled={disabled || isLoading}
             className="px-3 py-2 rounded-lg text-[10px] ml-auto shrink-0 font-bold tracking-[0.15em] uppercase transition-all disabled:cursor-not-allowed cursor-pointer"
             style={{
               fontFamily: "'Oswald', sans-serif",
-              background:
-                payload.length - 1 !== data.length
-                  ? "#FBF9E7"
-                  : "rgba(28,25,23,0.7)",
-              border: `1px solid ${payload.length - 1 !== data.length || isLoading ? "rgba(217,119,6,0.4)" : "rgba(255,255,255,0.06)"}`,
-              color:
-                payload.length - 1 !== data.length || isLoading
-                  ? "rgba(28,25,23,0.7)"
-                  : "#FCFCFC",
+              background: disabled ? "#FBF9E7" : "rgba(28,25,23,0.7)",
+              border: `1px solid ${disabled || isLoading ? "rgba(217,119,6,0.4)" : "rgba(255,255,255,0.06)"}`,
+              color: disabled || isLoading ? "rgba(28,25,23,0.7)" : "#FCFCFC",
             }}
           >
             Save start entries

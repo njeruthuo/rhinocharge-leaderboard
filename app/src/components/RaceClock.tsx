@@ -1,3 +1,4 @@
+import { useUpdateStartTimeMutation } from "@/state/rhinoApi";
 import { useMemo, useState } from "react";
 
 function DatePicker({
@@ -7,6 +8,7 @@ function DatePicker({
   value: string; // "YYYY-MM-DD"
   onChange: (date: string) => void;
 }) {
+  const [updateStartTime, { isLoading }] = useUpdateStartTimeMutation();
   const [open, setOpen] = useState(false);
   const date = useMemo(() => {
     if (!value) {
@@ -16,8 +18,17 @@ function DatePicker({
     return value;
   }, [value]);
 
-  function handleConfirm() {
-    setOpen(false);
+  async function handleConfirm() {
+    try {
+      await updateStartTime({
+        asset_id: 0,
+        column_id: 2,
+        column_value: value,
+      }).unwrap();
+      setOpen(false);
+    } catch (error) {
+      console.log(error, "error");
+    }
   }
 
   return (
@@ -100,13 +111,14 @@ function DatePicker({
 
                 <button
                   onClick={handleConfirm}
+                  disabled={isLoading}
                   className="flex-1 rounded-lg py-2 text-xs font-bold"
                   style={{
                     background: "rgba(217,119,6,0.18)",
                     color: "#D97706",
                   }}
                 >
-                  Set
+                  {isLoading ? "Setting..." : "Set"}
                 </button>
               </div>
             </div>
