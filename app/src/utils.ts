@@ -1,3 +1,4 @@
+import type { TripRecord } from "./state/types";
 import type { CheckPoint, RowStatus } from "./types";
 
 export function getParsedTime(dateTime: string) {
@@ -35,10 +36,15 @@ export function isOpen(
 ) {
   return Boolean(rowStatus?.[index]) && pathname === "/management/admin";
 }
+
 export function getCheckpointStatus(
   cp: CheckPoint,
 ): "completed" | "active" | "pending" {
   if (cp?.next && cp?.next !== "") return "active";
   if (cp?.time && cp?.time !== "") return "completed";
   return "pending";
+}
+
+export function calculateHistory(checkpoint: TripRecord, start_cp: string) {
+  console.log(checkpoint, start_cp, "checkpoint");
 }

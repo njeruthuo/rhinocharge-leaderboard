@@ -3,7 +3,7 @@ import {
   useGetCheckPointsMutation,
   useGetVehicleListQuery,
 } from "@/state/rhinoApi";
-import { getParsedTime } from "@/utils";
+import { calculateHistory, getParsedTime } from "@/utils";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 const useDriverList = () => {
@@ -57,10 +57,16 @@ const useDriverList = () => {
         (checkpoint) => checkpoint.vehicle === item.asset_name,
       );
 
+      const start_cp =
+        item?.more_asset_details?.find(
+          (item) => item?.column_name === "start_cp",
+        )?.column_value || "";
+
       const checkPoints = checkPointList.map((checkpoint) => ({
         point: checkpoint?.poi_name?.toUpperCase(),
         odometer: checkpoint?.start_odo,
         time: getParsedTime(checkpoint?.start_time),
+        calculated_odometer: calculateHistory(checkpoint, start_cp),
         next: "",
       }));
 
@@ -70,9 +76,7 @@ const useDriverList = () => {
         carNo: item?.asset_name,
         mileage: item?.realOdometer,
         penalties: 0,
-        start_cp: item?.more_asset_details?.find(
-          (item) => item?.column_name === "start_cp",
-        )?.column_value,
+        start_cp: start_cp,
         entrantName: item?.last_driver,
         team_name: item?.team_name,
         totalCps: checkPointList.length,
