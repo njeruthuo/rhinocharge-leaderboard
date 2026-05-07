@@ -177,7 +177,7 @@ export default function AdminPage() {
   const isLoading =
     LoadingVehicleList || LoadingCheckPoints || LoadingCreateStart;
 
-  console.log(data, "data");
+  // console.log(data, "data");
 
   const [time, setTime] = useState(`${d.getHours()}:${d.getMinutes()}`);
 
@@ -250,17 +250,18 @@ export default function AdminPage() {
   const handleUpload = async () => {
     if (!file) return;
 
-    Papa.parse(file, {
-      complete: function (results) {
-        setSelections((prev) => ({
-          ...Object.fromEntries(
-            results?.data?.map((selection) => [
-              Number(selection[0]) || 0,
-              selection[1] || "",
-            ]) || [],
-          ),
-        }));
-        console.log(selections, "selections");
+    Papa.parse<[string, string]>(file, {
+      complete: function (results: Papa.ParseResult<[string, string]>) {
+        results.data.forEach(([item1, item2]: [string, string]) => {
+          const car = data.find(
+            (asset) =>
+              asset?.carNo ===
+              `CAR${Number(item1).toString().padStart(2, "0")}`,
+          );
+          if (car) {
+            setSelections((prev) => ({ ...prev, [car.asset_id]: item2 }));
+          }
+        });
       },
     });
 
@@ -268,15 +269,14 @@ export default function AdminPage() {
     formData.append("file", file);
 
     try {
-      console.log(data);
-
-      alert("Upload successful!");
+      // console.log(data);
+      // alert("Upload successful!");
     } catch (error) {
       console.error("Upload failed", error);
     }
   };
 
-  console.log(selections, "selections");
+  console.log(Object.entries(selections).length, "selections number");
 
   return (
     <>
