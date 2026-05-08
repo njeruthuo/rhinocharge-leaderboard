@@ -3,7 +3,7 @@ import {
   useGetCheckPointsMutation,
   useGetVehicleListQuery,
 } from "@/state/rhinoApi";
-import { calculateHistory, getParsedTime } from "@/utils";
+import { calculateHistory, parseTime } from "@/utils";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 const useDriverList = () => {
@@ -20,6 +20,8 @@ const useDriverList = () => {
   const [getCheckPoints, { data: CheckPoints, isLoading: LoadingCheckPoints }] =
     useGetCheckPointsMutation();
   const fired = useRef(false);
+
+  // console.log(CheckPoints, "CheckPoints");
 
   useEffect(() => {
     if (fired.current) return;
@@ -62,18 +64,18 @@ const useDriverList = () => {
           (item) => item?.column_name === "start_cp",
         )?.column_value || "";
 
-      // console.log(
-      //   calculateHistory(checkPointList, start_cp),
-      //   "calculateHistory(checkPointList, start_cp, item.asset_name);",
-      // );
-
-      const checkPoints = checkPointList.map((checkpoint) => ({
-        point: checkpoint?.poi_name?.toUpperCase(),
-        odometer: checkpoint?.start_odo,
-        time: getParsedTime(checkpoint?.start_time),
-        calculated_odometer: 0,
-        next: "",
-      }));
+      const checkPoints = checkPointList.map((checkpoint) => {
+        const time = parseTime(checkpoint?.start_time)?.split(":");
+        return {
+          point: checkpoint?.poi_name?.toUpperCase(),
+          odometer: checkpoint?.start_odo,
+          // time: parseTime(checkpoint?.start_time)?.split(":"),
+          time: `${time[0]}:${time[1]}`,
+          // time: getParsedTime(checkpoint?.start_time),
+          calculated_odometer: 0,
+          next: "",
+        };
+      });
 
       return {
         id: index,

@@ -220,8 +220,6 @@ export default function SafariLeaderBoard() {
 
   return (
     <>
-      
-
       <div className="tread-bar tread-top" />
       <div className="tread-bar tread-bottom" />
 

@@ -99,6 +99,8 @@ export interface TripRecord {
   end_odo: number;
   end_time: string;
   mileage: number;
+  calculated_odometer: number;
+  startOdometer: number;
 }
 
 export type PoiSummary = {
