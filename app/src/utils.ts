@@ -48,11 +48,7 @@ export function getCheckpointStatus(
 export function calculateHistory(
   checkpointList: TripRecord[],
   start_cp: string,
-  name: string,
 ) {
-  // console.log(checkpointList, start_cp, name);
-
-  // Find the starting point
   const startCheckPoint = checkpointList?.find(
     (checkpoint) =>
       checkpoint.poi_name.toLowerCase().trim() ===
@@ -66,5 +62,14 @@ export function calculateHistory(
     return timeB.getTime() - timeA.getTime();
   });
 
-  console.log(orderedCheckPoints, "orderedCheckPoints");
+  // Create a new item in the checkpoints that contains the differences between points
+  return orderedCheckPoints.map((checkpoint) => ({
+    ...checkpoint,
+    point: checkpoint?.poi_name?.toUpperCase(),
+    odometer: checkpoint?.start_odo,
+    time: getParsedTime(checkpoint?.start_time),
+    calculated_odometer:
+      checkpoint.start_odo - (startCheckPoint?.start_odo || 0),
+    next: "",
+  }));
 }

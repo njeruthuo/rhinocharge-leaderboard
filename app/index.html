@@ -9,6 +9,82 @@
     />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Leaderboard | Rhino Charge 2026</title>
+    <style>
+      @import url("https://fonts.googleapis.com/css2?family=Oswald:wght@400;600;700&display=swap");
+      body {
+        margin: 0;
+        background: #1c1917;
+      }
+      @keyframes rhino-drift {
+        0% {
+          transform: translateX(0px) translateY(0px) rotate(-8deg);
+          opacity: 0.028;
+        }
+        50% {
+          transform: translateX(6px) translateY(-4px) rotate(-8deg);
+          opacity: 0.038;
+        }
+        100% {
+          transform: translateX(0px) translateY(0px) rotate(-8deg);
+          opacity: 0.028;
+        }
+      }
+      @keyframes tread-scroll {
+        0% {
+          background-position: 0 0;
+        }
+        100% {
+          background-position: 72px 0;
+        }
+      }
+      .rhino-ghost {
+        position: fixed;
+        pointer-events: none;
+        z-index: 0;
+        animation: rhino-drift 9s ease-in-out infinite;
+      }
+      .rhino-ghost-2 {
+        animation-delay: -4.5s;
+        animation-duration: 12s;
+      }
+      .tread-bar {
+        position: fixed;
+        left: 0;
+        right: 0;
+        height: 7px;
+        z-index: 1;
+        pointer-events: none;
+        background-image: repeating-linear-gradient(
+          90deg,
+          #d97706 0px,
+          #d97706 18px,
+          #b45309 18px,
+          #b45309 22px,
+          transparent 22px,
+          transparent 30px,
+          #92400e 30px,
+          #92400e 34px,
+          transparent 34px,
+          transparent 36px,
+          #d97706 36px,
+          #d97706 54px,
+          transparent 54px,
+          transparent 72px
+        );
+        animation: tread-scroll 2.4s linear infinite;
+        opacity: 0.55;
+      }
+      .tread-top {
+        top: 0;
+      }
+      .tread-bottom {
+        bottom: 0;
+      }
+      .cp-col {
+        width: 36px;
+        min-width: 36px;
+      }
+    </style>
   </head>
   <body>
     <div id="root"></div>

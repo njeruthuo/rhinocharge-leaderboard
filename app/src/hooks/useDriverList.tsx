@@ -62,10 +62,10 @@ const useDriverList = () => {
           (item) => item?.column_name === "start_cp",
         )?.column_value || "";
 
-      calculateHistory(checkPointList, start_cp, item.asset_name);
-
-      // console.log(alternativeCheckpoints, "alternativeCheckpoints");
-      // return;
+      // console.log(
+      //   calculateHistory(checkPointList, start_cp),
+      //   "calculateHistory(checkPointList, start_cp, item.asset_name);",
+      // );
 
       const checkPoints = checkPointList.map((checkpoint) => ({
         point: checkpoint?.poi_name?.toUpperCase(),
@@ -86,6 +86,7 @@ const useDriverList = () => {
         team_name: item?.team_name,
         totalCps: checkPointList.length,
         checkpoints: checkPoints,
+        orderedCheckpoints: calculateHistory(checkPointList, start_cp),
       };
     });
   }, [VehicleList, CheckPoints, LoadingVehicleList, LoadingCheckPoints]);
