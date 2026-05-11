@@ -1,7 +1,7 @@
 import { useState, useMemo } from "react";
 import { motion, AnimatePresence, Reorder } from "framer-motion";
 import type { CheckPoint, Driver } from "@/types";
-import useDriverList from "@/hooks/useDriverList";
+import useDriverList, { getSpecificTime } from "@/hooks/useDriverList";
 import { colors, spinner } from "@/constants";
 import DesktopTable from "@/components/DesktopTable";
 import { CHECKPOINTS } from "@/data";
@@ -211,8 +211,14 @@ function LeaderboardRow({
   );
 }
 
+
+
 export default function SafariLeaderBoard() {
-  const { data, LoadingVehicleList, LoadingCheckPoints } = useDriverList();
+  const [date] = useState(() => ({
+    startDate: getSpecificTime(7, 30),
+    endDate: getSpecificTime(23, 59, 59),
+  }));
+  const { data, LoadingVehicleList, LoadingCheckPoints } = useDriverList(date);
 
   const drivers = useMemo(() => {
     return [...data].sort((a, b) => b.totalCps - a.totalCps);

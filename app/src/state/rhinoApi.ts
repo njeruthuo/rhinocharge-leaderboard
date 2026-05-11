@@ -4,6 +4,7 @@ import type {
   AssetListResponse,
   ColumnData,
   ConfigType,
+  GetPoiPayload,
   Poi,
   PoiSummary,
   RhinoResponse,
@@ -42,14 +43,25 @@ export const rhinoApi = createApi({
       providesTags: ["VehicleList", "Time"],
     }),
 
-    getCheckPoints: build.mutation<TripRecord[], void>({
-      query: () => ({
-        url: `AnalyticsService?request={%22api_action%22%3A%22get_poi_summary%22%2C%22user_id%22%3A1263%2C%22start_date%22%3A%222025-05-30%2010%3A00%3A00%22%2C%22end_date%22%3A%222025-06-01%2011%3A00%3A00%22%2C%22region_id%22%3A0}`,
-        method: "POST",
-      }),
-      transformResponse: (arg: string) => {
-        const data = JSON.parse(arg as string);
-        return data.data;
+    getCheckPoints: build.mutation<TripRecord[], GetPoiPayload>({
+      query: ({ startDate, endDate }) => {
+        const requestBody = {
+          api_action: "get_poi_summary",
+          user_id: 1263,
+          start_date: startDate,
+          end_date: endDate,
+          region_id: 0,
+        };
+
+        return {
+          url: `AnalyticsService?request=${encodeURIComponent(JSON.stringify(requestBody))}`,
+          method: "POST",
+        };
+      },
+      transformResponse: (response: AssetListResponse) => {
+        const result =
+          typeof response === "string" ? JSON.parse(response) : response;
+        return result.data;
       },
     }),
 

@@ -122,3 +122,5 @@ export type ColumnData = ConfigType[];
 
 export type ColumnDataList = { body: ColumnData; assetId: number };
 export type FilterTypes = "all" | "partial" | "none";
+
+export type GetPoiPayload = { startDate: string; endDate: string };

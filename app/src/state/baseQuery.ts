@@ -41,8 +41,6 @@ export const baseQueryWithReauth: BaseQueryFn<
     );
 
     if (loginResult.data) {
-      console.log(loginResult.data, "loginResult.data");
-
       const data = loginResult.data as AuthData;
       localStorage.setItem("token", data.token);
       localStorage.setItem(

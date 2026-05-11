@@ -3,10 +3,11 @@ import {
   useGetCheckPointsMutation,
   useGetVehicleListQuery,
 } from "@/state/rhinoApi";
+import type { GetPoiPayload } from "@/state/types";
 import { calculateHistory, parseTime } from "@/utils";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
-const useDriverList = () => {
+const useDriverList = ({ startDate, endDate }: GetPoiPayload) => {
   const [tokenReady] = useState(() => !!localStorage.getItem("token"));
   const {
     data: VehicleList,
@@ -21,28 +22,26 @@ const useDriverList = () => {
     useGetCheckPointsMutation();
   const fired = useRef(false);
 
-  // console.log(CheckPoints, "CheckPoints");
-
   useEffect(() => {
     if (fired.current) return;
     fired.current = true;
     if (tokenReady) {
-      getCheckPoints();
+      getCheckPoints({ startDate, endDate });
     }
-  }, [tokenReady, getCheckPoints]);
+  }, [tokenReady, getCheckPoints, startDate, endDate]);
 
   useEffect(() => {
     if (!tokenReady) return;
     const interval = setInterval(() => {
-      getCheckPoints();
+      getCheckPoints({ startDate, endDate });
     }, REFETCH_INTERVAL);
     return () => clearInterval(interval);
-  }, [tokenReady, getCheckPoints]);
+  }, [tokenReady, getCheckPoints, startDate, endDate]);
 
   const refetch = useCallback(() => {
     refetchVehicles();
-    getCheckPoints();
-  }, [refetchVehicles, getCheckPoints]);
+    getCheckPoints({ startDate, endDate });
+  }, [refetchVehicles, getCheckPoints, startDate, endDate]);
 
   const driverList = useMemo(() => {
     if (
@@ -69,9 +68,7 @@ const useDriverList = () => {
         return {
           point: checkpoint?.poi_name?.toUpperCase(),
           odometer: checkpoint?.start_odo,
-          // time: parseTime(checkpoint?.start_time)?.split(":"),
           time: `${time[0]}:${time[1]}`,
-          // time: getParsedTime(checkpoint?.start_time),
           calculated_odometer: 0,
           next: "",
         };
@@ -97,3 +94,13 @@ const useDriverList = () => {
 };
 
 export default useDriverList;
+
+export const getSpecificTime = (hours = 0, minutes = 0, seconds = 0) => {
+  const now = new Date();
+  now.setHours(hours, minutes, seconds, 0);
+
+  const datePart = now.toLocaleDateString("en-CA");
+  const timePart = now.toTimeString().split(" ")[0];
+
+  return `${datePart} ${timePart}`;
+};
