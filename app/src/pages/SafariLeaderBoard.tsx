@@ -6,8 +6,15 @@ import { colors, spinner } from "@/constants";
 import DesktopTable from "@/components/DesktopTable";
 import { CHECKPOINTS } from "@/data";
 import { getCheckpointStatus } from "@/utils";
+import { useLocation } from "react-router-dom";
 
-function CheckpointBadge({ cp }: { cp: CheckPoint }) {
+function CheckpointBadge({
+  cp,
+  isViewer,
+}: {
+  cp: CheckPoint;
+  isViewer: boolean;
+}) {
   const status = getCheckpointStatus(cp);
 
   const badgeStyle =
@@ -29,9 +36,11 @@ function CheckpointBadge({ cp }: { cp: CheckPoint }) {
         {status === "completed" ? (
           <>
             <span className="text-[10px] font-bold">{cp.time}</span>
-            <span className="text-[8px] opacity-60 font-mono">
-              {cp.odometer} KM
-            </span>
+            {isViewer && (
+              <span className="text-[8px] opacity-60 font-mono">
+                {cp.odometer} KM
+              </span>
+            )}
           </>
         ) : status === "active" ? (
           <div className="flex items-center gap-1.5">
@@ -50,10 +59,12 @@ function LeaderboardRow({
   driver,
   rank,
   checkpoints,
+  isViewer,
 }: {
   driver: Driver;
   rank: number;
   checkpoints: CheckPoint[];
+  isViewer: boolean;
 }) {
   const [isOpen, setIsOpen] = useState(false);
   const totalCheckpoints = checkpoints.length;
@@ -199,7 +210,11 @@ function LeaderboardRow({
 
                 <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-2">
                   {driver.checkpoints.map((cp: CheckPoint) => (
-                    <CheckpointBadge key={`${cp.point}-${cp.time}`} cp={cp} />
+                    <CheckpointBadge
+                      isViewer={isViewer}
+                      key={`${cp.point}-${cp.time}`}
+                      cp={cp}
+                    />
                   ))}
                 </div>
               </div>
@@ -211,9 +226,8 @@ function LeaderboardRow({
   );
 }
 
-
-
 export default function SafariLeaderBoard() {
+  const { pathname } = useLocation();
   const [date] = useState(() => ({
     startDate: getSpecificTime(7, 30),
     endDate: getSpecificTime(23, 59, 59),
@@ -223,6 +237,12 @@ export default function SafariLeaderBoard() {
   const drivers = useMemo(() => {
     return [...data].sort((a, b) => b.totalCps - a.totalCps);
   }, [data]);
+
+  const isViewer = useMemo((): boolean => {
+    return pathname === "/viewer";
+  }, [pathname]);
+
+  console.log(isViewer);
 
   return (
     <>
@@ -367,7 +387,7 @@ export default function SafariLeaderBoard() {
                 />
               </div>
             ) : (
-              <DesktopTable drivers={drivers} />
+              <DesktopTable isViewer={isViewer} drivers={drivers} />
             )}
           </div>
 
@@ -403,6 +423,7 @@ export default function SafariLeaderBoard() {
                     transition={{ duration: 0.35, ease: "easeOut" }}
                   >
                     <LeaderboardRow
+                      isViewer={isViewer}
                       driver={driver}
                       rank={index + 1}
                       checkpoints={driver.checkpoints}

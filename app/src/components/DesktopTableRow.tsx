@@ -12,7 +12,7 @@ const TD_CELL: React.CSSProperties = {
   verticalAlign: "middle",
 };
 
-function DesktopTableRow({ driver, rank }: DesktopRowType) {
+function DesktopTableRow({ driver, rank, isViewer }: DesktopRowType) {
   const totalCheckpoints = CHECKPOINTS.length + 1 || 0;
   const progress = Math.round((driver.totalCps / totalCheckpoints) * 100);
 
@@ -96,35 +96,39 @@ function DesktopTableRow({ driver, rank }: DesktopRowType) {
         );
       })}
 
-      <td
-        style={{
-          ...TD_CELL,
-          paddingRight: 16,
-          whiteSpace: "nowrap",
-          paddingTop: 3,
-          paddingBottom: 3,
-          textAlign: "right",
-        }}
-      >
-        <span className="font-black text-sm tracking-widest rounded py-3 text-[#46237A]">
-          {new Intl.NumberFormat("en-US").format(driver?.mileage ?? 0)}
-        </span>
-      </td>
+      {isViewer && (
+        <td
+          style={{
+            ...TD_CELL,
+            paddingRight: 16,
+            whiteSpace: "nowrap",
+            paddingTop: 3,
+            paddingBottom: 3,
+            textAlign: "right",
+          }}
+        >
+          <span className="font-black text-sm tracking-widest rounded py-3 text-[#46237A]">
+            {new Intl.NumberFormat("en-US").format(driver?.mileage ?? 0)}
+          </span>
+        </td>
+      )}
 
-      <td
-        style={{
-          ...TD_CELL,
-          paddingRight: 16,
-          whiteSpace: "nowrap",
-          paddingTop: 3,
-          paddingBottom: 3,
-          textAlign: "right",
-        }}
-      >
-        <span className="font-black text-sm tracking-widest rounded py-3 pr-3 text-[#46237A]">
-          {driver?.penalties ?? 0}
-        </span>
-      </td>
+      {isViewer && (
+        <td
+          style={{
+            ...TD_CELL,
+            paddingRight: 16,
+            whiteSpace: "nowrap",
+            paddingTop: 3,
+            paddingBottom: 3,
+            textAlign: "right",
+          }}
+        >
+          <span className="font-black text-sm tracking-widest rounded py-3 pr-3 text-[#46237A]">
+            {driver?.penalties ?? 0}
+          </span>
+        </td>
+      )}
 
       <td
         style={{

@@ -29,4 +29,5 @@ export type DesktopRowType = {
   open: boolean;
   id: number;
   setOpen: React.Dispatch<React.SetStateAction<RowStatus>>;
+  isViewer: boolean;
 };
