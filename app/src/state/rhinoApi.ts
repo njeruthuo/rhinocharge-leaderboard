@@ -51,6 +51,8 @@ export const rhinoApi = createApi({
           start_date: startDate,
           end_date: endDate,
           region_id: 0,
+          backup: true,
+          unit_id: "",
         };
 
         return {

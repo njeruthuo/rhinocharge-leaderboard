@@ -242,8 +242,6 @@ export default function SafariLeaderBoard() {
     return pathname === "/viewer";
   }, [pathname]);
 
-  console.log(isViewer);
-
   return (
     <>
       <div className="tread-bar tread-top" />
@@ -352,12 +350,13 @@ export default function SafariLeaderBoard() {
                 Overall Leaderboard
               </div>
             </div>
+
             <div className="flex items-center gap-3 flex-wrap ml-auto">
               <div
                 className={`flex items-center gap-2 px-3 py-1.5 rounded-full border text-red-500`}
               >
                 <span
-                  className={`w-2 h-2 rounded-full  animate-pulse text-red-500`}
+                  className={`w-2 h-2 rounded-full  animate-pulse text-green-500`}
                 />
                 <span
                   className={`text-[10px] font-bold tracking-widest  uppercase text-red-400`}
