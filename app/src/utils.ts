@@ -12,6 +12,18 @@ export function getParsedTime(dateTime: string) {
   return dateTime;
 }
 
+export function parseTime(dateTime: string) {
+  const dateObj = new Date(dateTime);
+
+  // 2. Format to 24-hour time
+  return new Intl.DateTimeFormat("en-GB", {
+    hour: "2-digit",
+    minute: "2-digit",
+    second: "2-digit",
+    hour12: false,
+  }).format(dateObj);
+}
+
 export function convertTo24Hour(timeStr: string) {
   const modifier = timeStr.slice(-2).toUpperCase();
   // eslint-disable-next-line prefer-const
@@ -45,6 +57,38 @@ export function getCheckpointStatus(
   return "pending";
 }
 
-export function calculateHistory(checkpoint: TripRecord, start_cp: string) {
-  console.log(checkpoint, start_cp, "checkpoint");
+export function calculateHistory(
+  checkpointList: TripRecord[],
+  start_cp: string,
+) {
+  const startCheckPoint = checkpointList?.find(
+    (checkpoint) =>
+      checkpoint.poi_name.toLowerCase().trim() ===
+      start_cp.toLowerCase().trim(),
+  );
+
+  // Order the checkpoints using time
+  const orderedCheckPoints = checkpointList.sort((a, b) => {
+    const timeA = new Date(a.start_time);
+    const timeB = new Date(b.start_time);
+    return timeB.getTime() - timeA.getTime();
+  });
+
+  // Create a new item in the checkpoints that contains the differences between points
+  return orderedCheckPoints.map((checkpoint, index) => {
+    const time = parseTime(checkpoint?.start_time)?.split(":");
+    return {
+      point: checkpoint?.poi_name?.toUpperCase(),
+      odometer: checkpoint?.start_odo,
+      time: `${time[0]}:${time[1]}`,
+      // calculated_odometer:
+      //   checkpoint.start_odo - (startCheckPoint?.start_odo || 0),
+      calculated_odometer:
+        index === 0
+          ? checkpoint.start_odo - (startCheckPoint?.start_odo || 0)
+          : checkpoint.start_odo - orderedCheckPoints[index - 1].start_odo,
+      next: "",
+      startOdometer: startCheckPoint?.start_odo,
+    };
+  });
 }

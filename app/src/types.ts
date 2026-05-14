@@ -4,6 +4,7 @@ export interface Driver {
   entrantName: string;
   team_name: string;
   checkpoints: CheckPoint[];
+  orderedCheckpoints: CheckPoint[];
   totalCps: number;
   mileage: number;
   penalties: number;
@@ -15,6 +16,8 @@ export type CheckPoint = {
   odometer: number;
   time: string;
   next: string;
+  calculated_odometer?: number;
+  startOdometer?: number;
 };
 
 export type RowStatus = { [id: number]: boolean };
@@ -26,4 +29,5 @@ export type DesktopRowType = {
   open: boolean;
   id: number;
   setOpen: React.Dispatch<React.SetStateAction<RowStatus>>;
+  isViewer: boolean;
 };

@@ -1,6 +1,6 @@
 import { colors } from "@/constants";
 import type { CheckPoint } from "@/types";
-import { convertTo24Hour, getCheckpointStatus } from "@/utils";
+import { getCheckpointStatus } from "@/utils";
 
 function CheckpointCell({
   cp,
@@ -18,14 +18,16 @@ function CheckpointCell({
           <span
             className={`font-black text-[11px] block leading-none text-center text-`}
           >
-            {cp.time ? convertTo24Hour(cp?.time) : "00:00"}
+            {cp.time ?? "00:00"}
           </span>
         </div>
 
         <div className="w-full">
           <span className="text-[#EF476F] font-mono text-[11px] block leading-none text-center opacity-80">
             {start_cp !== cp.point
-              ? new Intl.NumberFormat("en-US").format(cp.odometer)
+              ? new Intl.NumberFormat("en-US").format(
+                  cp?.calculated_odometer || 0,
+                )
               : 0}
           </span>
         </div>
@@ -42,13 +44,16 @@ function CheckpointCell({
           <span
             className={`font-black text-[11px] block leading-none text-center ${colors.primary}`}
           >
-            {convertTo24Hour(cp?.time)}
+            {cp?.time}
+            {/* {convertTo24Hour(cp?.time)} */}
           </span>
         </div>
 
         <div className="w-full">
           <span className="text-stone-500 font-mono text-[11px] block leading-none text-center opacity-80">
-            {new Intl.NumberFormat("en-US").format(cp.odometer)}
+            {new Intl.NumberFormat("en-US").format(
+              cp?.calculated_odometer || 0,
+            )}
           </span>
         </div>
 

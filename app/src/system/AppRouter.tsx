@@ -6,6 +6,7 @@ const AppRouter = () => {
     <BrowserRouter>
       <Routes>
         <Route path={"/"} element={<SafariLeaderBoard />} />
+        <Route path={"/management/viewer"} element={<SafariLeaderBoard />} />
         <Route path={"/management/admin"} element={<Admin />} />
       </Routes>
     </BrowserRouter>

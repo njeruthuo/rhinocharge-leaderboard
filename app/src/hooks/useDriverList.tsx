@@ -3,10 +3,11 @@ import {
   useGetCheckPointsMutation,
   useGetVehicleListQuery,
 } from "@/state/rhinoApi";
-import { calculateHistory, getParsedTime } from "@/utils";
+import type { GetPoiPayload } from "@/state/types";
+import { calculateHistory, parseTime } from "@/utils";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
-const useDriverList = () => {
+const useDriverList = ({ startDate, endDate }: GetPoiPayload) => {
   const [tokenReady] = useState(() => !!localStorage.getItem("token"));
   const {
     data: VehicleList,
@@ -25,22 +26,22 @@ const useDriverList = () => {
     if (fired.current) return;
     fired.current = true;
     if (tokenReady) {
-      getCheckPoints();
+      getCheckPoints({ startDate, endDate });
     }
-  }, [tokenReady, getCheckPoints]);
+  }, [tokenReady, getCheckPoints, startDate, endDate]);
 
   useEffect(() => {
     if (!tokenReady) return;
     const interval = setInterval(() => {
-      getCheckPoints();
+      getCheckPoints({ startDate, endDate });
     }, REFETCH_INTERVAL);
     return () => clearInterval(interval);
-  }, [tokenReady, getCheckPoints]);
+  }, [tokenReady, getCheckPoints, startDate, endDate]);
 
   const refetch = useCallback(() => {
     refetchVehicles();
-    getCheckPoints();
-  }, [refetchVehicles, getCheckPoints]);
+    getCheckPoints({ startDate, endDate });
+  }, [refetchVehicles, getCheckPoints, startDate, endDate]);
 
   const driverList = useMemo(() => {
     if (
@@ -62,13 +63,16 @@ const useDriverList = () => {
           (item) => item?.column_name === "start_cp",
         )?.column_value || "";
 
-      const checkPoints = checkPointList.map((checkpoint) => ({
-        point: checkpoint?.poi_name?.toUpperCase(),
-        odometer: checkpoint?.start_odo,
-        time: getParsedTime(checkpoint?.start_time),
-        calculated_odometer: calculateHistory(checkpoint, start_cp),
-        next: "",
-      }));
+      const checkPoints = checkPointList.map((checkpoint) => {
+        const time = parseTime(checkpoint?.start_time)?.split(":");
+        return {
+          point: checkpoint?.poi_name?.toUpperCase(),
+          odometer: checkpoint?.start_odo,
+          time: `${time[0]}:${time[1]}`,
+          calculated_odometer: 0,
+          next: "",
+        };
+      });
 
       return {
         id: index,
@@ -81,6 +85,7 @@ const useDriverList = () => {
         team_name: item?.team_name,
         totalCps: checkPointList.length,
         checkpoints: checkPoints,
+        orderedCheckpoints: calculateHistory(checkPointList, start_cp),
       };
     });
   }, [VehicleList, CheckPoints, LoadingVehicleList, LoadingCheckPoints]);
@@ -89,3 +94,13 @@ const useDriverList = () => {
 };
 
 export default useDriverList;
+
+export const getSpecificTime = (hours = 0, minutes = 0, seconds = 0) => {
+  const now = new Date();
+  now.setHours(hours, minutes, seconds, 0);
+
+  const datePart = now.toLocaleDateString("en-CA");
+  const timePart = now.toTimeString().split(" ")[0];
+
+  return `${datePart} ${timePart}`;
+};

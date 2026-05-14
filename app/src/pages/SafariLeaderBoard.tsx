@@ -1,13 +1,20 @@
 import { useState, useMemo } from "react";
 import { motion, AnimatePresence, Reorder } from "framer-motion";
 import type { CheckPoint, Driver } from "@/types";
-import useDriverList from "@/hooks/useDriverList";
+import useDriverList, { getSpecificTime } from "@/hooks/useDriverList";
 import { colors, spinner } from "@/constants";
 import DesktopTable from "@/components/DesktopTable";
 import { CHECKPOINTS } from "@/data";
 import { getCheckpointStatus } from "@/utils";
+import { useLocation } from "react-router-dom";
 
-function CheckpointBadge({ cp }: { cp: CheckPoint }) {
+function CheckpointBadge({
+  cp,
+  isViewer,
+}: {
+  cp: CheckPoint;
+  isViewer: boolean;
+}) {
   const status = getCheckpointStatus(cp);
 
   const badgeStyle =
@@ -29,9 +36,11 @@ function CheckpointBadge({ cp }: { cp: CheckPoint }) {
         {status === "completed" ? (
           <>
             <span className="text-[10px] font-bold">{cp.time}</span>
-            <span className="text-[8px] opacity-60 font-mono">
-              {cp.odometer} KM
-            </span>
+            {isViewer && (
+              <span className="text-[8px] opacity-60 font-mono">
+                {cp.odometer} KM
+              </span>
+            )}
           </>
         ) : status === "active" ? (
           <div className="flex items-center gap-1.5">
@@ -50,10 +59,12 @@ function LeaderboardRow({
   driver,
   rank,
   checkpoints,
+  isViewer,
 }: {
   driver: Driver;
   rank: number;
   checkpoints: CheckPoint[];
+  isViewer: boolean;
 }) {
   const [isOpen, setIsOpen] = useState(false);
   const totalCheckpoints = checkpoints.length;
@@ -199,7 +210,11 @@ function LeaderboardRow({
 
                 <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-2">
                   {driver.checkpoints.map((cp: CheckPoint) => (
-                    <CheckpointBadge key={`${cp.point}-${cp.time}`} cp={cp} />
+                    <CheckpointBadge
+                      isViewer={isViewer}
+                      key={`${cp.point}-${cp.time}`}
+                      cp={cp}
+                    />
                   ))}
                 </div>
               </div>
@@ -212,37 +227,23 @@ function LeaderboardRow({
 }
 
 export default function SafariLeaderBoard() {
-  const { data, LoadingVehicleList, LoadingCheckPoints } = useDriverList();
+  const { pathname } = useLocation();
+  const [date] = useState(() => ({
+    startDate: getSpecificTime(7, 30),
+    endDate: getSpecificTime(23, 59, 59),
+  }));
+  const { data, LoadingVehicleList, LoadingCheckPoints } = useDriverList(date);
 
   const drivers = useMemo(() => {
     return [...data].sort((a, b) => b.totalCps - a.totalCps);
   }, [data]);
 
+  const isViewer = useMemo((): boolean => {
+    return pathname === "/viewer";
+  }, [pathname]);
+
   return (
     <>
-      <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Oswald:wght@400;600;700&display=swap');
-        body { margin: 0; background: #1C1917; }
-        @keyframes rhino-drift {
-          0%   { transform: translateX(0px) translateY(0px) rotate(-8deg); opacity: 0.028; }
-          50%  { transform: translateX(6px) translateY(-4px) rotate(-8deg); opacity: 0.038; }
-          100% { transform: translateX(0px) translateY(0px) rotate(-8deg); opacity: 0.028; }
-        }
-        @keyframes tread-scroll {
-          0%   { background-position: 0 0; }
-          100% { background-position: 72px 0; }
-        }
-        .rhino-ghost { position: fixed; pointer-events: none; z-index: 0; animation: rhino-drift 9s ease-in-out infinite; }
-        .rhino-ghost-2 { animation-delay: -4.5s; animation-duration: 12s; }
-        .tread-bar {
-          position: fixed; left: 0; right: 0; height: 7px; z-index: 1; pointer-events: none;
-          background-image: repeating-linear-gradient(90deg, #D97706 0px, #D97706 18px, #b45309 18px, #b45309 22px, transparent 22px, transparent 30px, #92400e 30px, #92400e 34px, transparent 34px, transparent 36px, #D97706 36px, #D97706 54px, transparent 54px, transparent 72px);
-          animation: tread-scroll 2.4s linear infinite; opacity: 0.55;
-        }
-        .tread-top { top: 0; } .tread-bottom { bottom: 0; }
-        .cp-col { width: 36px; min-width: 36px; }
-      `}</style>
-
       <div className="tread-bar tread-top" />
       <div className="tread-bar tread-bottom" />
 
@@ -349,12 +350,13 @@ export default function SafariLeaderBoard() {
                 Overall Leaderboard
               </div>
             </div>
+
             <div className="flex items-center gap-3 flex-wrap ml-auto">
               <div
                 className={`flex items-center gap-2 px-3 py-1.5 rounded-full border text-red-500`}
               >
                 <span
-                  className={`w-2 h-2 rounded-full  animate-pulse text-red-500`}
+                  className={`w-2 h-2 rounded-full  animate-pulse text-green-500`}
                 />
                 <span
                   className={`text-[10px] font-bold tracking-widest  uppercase text-red-400`}
@@ -384,7 +386,7 @@ export default function SafariLeaderBoard() {
                 />
               </div>
             ) : (
-              <DesktopTable drivers={drivers} />
+              <DesktopTable isViewer={isViewer} drivers={drivers} />
             )}
           </div>
 
@@ -420,6 +422,7 @@ export default function SafariLeaderBoard() {
                     transition={{ duration: 0.35, ease: "easeOut" }}
                   >
                     <LeaderboardRow
+                      isViewer={isViewer}
                       driver={driver}
                       rank={index + 1}
                       checkpoints={driver.checkpoints}

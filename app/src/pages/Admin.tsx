@@ -8,7 +8,7 @@ import { CHECKPOINTS } from "@/data";
 import Toast from "@/components/Toast";
 import TimePicker from "@/components/RaceClock";
 import type { FilterTypes } from "@/state/types";
-import useDriverList from "@/hooks/useDriverList";
+import useDriverList, { getSpecificTime } from "@/hooks/useDriverList";
 import { useConfigStartPointMutation } from "@/state/rhinoApi";
 import Upload from "@/components/Upload";
 
@@ -171,13 +171,14 @@ const FilterBtn = ({
 
 export default function AdminPage() {
   const [file, setFile] = useState<File | null>(null);
-  const { data, LoadingVehicleList, LoadingCheckPoints } = useDriverList();
+  const { data, LoadingVehicleList, LoadingCheckPoints } = useDriverList({
+    startDate: getSpecificTime(7, 30),
+    endDate: getSpecificTime(23, 59, 59),
+  });
   const [configStartPoint, { isLoading: LoadingCreateStart }] =
     useConfigStartPointMutation();
   const isLoading =
     LoadingVehicleList || LoadingCheckPoints || LoadingCreateStart;
-
-  // console.log(data, "data");
 
   const [time, setTime] = useState(`${d.getHours()}:${d.getMinutes()}`);
 

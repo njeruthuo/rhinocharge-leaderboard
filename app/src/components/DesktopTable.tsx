@@ -9,7 +9,13 @@ import { isOpen } from "@/utils";
 import DesktopTableRow from "./DesktopTableRow";
 import StartForm from "./StartForm";
 
-function DesktopTable({ drivers }: { drivers: Driver[] }) {
+function DesktopTable({
+  drivers,
+  isViewer,
+}: {
+  drivers: Driver[];
+  isViewer: boolean;
+}) {
   const [rowStatus, setRowStatus] = useState<RowStatus>({ 1: false });
   const { pathname } = useLocation();
 
@@ -31,9 +37,9 @@ function DesktopTable({ drivers }: { drivers: Driver[] }) {
               position: "sticky",
               top: 0,
               zIndex: 10,
-              // background: "#D9D7D7",
+              background: "#D9D7D7",
             }}
-            className="text-sky-600 bg-gray-200"
+            className="text-sky-600 bg-gray-200 space-x-2"
           >
             <th
               className="w-1"
@@ -89,22 +95,28 @@ function DesktopTable({ drivers }: { drivers: Driver[] }) {
               </th>
             ))}
 
-            <th
-              className="py-3 pl-2 pr-2 text-right"
-              style={{ borderBottom: "1px solid rgba(217,119,6,0.15)" }}
-            >
-              <span className="text-[9px] font-bold tracking-[0.2em] uppercase">
-                mil.
-              </span>
-            </th>
-            <th
-              className="py-3 pl-2 pr-2 text-right"
-              style={{ borderBottom: "1px solid rgba(217,119,6,0.15)" }}
-            >
-              <span className="text-[9px] font-bold tracking-[0.2em] uppercase">
-                penalty
-              </span>
-            </th>
+            {isViewer && (
+              <th
+                className="py-3 pl-2 pr-2 text-right"
+                style={{ borderBottom: "1px solid rgba(217,119,6,0.15)" }}
+              >
+                <span className="text-[9px] font-bold tracking-[0.2em] uppercase">
+                  mil.
+                </span>
+              </th>
+            )}
+
+            {isViewer && (
+              <th
+                className="py-3 pl-2 pr-2 text-right"
+                style={{ borderBottom: "1px solid rgba(217,119,6,0.15)" }}
+              >
+                <span className="text-[9px] font-bold tracking-[0.2em] uppercase">
+                  penalty
+                </span>
+              </th>
+            )}
+
             <th
               className="py-3 pl-2 pr-1 text-right"
               style={{ borderBottom: "1px solid rgba(217,119,6,0.15)" }}
@@ -147,6 +159,7 @@ function DesktopTable({ drivers }: { drivers: Driver[] }) {
                     className="hover:bg-white/[0.02] transition-colors duration-100"
                   >
                     <DesktopTableRow
+                      isViewer={isViewer}
                       driver={driver}
                       rank={rank}
                       open={isOpen(index, rowStatus, pathname)}
