@@ -227,6 +227,11 @@ function LeaderboardRow({
 }
 
 export default function SafariLeaderBoard() {
+  /**
+   * TODO: we also need to store dates that can be
+   * used to fetch events data based on dates
+   */
+
   const navigate = useNavigate();
   const { pathname } = useLocation();
   const [date] = useState(() => ({
