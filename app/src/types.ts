@@ -1,3 +1,5 @@
+import type { Dispatch, SetStateAction } from "react";
+
 export interface Driver {
   id: number;
   carNo: string;
@@ -39,7 +41,15 @@ export interface TabOption {
 }
 
 export interface AdminTabsProps {
-  tabs: TabOption[];
+  tabs: readonly TabOption[];
   activeTab: string;
-  onChange: (tabId: string) => void;
+  onChange: Dispatch<SetStateAction<Readonly<TabType>>>;
 }
+
+export type TabType = (typeof TabOptionList)[keyof typeof TabOptionList];
+
+export const TabOptionList = {
+  LIVEDATA: "livedata",
+  COMPETITORS: "competitors",
+  RESULTS: "results",
+} as const;

@@ -1,4 +1,4 @@
-import type { AdminTabsProps } from "@/types";
+import type { AdminTabsProps, TabType } from "@/types";
 
 export function AdminTabs({ tabs, activeTab, onChange }: AdminTabsProps) {
   return (
@@ -16,7 +16,7 @@ export function AdminTabs({ tabs, activeTab, onChange }: AdminTabsProps) {
           return (
             <button
               key={tab.id}
-              onClick={() => onChange(tab.id)}
+              onClick={() => onChange(tab.id as unknown as TabType)}
               className="flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg text-[10px] font-black tracking-[0.15em] uppercase transition-all duration-200 shrink-0 cursor-pointer select-none"
               style={{
                 fontFamily: "'Oswald', sans-serif",

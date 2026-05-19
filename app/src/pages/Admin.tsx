@@ -1,23 +1,24 @@
-import { useState, type ReactNode } from "react";
+import { useState } from "react";
 import { AnimatePresence } from "framer-motion";
 
 import { ADMIN_TABS } from "@/data";
 import Toast from "@/components/Toast";
 
 import { AdminTabs } from "@/components/AdminTabs";
+import SafariLeaderBoard from "./SafariLeaderBoard";
+import { TabOptionList, type TabType } from "@/types";
 import CompetitorInfo from "@/components/admintabsopt/CompetitorInfo";
 import LoginPage from "@/components/admintabsopt/components/LoginPage";
-import SafariLeaderBoard from "./SafariLeaderBoard";
 
 export default function AdminPage() {
-  const [currentTab, setCurrentTab] = useState("livedata");
+  const [currentTab, setCurrentTab] = useState<TabType>(TabOptionList.LIVEDATA);
   const [isAuthenticated, setIsAuthenticated] = useState(true);
   const [toast, setToast] = useState<string | null>(null);
 
-  const TabOptions: Record<string, ReactNode> = {
-    competitors: <CompetitorInfo />,
-    livedata: <SafariLeaderBoard showHeader={false} />,
-    results: <></>,
+  const TabOptions: Record<TabType, React.ReactNode> = {
+    [TabOptionList.LIVEDATA]: <SafariLeaderBoard showHeader={false} />,
+    [TabOptionList.COMPETITORS]: <CompetitorInfo />,
+    [TabOptionList.RESULTS]: <></>,
   };
 
   return (
