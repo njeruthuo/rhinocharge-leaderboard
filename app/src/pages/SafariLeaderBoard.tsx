@@ -1,12 +1,13 @@
-import { useState, useMemo, useRef, useEffect } from "react";
+import { useState, useMemo } from "react";
 import { motion, AnimatePresence, Reorder } from "framer-motion";
 import type { CheckPoint, Driver } from "@/types";
 import useDriverList, { getSpecificTime } from "@/hooks/useDriverList";
-import { ADMIN_PAGE_CLICKS, colors, spinner } from "@/constants";
+import { colors, spinner } from "@/constants";
 import DesktopTable from "@/components/DesktopTable";
 import { CHECKPOINTS } from "@/data";
 import { getCheckpointStatus } from "@/utils";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useLocation } from "react-router-dom";
+import LeaderboardHeader from "@/components/LeaderboardHeader";
 
 function CheckpointBadge({
   cp,
@@ -226,13 +227,16 @@ function LeaderboardRow({
   );
 }
 
-export default function SafariLeaderBoard() {
+export default function SafariLeaderBoard({
+  showHeader = true,
+}: {
+  showHeader?: boolean;
+}) {
   /**
    * TODO: we also need to store dates that can be
    * used to fetch events data based on dates
    */
 
-  const navigate = useNavigate();
   const { pathname } = useLocation();
   const [date] = useState(() => ({
     startDate: getSpecificTime(7, 30),
@@ -248,38 +252,14 @@ export default function SafariLeaderBoard() {
     return pathname !== "/";
   }, [pathname]);
 
-  const [clicks, setClicks] = useState(0);
-  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
-
-  const handleOpenAdmin = () => {
-    if (timeoutRef.current) {
-      clearTimeout(timeoutRef.current);
-    }
-
-    const nextClicks = clicks + 1;
-
-    if (nextClicks >= ADMIN_PAGE_CLICKS) {
-      setClicks(0);
-      navigate("/management/admin");
-    } else {
-      setClicks(nextClicks);
-
-      timeoutRef.current = setTimeout(() => {
-        setClicks(0);
-      }, 2000);
-    }
-  };
-
-  useEffect(() => {
-    return () => {
-      if (timeoutRef.current) clearTimeout(timeoutRef.current);
-    };
-  }, []);
-
   return (
     <>
-      <div className="tread-bar tread-top" />
-      <div className="tread-bar tread-bottom" />
+      {showHeader && (
+        <>
+          <div className="tread-bar tread-top" />
+          <div className="tread-bar tread-bottom" />
+        </>
+      )}
 
       <svg
         className="rhino-ghost"
@@ -356,7 +336,7 @@ export default function SafariLeaderBoard() {
       </svg>
 
       <div
-        className="min-h-screen text-stone-100 py-4 px-4"
+        className={`${showHeader ? "min-h-screen" : "max-h-[65vh]"} text-stone-100 py-4 px-4`}
         style={{
           background: "#FBFBFB",
           backgroundImage: `
@@ -369,43 +349,7 @@ export default function SafariLeaderBoard() {
         }}
       >
         <div className="max-w-3xl xl:max-w-[95vw] 2xl:max-w-[1600px] mx-auto">
-          <div className="mb-4 flex place-content-start">
-            <div>
-              <div
-                className="text-2xl select-none sm:text-4xl font-black text-[#716969] leading-none mb-1"
-                style={{
-                  fontFamily: "'Oswald', sans-serif",
-                  letterSpacing: "0.04em",
-                }}
-                onClick={handleOpenAdmin}
-              >
-                Rhino Charge 2026
-              </div>
-              <div className="text-stone-500 text-xs tracking-widest uppercase">
-                Overall Leaderboard
-              </div>
-            </div>
-
-            <div className="flex items-center gap-3 flex-wrap ml-auto">
-              <div
-                className="flex items-center gap-2 px-3 py-1.5 rounded-full border"
-                style={{
-                  borderColor: "rgba(239, 68, 68, 0.2)",
-                  background: "rgba(239, 68, 68, 0.05)",
-                }}
-              >
-                <span className="w-2 h-2 rounded-full animate-pulse bg-red-400 shadow-[0_0_8px_rgba(34,197,94,0.7)]" />
-
-                <span
-                  className="text-[10px] font-bold tracking-widest uppercase text-red-400"
-                  style={{ fontFamily: "'Oswald', sans-serif" }}
-                >
-                  Live
-                </span>
-              </div>
-            </div>
-          </div>
-
+          {showHeader && <LeaderboardHeader />}
           <div className="hidden lg:block mb-2">
             {LoadingVehicleList || LoadingCheckPoints ? (
               <div
@@ -428,7 +372,6 @@ export default function SafariLeaderBoard() {
               <DesktopTable isViewer={isViewer} drivers={drivers} />
             )}
           </div>
-
           <div className="lg:hidden">
             <div className="hidden sm:grid grid-cols-[48px_56px_1fr_112px_56px_28px] gap-3 px-4 mb-2">
               {["Car", "Driver / Team", "Progress", "CPS", ""].map((h) => (
@@ -471,7 +414,6 @@ export default function SafariLeaderBoard() {
               </AnimatePresence>
             </Reorder.Group>
           </div>
-
           {/* ✅ use already-computed checkpoints variable, no hook call */}
           <div className="mt-8 flex items-center gap-4 flex-wrap">
             <div className="h-px flex-1 bg-stone-800" />
@@ -481,7 +423,6 @@ export default function SafariLeaderBoard() {
             </span>
             <div className="h-px flex-1 bg-stone-800" />
           </div>
-
           <div className="mt-4 flex items-center gap-4 flex-wrap justify-center">
             {[
               { color: "bg-[#EF476F]", label: "Completed" },
