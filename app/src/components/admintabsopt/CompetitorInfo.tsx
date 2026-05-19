@@ -48,7 +48,7 @@ const CompetitorInfo = ({
     if (checkpoints.length === 0 && !time) return [];
 
     return checkpoints;
-  }, [selections]);
+  }, [selections, time]);
 
   const disabled = useMemo(() => {
     return payload && data && payload.length !== data.length;

@@ -52,18 +52,7 @@ export default function AdminPage() {
   };
 
   const TabOptions: Record<TabType, React.ReactNode> = {
-    [TabOptionList.LIVEDATA]: (
-      <>
-        <div className="flex space-x-2">
-          <Upload file={file} setFile={setFile} handleUpload={handleUpload} />
-          <TimePicker
-            value={time}
-            onChange={(selectedTime) => setTime(selectedTime)}
-          />
-        </div>
-        <SafariLeaderBoard showHeader={false} />
-      </>
-    ),
+    [TabOptionList.LIVEDATA]: <SafariLeaderBoard showHeader={false} />,
     [TabOptionList.COMPETITORS]: (
       <CompetitorInfo
         LoadingData={LoadingCheckPoints || LoadingVehicleList}
@@ -90,7 +79,7 @@ export default function AdminPage() {
         >
           <div className="max-w-[1400px] flex flex-col mx-auto">
             {/* ── Header ── */}
-            <div className="flex items-start justify-between mb-6 flex-wrap gap-3">
+            <div className="flex flex-row items-start justify-between mb-6 flex-wrap gap-3">
               <div>
                 <h1
                   className="text-3xl sm:text-4xl font-black leading-none mb-1"
@@ -109,13 +98,34 @@ export default function AdminPage() {
                   Admin · Checkpoint Control
                 </p>
               </div>
+              {currentTab === TabOptionList.COMPETITORS && (
+                <div className="ml-auto">
+                  <Upload
+                    file={file}
+                    setFile={setFile}
+                    handleUpload={handleUpload}
+                  />
+                </div>
+              )}
             </div>
 
-            <AdminTabs
-              tabs={ADMIN_TABS}
-              activeTab={currentTab}
-              onChange={setCurrentTab}
-            />
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 w-full mb-2">
+              <div className="flex-1 min-w-0 sm:max-w-xl">
+                <AdminTabs
+                  tabs={ADMIN_TABS}
+                  activeTab={currentTab}
+                  onChange={setCurrentTab}
+                />
+              </div>
+              {currentTab === TabOptionList.LIVEDATA && (
+                <div className="flex items-center space-x-2 shrink-0 sm:mb-6">
+                  <TimePicker
+                    value={time}
+                    onChange={(selectedTime) => setTime(selectedTime)}
+                  />
+                </div>
+              )}
+            </div>
 
             {TabOptions[currentTab]}
           </div>
