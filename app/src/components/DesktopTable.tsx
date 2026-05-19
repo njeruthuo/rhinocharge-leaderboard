@@ -106,7 +106,7 @@ function DesktopTable({
               </th>
             )}
 
-            {isViewer && (
+            {/* {isViewer && (
               <th
                 className="py-3 pl-2 pr-2 text-right"
                 style={{ borderBottom: "1px solid rgba(217,119,6,0.15)" }}
@@ -115,7 +115,7 @@ function DesktopTable({
                   penalty
                 </span>
               </th>
-            )}
+            )} */}
 
             <th
               className="py-3 pl-2 pr-1 text-right"

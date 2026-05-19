@@ -113,7 +113,7 @@ function DesktopTableRow({ driver, rank, isViewer }: DesktopRowType) {
         </td>
       )}
 
-      {isViewer && (
+      {/* {isViewer && (
         <td
           style={{
             ...TD_CELL,
@@ -128,7 +128,7 @@ function DesktopTableRow({ driver, rank, isViewer }: DesktopRowType) {
             {driver?.penalties ?? 0}
           </span>
         </td>
-      )}
+      )} */}
 
       <td
         style={{
