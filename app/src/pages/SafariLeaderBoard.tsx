@@ -239,7 +239,7 @@ export default function SafariLeaderBoard() {
   }, [data]);
 
   const isViewer = useMemo((): boolean => {
-    return pathname === "/viewer";
+    return pathname === "/management/viewer";
   }, [pathname]);
 
   return (
