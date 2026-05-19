@@ -369,7 +369,7 @@ export default function SafariLeaderBoard({
                 />
               </div>
             ) : (
-              <DesktopTable isViewer={isViewer} drivers={drivers} />
+              <DesktopTable isViewer={isViewer} drivers={drivers as Driver[]} />
             )}
           </div>
           <div className="lg:hidden">
@@ -405,7 +405,7 @@ export default function SafariLeaderBoard({
                   >
                     <LeaderboardRow
                       isViewer={isViewer}
-                      driver={driver}
+                      driver={driver as unknown as Driver}
                       rank={index + 1}
                       checkpoints={driver.checkpoints}
                     />
