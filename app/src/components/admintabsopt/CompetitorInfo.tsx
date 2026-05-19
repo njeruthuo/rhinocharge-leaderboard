@@ -5,36 +5,36 @@ import FilterBtn from "./components/FilterBtn";
 import CpColumnHeader from "./components/CpColumnHeader";
 import { useMemo, useState } from "react";
 
-import * as Papa from "papaparse";
-import Upload from "@/components/Upload";
-
-import TimePicker from "@/components/RaceClock";
-import useDriverList, { getSpecificTime } from "@/hooks/useDriverList";
 import { useConfigStartPointMutation } from "@/state/rhinoApi";
 import type { Driver } from "@/types";
 import type { FilterTypes } from "@/state/types";
+import type { DataType } from "@/hooks/useDriverList";
 
-const d = new Date();
-
-const CompetitorInfo = () => {
-  const [file, setFile] = useState<File | null>(null);
-  const [time, setTime] = useState(`${d.getHours()}:${d.getMinutes()}`);
+const CompetitorInfo = ({
+  LoadingData,
+  data,
+  selections,
+  setSelections,
+  file,
+  time,
+}: {
+  LoadingData: boolean;
+  data: DataType[];
+  selections: Record<number, string>;
+  setSelections: React.Dispatch<React.SetStateAction<Record<number, string>>>;
+  file: File | null;
+  time: string;
+}) => {
   const [search, setSearch] = useState("");
   const [isInitialized, setIsInitialized] = useState(false);
   const [expanded, setExpanded] = useState<number | null>(null);
-  const [selections, setSelections] = useState<Record<number, string>>({});
 
   const [filter, setFilter] = useState<FilterTypes>("all");
-  const { data, LoadingVehicleList, LoadingCheckPoints } = useDriverList({
-    startDate: getSpecificTime(7, 30),
-    endDate: getSpecificTime(23, 59, 59),
-  });
 
   const [configStartPoint, { isLoading: LoadingCreateStart }] =
     useConfigStartPointMutation();
 
-  const isLoading =
-    LoadingVehicleList || LoadingCheckPoints || LoadingCreateStart;
+  const isLoading = LoadingData || LoadingCreateStart;
 
   const payload = useMemo(() => {
     const checkpoints = Object.entries(selections ?? {})?.map(
@@ -64,7 +64,7 @@ const CompetitorInfo = () => {
           car.carNo?.toString().includes(q) ||
           car.entrantName?.toLowerCase().includes(q) ||
           car.team_name?.toLowerCase().includes(q);
-        const n = cpCount(car);
+        const n = cpCount(car as Driver);
         const matchF =
           filter === "all" ||
           (filter === "partial" && n > 0 && n < CHECKPOINTS.length) ||
@@ -94,34 +94,8 @@ const CompetitorInfo = () => {
     setIsInitialized(true);
   }
 
-  const handleUpload = async () => {
-    if (!file) return;
-
-    Papa.parse<[string, string]>(file, {
-      complete: function (results: Papa.ParseResult<[string, string]>) {
-        results.data.forEach(([item1, item2]: [string, string]) => {
-          const car = data.find(
-            (asset) =>
-              asset?.carNo ===
-              `CAR${Number(item1).toString().padStart(2, "0")}`,
-          );
-          if (car) {
-            setSelections((prev) => ({ ...prev, [car.asset_id]: item2 }));
-          }
-        });
-      },
-    });
-  };
-
   return (
     <div>
-      <div className="flex space-x-2">
-        <Upload file={file} setFile={setFile} handleUpload={handleUpload} />
-        <TimePicker
-          value={time}
-          onChange={(selectedTime) => setTime(selectedTime)}
-        />
-      </div>
       {/* ── Search + Filters ── */}
       <div className="flex flex-wrap gap-2 mb-4">
         <div className="relative flex-1 min-w-48">
@@ -250,7 +224,7 @@ const CompetitorInfo = () => {
                   {filtered.map((car) => (
                     <CarRow
                       key={car.asset_id}
-                      car={car}
+                      car={car as Driver}
                       isExpanded={expanded === car.asset_id}
                       onToggle={() =>
                         setExpanded((prev) =>

@@ -1,3 +1,5 @@
+import { TabOptionList } from "./types";
+
 export const CHECKPOINTS = [
   "KWS",
   "TOOLCRAFT",
@@ -18,7 +20,7 @@ export const CHECKPOINTS = [
 export type CheckpointName = (typeof CHECKPOINTS)[number];
 
 export const ADMIN_TABS = [
-  { id: "livedata", label: "Live Data" },
-  { id: "competitors", label: "Competitor Info" },
-  { id: "results", label: "Results" },
-];
+  { id: TabOptionList.LIVEDATA, label: "Live Data" },
+  { id: TabOptionList.COMPETITORS, label: "Competitor Info" },
+  { id: TabOptionList.RESULTS, label: "Results" },
+] as const;

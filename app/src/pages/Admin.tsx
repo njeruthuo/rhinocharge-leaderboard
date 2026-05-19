@@ -1,23 +1,69 @@
-import { useState, type ReactNode } from "react";
+import { useState } from "react";
 import { AnimatePresence } from "framer-motion";
 
 import { ADMIN_TABS } from "@/data";
 import Toast from "@/components/Toast";
 
 import { AdminTabs } from "@/components/AdminTabs";
+import SafariLeaderBoard from "./SafariLeaderBoard";
+import { TabOptionList, type TabType } from "@/types";
 import CompetitorInfo from "@/components/admintabsopt/CompetitorInfo";
 import LoginPage from "@/components/admintabsopt/components/LoginPage";
-import SafariLeaderBoard from "./SafariLeaderBoard";
+
+import * as Papa from "papaparse";
+import Upload from "@/components/Upload";
+
+import TimePicker from "@/components/RaceClock";
+import useDriverList, { getSpecificTime } from "@/hooks/useDriverList";
+
+const d = new Date();
 
 export default function AdminPage() {
-  const [currentTab, setCurrentTab] = useState("livedata");
+  const [currentTab, setCurrentTab] = useState<TabType>(TabOptionList.LIVEDATA);
   const [isAuthenticated, setIsAuthenticated] = useState(true);
   const [toast, setToast] = useState<string | null>(null);
 
-  const TabOptions: Record<string, ReactNode> = {
-    competitors: <CompetitorInfo />,
-    livedata: <SafariLeaderBoard showHeader={false} />,
-    results: <></>,
+  const [file, setFile] = useState<File | null>(null);
+  const [time, setTime] = useState(`${d.getHours()}:${d.getMinutes()}`);
+  const [selections, setSelections] = useState<Record<number, string>>({});
+
+  const { data, LoadingVehicleList, LoadingCheckPoints } = useDriverList({
+    startDate: getSpecificTime(7, 30),
+    endDate: getSpecificTime(23, 59, 59),
+  });
+
+  const handleUpload = async () => {
+    if (!file) return;
+
+    Papa.parse<[string, string]>(file, {
+      complete: function (results: Papa.ParseResult<[string, string]>) {
+        results.data.forEach(([item1, item2]: [string, string]) => {
+          const car = data.find(
+            (asset) =>
+              asset?.carNo ===
+              `CAR${Number(item1).toString().padStart(2, "0")}`,
+          );
+          if (car) {
+            setSelections((prev) => ({ ...prev, [car.asset_id]: item2 }));
+          }
+        });
+      },
+    });
+  };
+
+  const TabOptions: Record<TabType, React.ReactNode> = {
+    [TabOptionList.LIVEDATA]: <SafariLeaderBoard showHeader={false} />,
+    [TabOptionList.COMPETITORS]: (
+      <CompetitorInfo
+        LoadingData={LoadingCheckPoints || LoadingVehicleList}
+        selections={selections}
+        setSelections={setSelections}
+        data={data}
+        file={file}
+        time={time}
+      />
+    ),
+    [TabOptionList.RESULTS]: <></>,
   };
 
   return (
@@ -33,7 +79,7 @@ export default function AdminPage() {
         >
           <div className="max-w-[1400px] flex flex-col mx-auto">
             {/* ── Header ── */}
-            <div className="flex items-start justify-between mb-6 flex-wrap gap-3">
+            <div className="flex flex-row items-start justify-between mb-6 flex-wrap gap-3">
               <div>
                 <h1
                   className="text-3xl sm:text-4xl font-black leading-none mb-1"
@@ -52,13 +98,34 @@ export default function AdminPage() {
                   Admin · Checkpoint Control
                 </p>
               </div>
+              {currentTab === TabOptionList.COMPETITORS && (
+                <div className="ml-auto">
+                  <Upload
+                    file={file}
+                    setFile={setFile}
+                    handleUpload={handleUpload}
+                  />
+                </div>
+              )}
             </div>
 
-            <AdminTabs
-              tabs={ADMIN_TABS}
-              activeTab={currentTab}
-              onChange={setCurrentTab}
-            />
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 w-full mb-2">
+              <div className="flex-1 min-w-0 sm:max-w-xl">
+                <AdminTabs
+                  tabs={ADMIN_TABS}
+                  activeTab={currentTab}
+                  onChange={setCurrentTab}
+                />
+              </div>
+              {currentTab === TabOptionList.LIVEDATA && (
+                <div className="flex items-center space-x-2 shrink-0 sm:mb-6">
+                  <TimePicker
+                    value={time}
+                    onChange={(selectedTime) => setTime(selectedTime)}
+                  />
+                </div>
+              )}
+            </div>
 
             {TabOptions[currentTab]}
           </div>
