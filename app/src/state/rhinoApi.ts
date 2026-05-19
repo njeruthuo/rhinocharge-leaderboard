@@ -56,8 +56,10 @@ export const rhinoApi = createApi({
         };
 
         return {
-          url: `AnalyticsService?request=${encodeURIComponent(JSON.stringify(requestBody))}`,
+          url: `AnalyticsService/GetPoiSummary`,
+          // url: `AnalyticsService?request=${encodeURIComponent(JSON.stringify(requestBody))}`,
           method: "POST",
+          body: requestBody,
         };
       },
       transformResponse: (response: AssetListResponse) => {

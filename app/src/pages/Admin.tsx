@@ -20,7 +20,7 @@ import useDriverList from "@/hooks/useDriverList";
 
 export default function AdminPage() {
   const [currentTab, setCurrentTab] = useState<TabType>(TabOptionList.LIVEDATA);
-  const [isAuthenticated, setIsAuthenticated] = useState(true);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [toast, setToast] = useState<string | null>(null);
 
   const [file, setFile] = useState<File | null>(null);
