@@ -23,7 +23,7 @@ const CompetitorInfo = ({
   selections: Record<number, string>;
   setSelections: React.Dispatch<React.SetStateAction<Record<number, string>>>;
   file: File | null;
-  time: string;
+  time: { startDate: string; endDate: string };
 }) => {
   const [search, setSearch] = useState("");
   const [isInitialized, setIsInitialized] = useState(false);
