@@ -53,7 +53,7 @@ const useDriverList = ({ startDate, endDate }: GetPoiPayload) => {
       return [];
     }
 
-    return VehicleList.map((item, index) => {
+    return VehicleList.map((item, index): DataType => {
       const checkPointList = CheckPoints.filter(
         (checkpoint) => checkpoint.vehicle === item.asset_name,
       );
@@ -103,4 +103,31 @@ export const getSpecificTime = (hours = 0, minutes = 0, seconds = 0) => {
   const timePart = now.toTimeString().split(" ")[0];
 
   return `${datePart} ${timePart}`;
+};
+
+export type DataType = {
+  id: number | string;
+  asset_id: number;
+  carNo: string;
+  mileage: number;
+  penalties: number;
+  start_cp: string;
+  entrantName: string;
+  team_name: string;
+  totalCps: number;
+  checkpoints: {
+    point: string;
+    odometer: number;
+    time: string;
+    calculated_odometer: number;
+    next: string;
+  }[];
+  orderedCheckpoints: {
+    point: string;
+    odometer: number;
+    time: string;
+    calculated_odometer: number;
+    next: string;
+    startOdometer: number | undefined;
+  }[];
 };

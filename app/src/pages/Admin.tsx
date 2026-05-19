@@ -10,14 +10,70 @@ import { TabOptionList, type TabType } from "@/types";
 import CompetitorInfo from "@/components/admintabsopt/CompetitorInfo";
 import LoginPage from "@/components/admintabsopt/components/LoginPage";
 
+import * as Papa from "papaparse";
+import Upload from "@/components/Upload";
+
+import TimePicker from "@/components/RaceClock";
+import useDriverList, { getSpecificTime } from "@/hooks/useDriverList";
+
+const d = new Date();
+
 export default function AdminPage() {
   const [currentTab, setCurrentTab] = useState<TabType>(TabOptionList.LIVEDATA);
   const [isAuthenticated, setIsAuthenticated] = useState(true);
   const [toast, setToast] = useState<string | null>(null);
 
+  const [file, setFile] = useState<File | null>(null);
+  const [time, setTime] = useState(`${d.getHours()}:${d.getMinutes()}`);
+  const [selections, setSelections] = useState<Record<number, string>>({});
+
+  const { data, LoadingVehicleList, LoadingCheckPoints } = useDriverList({
+    startDate: getSpecificTime(7, 30),
+    endDate: getSpecificTime(23, 59, 59),
+  });
+
+  const handleUpload = async () => {
+    if (!file) return;
+
+    Papa.parse<[string, string]>(file, {
+      complete: function (results: Papa.ParseResult<[string, string]>) {
+        results.data.forEach(([item1, item2]: [string, string]) => {
+          const car = data.find(
+            (asset) =>
+              asset?.carNo ===
+              `CAR${Number(item1).toString().padStart(2, "0")}`,
+          );
+          if (car) {
+            setSelections((prev) => ({ ...prev, [car.asset_id]: item2 }));
+          }
+        });
+      },
+    });
+  };
+
   const TabOptions: Record<TabType, React.ReactNode> = {
-    [TabOptionList.LIVEDATA]: <SafariLeaderBoard showHeader={false} />,
-    [TabOptionList.COMPETITORS]: <CompetitorInfo />,
+    [TabOptionList.LIVEDATA]: (
+      <>
+        <div className="flex space-x-2">
+          <Upload file={file} setFile={setFile} handleUpload={handleUpload} />
+          <TimePicker
+            value={time}
+            onChange={(selectedTime) => setTime(selectedTime)}
+          />
+        </div>
+        <SafariLeaderBoard showHeader={false} />
+      </>
+    ),
+    [TabOptionList.COMPETITORS]: (
+      <CompetitorInfo
+        LoadingData={LoadingCheckPoints || LoadingVehicleList}
+        selections={selections}
+        setSelections={setSelections}
+        data={data}
+        file={file}
+        time={time}
+      />
+    ),
     [TabOptionList.RESULTS]: <></>,
   };
 
