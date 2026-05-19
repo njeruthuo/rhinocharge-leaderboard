@@ -10,7 +10,7 @@ import LoginPage from "@/components/admintabsopt/components/LoginPage";
 import SafariLeaderBoard from "./SafariLeaderBoard";
 
 export default function AdminPage() {
-  const [currentTab, setCurrentTab] = useState("competitors");
+  const [currentTab, setCurrentTab] = useState("livedata");
   const [isAuthenticated, setIsAuthenticated] = useState(true);
   const [toast, setToast] = useState<string | null>(null);
 
