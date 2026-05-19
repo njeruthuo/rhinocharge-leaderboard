@@ -14,9 +14,9 @@ import * as Papa from "papaparse";
 import Upload from "@/components/Upload";
 
 import TimePicker from "@/components/RaceClock";
-import useDriverList, { getSpecificTime } from "@/hooks/useDriverList";
+import useDriverList from "@/hooks/useDriverList";
 
-const d = new Date();
+// const d = new Date();
 
 export default function AdminPage() {
   const [currentTab, setCurrentTab] = useState<TabType>(TabOptionList.LIVEDATA);
@@ -24,13 +24,20 @@ export default function AdminPage() {
   const [toast, setToast] = useState<string | null>(null);
 
   const [file, setFile] = useState<File | null>(null);
-  const [time, setTime] = useState(`${d.getHours()}:${d.getMinutes()}`);
+  const [time, setTime] = useState({
+    startDate: "2026-06-01T07:30:00",
+    endDate: "2026-06-01T17:30:00",
+  });
   const [selections, setSelections] = useState<Record<number, string>>({});
 
   const { data, LoadingVehicleList, LoadingCheckPoints } = useDriverList({
-    startDate: getSpecificTime(7, 30),
-    endDate: getSpecificTime(23, 59, 59),
+    // startDate: getSpecificTime(7, 30),
+    // endDate: getSpecificTime(23, 59, 59),
+    startDate: "2026-06-01T07:30:00",
+    endDate: "2026-06-01T17:30:00",
   });
+
+  console.log(time, "time");
 
   const handleUpload = async () => {
     if (!file) return;
