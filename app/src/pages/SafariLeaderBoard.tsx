@@ -1,12 +1,12 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useRef, useEffect } from "react";
 import { motion, AnimatePresence, Reorder } from "framer-motion";
 import type { CheckPoint, Driver } from "@/types";
 import useDriverList, { getSpecificTime } from "@/hooks/useDriverList";
-import { colors, spinner } from "@/constants";
+import { ADMIN_PAGE_CLICKS, colors, spinner } from "@/constants";
 import DesktopTable from "@/components/DesktopTable";
 import { CHECKPOINTS } from "@/data";
 import { getCheckpointStatus } from "@/utils";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 
 function CheckpointBadge({
   cp,
@@ -227,6 +227,7 @@ function LeaderboardRow({
 }
 
 export default function SafariLeaderBoard() {
+  const navigate = useNavigate();
   const { pathname } = useLocation();
   const [date] = useState(() => ({
     startDate: getSpecificTime(7, 30),
@@ -241,6 +242,34 @@ export default function SafariLeaderBoard() {
   const isViewer = useMemo((): boolean => {
     return pathname === "/management/viewer";
   }, [pathname]);
+
+  const [clicks, setClicks] = useState(0);
+  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  const handleOpenAdmin = () => {
+    if (timeoutRef.current) {
+      clearTimeout(timeoutRef.current);
+    }
+
+    const nextClicks = clicks + 1;
+
+    if (nextClicks >= ADMIN_PAGE_CLICKS) {
+      setClicks(0);
+      navigate("/management/admin");
+    } else {
+      setClicks(nextClicks);
+
+      timeoutRef.current = setTimeout(() => {
+        setClicks(0);
+      }, 2000);
+    }
+  };
+
+  useEffect(() => {
+    return () => {
+      if (timeoutRef.current) clearTimeout(timeoutRef.current);
+    };
+  }, []);
 
   return (
     <>
@@ -338,11 +367,12 @@ export default function SafariLeaderBoard() {
           <div className="mb-4 flex place-content-start">
             <div>
               <div
-                className="text-2xl sm:text-4xl font-black text-[#716969] leading-none mb-1"
+                className="text-2xl select-none sm:text-4xl font-black text-[#716969] leading-none mb-1"
                 style={{
                   fontFamily: "'Oswald', sans-serif",
                   letterSpacing: "0.04em",
                 }}
+                onClick={handleOpenAdmin}
               >
                 Rhino Charge 2026
               </div>
@@ -353,13 +383,17 @@ export default function SafariLeaderBoard() {
 
             <div className="flex items-center gap-3 flex-wrap ml-auto">
               <div
-                className={`flex items-center gap-2 px-3 py-1.5 rounded-full border text-red-500`}
+                className="flex items-center gap-2 px-3 py-1.5 rounded-full border"
+                style={{
+                  borderColor: "rgba(239, 68, 68, 0.2)",
+                  background: "rgba(239, 68, 68, 0.05)",
+                }}
               >
+                <span className="w-2 h-2 rounded-full animate-pulse bg-red-400 shadow-[0_0_8px_rgba(34,197,94,0.7)]" />
+
                 <span
-                  className={`w-2 h-2 rounded-full  animate-pulse text-green-500`}
-                />
-                <span
-                  className={`text-[10px] font-bold tracking-widest  uppercase text-red-400`}
+                  className="text-[10px] font-bold tracking-widest uppercase text-red-400"
+                  style={{ fontFamily: "'Oswald', sans-serif" }}
                 >
                   Live
                 </span>

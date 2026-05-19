@@ -11,6 +11,7 @@ import type { FilterTypes } from "@/state/types";
 import useDriverList, { getSpecificTime } from "@/hooks/useDriverList";
 import { useConfigStartPointMutation } from "@/state/rhinoApi";
 import Upload from "@/components/Upload";
+import { ADMIN_PASSWORD, ADMIN_USERNAME } from "@/constants";
 
 const d = new Date();
 
@@ -171,12 +172,38 @@ const FilterBtn = ({
 
 export default function AdminPage() {
   const [file, setFile] = useState<File | null>(null);
+
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+  const [authError, setAuthError] = useState<string | null>(null);
+
+  const handleSignIn = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (username === ADMIN_USERNAME && password === ADMIN_PASSWORD) {
+      setIsAuthenticated(true);
+      setAuthError(null);
+    } else {
+      setAuthError("Invalid username or password");
+    }
+  };
+
+  console.log(
+    isAuthenticated,
+    ADMIN_PASSWORD,
+    ADMIN_USERNAME,
+    "isAuthenticated",
+  );
+
   const { data, LoadingVehicleList, LoadingCheckPoints } = useDriverList({
     startDate: getSpecificTime(7, 30),
     endDate: getSpecificTime(23, 59, 59),
   });
   const [configStartPoint, { isLoading: LoadingCreateStart }] =
     useConfigStartPointMutation();
+
+  // const isAuthenticated = false;
+
   const isLoading =
     LoadingVehicleList || LoadingCheckPoints || LoadingCreateStart;
 
@@ -269,271 +296,377 @@ export default function AdminPage() {
 
   return (
     <>
-      <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Oswald:wght@400;600;700&display=swap');
-        
-        @keyframes tread-scroll { 0% { background-position: 0 0; } 100% { background-position: 72px 0; } }
-        .tread-bar {
-          position: fixed; left: 0; right: 0; height: 6px; z-index: 10; pointer-events: none;
-          background-image: repeating-linear-gradient(90deg,#D97706 0,#D97706 18px,#b45309 18px,#b45309 22px,transparent 22px,transparent 30px,#92400e 30px,#92400e 34px,transparent 34px,transparent 36px,#D97706 36px,#D97706 54px,transparent 54px,transparent 72px);
-          animation: tread-scroll 2.4s linear infinite; opacity: 0.5;
-        }
-        input[type="time"]::-webkit-calendar-picker-indicator { filter: invert(0.4); }
-        input[type="number"]::-webkit-inner-spin-button { filter: invert(0.4); }
-        select option { background: #1C1917; color: #e7e5e4; }
-        /* Sticky column shadows */
-        .sticky-col { position: sticky; left: 0; z-index: 2; background: #1C1917; }
-        .sticky-col-2 { position: sticky; left: 32px; z-index: 2; background: #1C1917; }
-        .sticky-col-3 { position: sticky; left: 80px; z-index: 2; background: #1C1917; }
-      `}</style>
+      {isAuthenticated ? (
+        <div
+          className="min-h-screen text-stone-100 pt-8 pb-16 px-4"
+          style={{
+            background: "#fff",
+            backgroundImage:
+              "repeating-linear-gradient(0deg,transparent,transparent 39px,rgba(217,119,6,0.018) 39px,rgba(217,119,6,0.018) 40px),repeating-linear-gradient(90deg,transparent,transparent 39px,rgba(217,119,6,0.018) 39px,rgba(217,119,6,0.018) 40px)",
+          }}
+        >
+          <div className="max-w-[1400px] flex flex-col mx-auto">
+            {/* ── Header ── */}
+            <div className="flex items-start justify-between mb-6 flex-wrap gap-3">
+              <div>
+                <h1
+                  className="text-3xl sm:text-4xl font-black leading-none mb-1"
+                  style={{
+                    fontFamily: "'Oswald', sans-serif",
+                    letterSpacing: "0.04em",
+                    color: "#716969",
+                  }}
+                >
+                  Rhino Charge 2026
+                </h1>
+                <p
+                  className="text-[10px] uppercase tracking-[0.25em]"
+                  style={{ color: "#57534e" }}
+                >
+                  Admin · Checkpoint Control
+                </p>
+              </div>
 
-      <div
-        className="min-h-screen text-stone-100 pt-8 pb-16 px-4"
-        style={{
-          background: "#fff",
-          backgroundImage:
-            "repeating-linear-gradient(0deg,transparent,transparent 39px,rgba(217,119,6,0.018) 39px,rgba(217,119,6,0.018) 40px),repeating-linear-gradient(90deg,transparent,transparent 39px,rgba(217,119,6,0.018) 39px,rgba(217,119,6,0.018) 40px)",
-        }}
-      >
-        <div className="max-w-[1400px] flex flex-col mx-auto">
-          {/* ── Header ── */}
-          <div className="flex items-start justify-between mb-6 flex-wrap gap-3">
-            <div>
-              <h1
-                className="text-3xl sm:text-4xl font-black leading-none mb-1"
+              <div className="flex space-x-2">
+                <Upload
+                  file={file}
+                  setFile={setFile}
+                  handleUpload={handleUpload}
+                />
+                <TimePicker
+                  value={time}
+                  onChange={(selectedTime) => setTime(selectedTime)}
+                />
+              </div>
+            </div>
+
+            {/* ── Search + Filters ── */}
+            <div className="flex flex-wrap gap-2 mb-4">
+              <div className="relative flex-1 min-w-48">
+                <svg
+                  className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 pointer-events-none"
+                  viewBox="0 0 16 16"
+                  fill="none"
+                  style={{ color: "#57534e" }}
+                >
+                  <circle
+                    cx="6.5"
+                    cy="6.5"
+                    r="4.5"
+                    stroke="currentColor"
+                    strokeWidth="1.3"
+                  />
+                  <path
+                    d="M10 10l3 3"
+                    stroke="currentColor"
+                    strokeWidth="1.3"
+                    strokeLinecap="round"
+                  />
+                </svg>
+                <input
+                  type="text"
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
+                  placeholder="Search by car no. or driver…"
+                  className="w-full pl-9 pr-4 py-2 rounded-lg text-lg outline-none"
+                  style={{
+                    background: "#FBF9E7",
+                    border: "1px solid rgba(217,119,6,0.4)",
+                    color: "#000",
+                    fontFamily: "'Oswald', sans-serif",
+                  }}
+                />
+              </div>
+              <FilterBtn
+                value="all"
+                label="All"
+                filter={filter}
+                setFilter={setFilter}
+              />
+              <FilterBtn
+                value="partial"
+                label="In Progress"
+                filter={filter}
+                setFilter={setFilter}
+              />
+              <FilterBtn
+                value="none"
+                label="Not Started"
+                filter={filter}
+                setFilter={setFilter}
+              />
+            </div>
+
+            {/* ── Table ── */}
+            <div
+              className="rounded-xl border overflow-hidden"
+              style={{
+                borderColor: "rgba(255,255,255,0.06)",
+                background: "#FBF9E7",
+                backdropFilter: "blur(20px)",
+              }}
+            >
+              {isLoading ? (
+                <div className="flex items-center justify-center py-24">
+                  <div
+                    className="w-8 h-8 rounded-full border-2 border-t-transparent animate-spin"
+                    style={{
+                      borderColor: "rgba(217,119,6,0.4)",
+                      borderTopColor: "#D97706",
+                    }}
+                  />
+                </div>
+              ) : (
+                <div style={{ overflowX: "auto", height: "72vh" }}>
+                  <table
+                    className="w-full border-collapse"
+                    style={{ minWidth: 900 }}
+                  >
+                    <thead>
+                      <tr
+                        className="border-b"
+                        style={{
+                          borderColor: "rgba(255,255,255,0.06)",
+                          background: "rgba(0,0,0,0.3)",
+                          position: "sticky",
+                          top: 0,
+                          zIndex: 10,
+                          color: "white",
+                        }}
+                      >
+                        {/* <th className="w-8 pl-4 pr-2 py-3" /> */}
+                        <th className="pr-2 py-3 pl-4 w-14 text-left">
+                          <span
+                            className="text-[9px] tracking-[0.2em] uppercase"
+                            style={{
+                              color: "white",
+                              fontFamily: "'Oswald', sans-serif",
+                            }}
+                          >
+                            Car
+                          </span>
+                        </th>
+                        <th
+                          className="py-3 pr-4 text-left"
+                          style={{ minWidth: 160 }}
+                        >
+                          <span
+                            className="text-[9px] font-black tracking-[0.2em] uppercase"
+                            style={{
+                              color: "white",
+                              fontFamily: "'Oswald', sans-serif",
+                            }}
+                          >
+                            Driver / Team
+                          </span>
+                        </th>
+
+                        {/* Checkpoint columns */}
+                        {CHECKPOINTS.map((cp) => (
+                          <CpColumnHeader key={cp} cp={cp} />
+                        ))}
+
+                        <th className="pr-4 py-3 w-20" />
+                      </tr>
+                    </thead>
+
+                    <tbody>
+                      <AnimatePresence mode="popLayout">
+                        {filtered.map((car) => (
+                          <CarRow
+                            key={car.asset_id}
+                            car={car}
+                            isExpanded={expanded === car.asset_id}
+                            onToggle={() =>
+                              setExpanded((prev) =>
+                                prev === car.asset_id ? null : car.asset_id,
+                              )
+                            }
+                            // onLog={(carId, cp) => handleLog(carId, cp)}
+                            selectedCp={selections[car.asset_id] ?? ""}
+                            onSelectCp={(cp) =>
+                              setSelections((prev) => ({
+                                ...prev,
+                                [car?.asset_id]: cp,
+                              }))
+                            }
+                          />
+                        ))}
+                      </AnimatePresence>
+
+                      {filtered.length === 0 && (
+                        <tr>
+                          <td
+                            colSpan={4 + CHECKPOINTS.length + 1}
+                            className="text-center py-16"
+                          >
+                            <span
+                              className="text-sm tracking-widest uppercase"
+                              style={{
+                                color: "#57534e",
+                                fontFamily: "'Oswald', sans-serif",
+                              }}
+                            >
+                              No entrants match your filters
+                            </span>
+                          </td>
+                        </tr>
+                      )}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+            </div>
+
+            {/* ── Footer ── */}
+            <div className="mt-8 flex items-center gap-4">
+              <div className="h-px flex-1" style={{ background: "#292524" }} />
+              <span
+                className="text-[9px] tracking-widest uppercase"
+                style={{ color: "#44403c", fontFamily: "'Oswald', sans-serif" }}
+              >
+                {CHECKPOINTS.length + 1} Checkpoints · {data.length} Entrants
+              </span>
+              <div className="h-px flex-1" style={{ background: "#292524" }} />
+            </div>
+            <button
+              onClick={handleSaveStart}
+              disabled={disabled || isLoading || !file}
+              className="px-3 py-2 rounded-lg text-[10px] ml-auto shrink-0 font-bold tracking-[0.15em] uppercase transition-all disabled:cursor-not-allowed cursor-pointer"
+              style={{
+                fontFamily: "'Oswald', sans-serif",
+                background: disabled ? "#FBF9E7" : "rgba(28,25,23,0.7)",
+                border: `1px solid ${disabled || isLoading ? "rgba(217,119,6,0.4)" : "rgba(255,255,255,0.06)"}`,
+                color: disabled || isLoading ? "rgba(28,25,23,0.7)" : "#FCFCFC",
+              }}
+            >
+              Save start entries
+            </button>
+          </div>
+        </div>
+      ) : (
+        <div
+          className="min-h-screen flex items-center justify-center px-4"
+          style={{
+            background: "#fff",
+            backgroundImage:
+              "repeating-linear-gradient(0deg,transparent,transparent 39px,rgba(217,119,6,0.018) 39px,rgba(217,119,6,0.018) 40px),repeating-linear-gradient(90deg,transparent,transparent 39px,rgba(217,119,6,0.018) 39px,rgba(217,119,6,0.018) 40px)",
+          }}
+        >
+          <div
+            className="w-full max-w-md rounded-xl border p-8 shadow-sm"
+            style={{
+              borderColor: "rgba(217,119,6,0.25)",
+              background: "#FBF9E7",
+            }}
+          >
+            <div className="mb-6 text-center">
+              <h2
+                className="text-2xl font-black tracking-wider uppercase mb-1"
                 style={{
                   fontFamily: "'Oswald', sans-serif",
-                  letterSpacing: "0.04em",
                   color: "#716969",
                 }}
               >
                 Rhino Charge 2026
-              </h1>
+              </h2>
               <p
                 className="text-[10px] uppercase tracking-[0.25em]"
                 style={{ color: "#57534e" }}
               >
-                Admin · Checkpoint Control
+                Admin Gateway
               </p>
             </div>
 
-            <div className="flex space-x-2">
-              <Upload
-                file={file}
-                setFile={setFile}
-                handleUpload={handleUpload}
-              />
-              <TimePicker
-                value={time}
-                onChange={(selectedTime) => setTime(selectedTime)}
-              />
-            </div>
-          </div>
-
-          {/* ── Search + Filters ── */}
-          <div className="flex flex-wrap gap-2 mb-4">
-            <div className="relative flex-1 min-w-48">
-              <svg
-                className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 pointer-events-none"
-                viewBox="0 0 16 16"
-                fill="none"
-                style={{ color: "#57534e" }}
-              >
-                <circle
-                  cx="6.5"
-                  cy="6.5"
-                  r="4.5"
-                  stroke="currentColor"
-                  strokeWidth="1.3"
-                />
-                <path
-                  d="M10 10l3 3"
-                  stroke="currentColor"
-                  strokeWidth="1.3"
-                  strokeLinecap="round"
-                />
-              </svg>
-              <input
-                type="text"
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                placeholder="Search by car no. or driver…"
-                className="w-full pl-9 pr-4 py-2 rounded-lg text-lg outline-none"
-                style={{
-                  background: "#FBF9E7",
-                  border: "1px solid rgba(217,119,6,0.4)",
-                  color: "#000",
-                  fontFamily: "'Oswald', sans-serif",
-                }}
-              />
-            </div>
-            <FilterBtn
-              value="all"
-              label="All"
-              filter={filter}
-              setFilter={setFilter}
-            />
-            <FilterBtn
-              value="partial"
-              label="In Progress"
-              filter={filter}
-              setFilter={setFilter}
-            />
-            <FilterBtn
-              value="none"
-              label="Not Started"
-              filter={filter}
-              setFilter={setFilter}
-            />
-          </div>
-
-          {/* ── Table ── */}
-          <div
-            className="rounded-xl border overflow-hidden"
-            style={{
-              borderColor: "rgba(255,255,255,0.06)",
-              background: "#FBF9E7",
-              backdropFilter: "blur(20px)",
-            }}
-          >
-            {isLoading ? (
-              <div className="flex items-center justify-center py-24">
-                <div
-                  className="w-8 h-8 rounded-full border-2 border-t-transparent animate-spin"
+            <form onSubmit={handleSignIn} className="space-y-4">
+              <div>
+                <label
+                  className="block text-[10px] font-bold tracking-[0.15em] uppercase mb-1.5"
                   style={{
-                    borderColor: "rgba(217,119,6,0.4)",
-                    borderTopColor: "#D97706",
+                    fontFamily: "'Oswald', sans-serif",
+                    color: "#57534e",
+                  }}
+                >
+                  Username
+                </label>
+                <input
+                  type="text"
+                  required
+                  value={username}
+                  onChange={(e) => setUsername(e.target.value)}
+                  className="w-full px-4 py-2.5 rounded-lg text-base outline-none border transition-colors"
+                  style={{
+                    background: "#fff",
+                    borderColor: "rgba(217,119,6,0.2)",
+                    color: "#292524",
                   }}
                 />
               </div>
-            ) : (
-              <div style={{ overflowX: "auto", height: "72vh" }}>
-                <table
-                  className="w-full border-collapse"
-                  style={{ minWidth: 900 }}
+
+              <div>
+                <label
+                  className="block text-[10px] font-bold tracking-[0.15em] uppercase mb-1.5"
+                  style={{
+                    fontFamily: "'Oswald', sans-serif",
+                    color: "#57534e",
+                  }}
                 >
-                  <thead>
-                    <tr
-                      className="border-b"
-                      style={{
-                        borderColor: "rgba(255,255,255,0.06)",
-                        background: "rgba(0,0,0,0.3)",
-                        position: "sticky",
-                        top: 0,
-                        zIndex: 10,
-                        color: "white",
-                      }}
-                    >
-                      {/* <th className="w-8 pl-4 pr-2 py-3" /> */}
-                      <th className="pr-2 py-3 pl-4 w-14 text-left">
-                        <span
-                          className="text-[9px] tracking-[0.2em] uppercase"
-                          style={{
-                            color: "white",
-                            fontFamily: "'Oswald', sans-serif",
-                          }}
-                        >
-                          Car
-                        </span>
-                      </th>
-                      <th
-                        className="py-3 pr-4 text-left"
-                        style={{ minWidth: 160 }}
-                      >
-                        <span
-                          className="text-[9px] font-black tracking-[0.2em] uppercase"
-                          style={{
-                            color: "white",
-                            fontFamily: "'Oswald', sans-serif",
-                          }}
-                        >
-                          Driver / Team
-                        </span>
-                      </th>
-
-                      {/* Checkpoint columns */}
-                      {CHECKPOINTS.map((cp) => (
-                        <CpColumnHeader key={cp} cp={cp} />
-                      ))}
-
-                      <th className="pr-4 py-3 w-20" />
-                    </tr>
-                  </thead>
-
-                  <tbody>
-                    <AnimatePresence mode="popLayout">
-                      {filtered.map((car) => (
-                        <CarRow
-                          key={car.asset_id}
-                          car={car}
-                          isExpanded={expanded === car.asset_id}
-                          onToggle={() =>
-                            setExpanded((prev) =>
-                              prev === car.asset_id ? null : car.asset_id,
-                            )
-                          }
-                          // onLog={(carId, cp) => handleLog(carId, cp)}
-                          selectedCp={selections[car.asset_id] ?? ""}
-                          onSelectCp={(cp) =>
-                            setSelections((prev) => ({
-                              ...prev,
-                              [car?.asset_id]: cp,
-                            }))
-                          }
-                        />
-                      ))}
-                    </AnimatePresence>
-
-                    {filtered.length === 0 && (
-                      <tr>
-                        <td
-                          colSpan={4 + CHECKPOINTS.length + 1}
-                          className="text-center py-16"
-                        >
-                          <span
-                            className="text-sm tracking-widest uppercase"
-                            style={{
-                              color: "#57534e",
-                              fontFamily: "'Oswald', sans-serif",
-                            }}
-                          >
-                            No entrants match your filters
-                          </span>
-                        </td>
-                      </tr>
-                    )}
-                  </tbody>
-                </table>
+                  Password
+                </label>
+                <input
+                  type="password"
+                  required
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  className="w-full px-4 py-2.5 rounded-lg text-base outline-none border transition-colors"
+                  style={{
+                    background: "#fff",
+                    borderColor: "rgba(217,119,6,0.2)",
+                    color: "#292524",
+                  }}
+                />
               </div>
-            )}
-          </div>
 
-          {/* ── Footer ── */}
-          <div className="mt-8 flex items-center gap-4">
-            <div className="h-px flex-1" style={{ background: "#292524" }} />
-            <span
-              className="text-[9px] tracking-widest uppercase"
-              style={{ color: "#44403c", fontFamily: "'Oswald', sans-serif" }}
-            >
-              {CHECKPOINTS.length + 1} Checkpoints · {data.length} Entrants
-            </span>
-            <div className="h-px flex-1" style={{ background: "#292524" }} />
+              {authError && (
+                <div
+                  className="text-xs font-bold uppercase tracking-wider text-center py-2 px-3 rounded-md"
+                  style={{
+                    fontFamily: "'Oswald', sans-serif",
+                    background: "rgba(239, 68, 68, 0.1)",
+                    color: "#ef4444",
+                    border: "1px solid rgba(239, 68, 68, 0.2)",
+                  }}
+                >
+                  {authError}
+                </div>
+              )}
+
+              <button
+                type="submit"
+                className="w-full mt-2 py-3 rounded-lg text-[11px] font-black tracking-[0.2em] uppercase transition-all cursor-pointer text-center"
+                style={{
+                  fontFamily: "'Oswald', sans-serif",
+                  background: "rgba(28,25,23,0.85)",
+                  color: "#FCFCFC",
+                  border: "1px solid rgba(255,255,255,0.06)",
+                }}
+              >
+                Authenticate
+              </button>
+            </form>
           </div>
-          <button
-            onClick={handleSaveStart}
-            disabled={disabled || isLoading}
-            className="px-3 py-2 rounded-lg text-[10px] ml-auto shrink-0 font-bold tracking-[0.15em] uppercase transition-all disabled:cursor-not-allowed cursor-pointer"
-            style={{
-              fontFamily: "'Oswald', sans-serif",
-              background: disabled ? "#FBF9E7" : "rgba(28,25,23,0.7)",
-              border: `1px solid ${disabled || isLoading ? "rgba(217,119,6,0.4)" : "rgba(255,255,255,0.06)"}`,
-              color: disabled || isLoading ? "rgba(28,25,23,0.7)" : "#FCFCFC",
-            }}
-          >
-            Save start entries
-          </button>
         </div>
-      </div>
+        // <div
+        //   className="min-h-screen text-stone-100 pt-8 pb-16 px-4"
+        //   style={{
+        //     background: "#fff",
+        //     backgroundImage:
+        //       "repeating-linear-gradient(0deg,transparent,transparent 39px,rgba(217,119,6,0.018) 39px,rgba(217,119,6,0.018) 40px),repeating-linear-gradient(90deg,transparent,transparent 39px,rgba(217,119,6,0.018) 39px,rgba(217,119,6,0.018) 40px)",
+        //   }}
+        // >
+        //   <h3 className="text-black">Sign In</h3>
+        // </div>
+      )}
 
       <AnimatePresence>
         {toast && (
