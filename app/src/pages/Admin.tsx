@@ -4,7 +4,7 @@ import { AnimatePresence } from "framer-motion";
 import * as Papa from "papaparse";
 
 import type { Driver } from "@/types";
-import { CHECKPOINTS } from "@/data";
+import { ADMIN_TABS, CHECKPOINTS } from "@/data";
 import Toast from "@/components/Toast";
 import TimePicker from "@/components/RaceClock";
 import type { FilterTypes } from "@/state/types";
@@ -12,6 +12,7 @@ import useDriverList, { getSpecificTime } from "@/hooks/useDriverList";
 import { useConfigStartPointMutation } from "@/state/rhinoApi";
 import Upload from "@/components/Upload";
 import { ADMIN_PASSWORD, ADMIN_USERNAME } from "@/constants";
+import { AdminTabs } from "@/components/AdminTabs";
 
 const d = new Date();
 
@@ -173,10 +174,27 @@ const FilterBtn = ({
 export default function AdminPage() {
   const [file, setFile] = useState<File | null>(null);
 
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [currentTab, setCurrentTab] = useState("checkpoints");
+
+  const [isAuthenticated, setIsAuthenticated] = useState(true);
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [authError, setAuthError] = useState<string | null>(null);
+  const [expanded, setExpanded] = useState<number | null>(null);
+  const [search, setSearch] = useState("");
+  const [filter, setFilter] = useState<FilterTypes>("all");
+  const [toast, setToast] = useState<string | null>(null);
+  const [selections, setSelections] = useState<Record<number, string>>({});
+  const [time, setTime] = useState(`${d.getHours()}:${d.getMinutes()}`);
+  const [isInitialized, setIsInitialized] = useState(false);
+
+  const { data, LoadingVehicleList, LoadingCheckPoints } = useDriverList({
+    startDate: getSpecificTime(7, 30),
+    endDate: getSpecificTime(23, 59, 59),
+  });
+
+  const [configStartPoint, { isLoading: LoadingCreateStart }] =
+    useConfigStartPointMutation();
 
   const handleSignIn = (e: React.FormEvent) => {
     e.preventDefault();
@@ -188,34 +206,8 @@ export default function AdminPage() {
     }
   };
 
-  console.log(
-    isAuthenticated,
-    ADMIN_PASSWORD,
-    ADMIN_USERNAME,
-    "isAuthenticated",
-  );
-
-  const { data, LoadingVehicleList, LoadingCheckPoints } = useDriverList({
-    startDate: getSpecificTime(7, 30),
-    endDate: getSpecificTime(23, 59, 59),
-  });
-  const [configStartPoint, { isLoading: LoadingCreateStart }] =
-    useConfigStartPointMutation();
-
-  // const isAuthenticated = false;
-
   const isLoading =
     LoadingVehicleList || LoadingCheckPoints || LoadingCreateStart;
-
-  const [time, setTime] = useState(`${d.getHours()}:${d.getMinutes()}`);
-
-  const [expanded, setExpanded] = useState<number | null>(null);
-  const [search, setSearch] = useState("");
-  const [filter, setFilter] = useState<FilterTypes>("all");
-  const [toast, setToast] = useState<string | null>(null);
-  const [selections, setSelections] = useState<Record<number, string>>({});
-
-  const [isInitialized, setIsInitialized] = useState(false);
 
   const payload = useMemo(() => {
     const checkpoints = Object.entries(selections ?? {})?.map(
@@ -339,6 +331,12 @@ export default function AdminPage() {
                 />
               </div>
             </div>
+
+            <AdminTabs
+              tabs={ADMIN_TABS}
+              activeTab={currentTab}
+              onChange={setCurrentTab}
+            />
 
             {/* ── Search + Filters ── */}
             <div className="flex flex-wrap gap-2 mb-4">

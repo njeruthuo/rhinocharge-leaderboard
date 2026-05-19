@@ -245,7 +245,7 @@ export default function SafariLeaderBoard() {
   }, [data]);
 
   const isViewer = useMemo((): boolean => {
-    return pathname === "/management/viewer";
+    return pathname !== "/";
   }, [pathname]);
 
   const [clicks, setClicks] = useState(0);

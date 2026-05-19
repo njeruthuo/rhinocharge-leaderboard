@@ -16,3 +16,9 @@ export const CHECKPOINTS = [
 ] as const;
 
 export type CheckpointName = (typeof CHECKPOINTS)[number];
+
+export const ADMIN_TABS = [
+  { id: "checkpoints", label: "Live Data" },
+  { id: "vehicles", label: "Competitor Info" },
+  { id: "logs", label: "Results" },
+];

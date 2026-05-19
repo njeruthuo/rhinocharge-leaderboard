@@ -31,3 +31,15 @@ export type DesktopRowType = {
   setOpen: React.Dispatch<React.SetStateAction<RowStatus>>;
   isViewer: boolean;
 };
+
+export interface TabOption {
+  id: string;
+  label: string;
+  icon?: React.ReactNode;
+}
+
+export interface AdminTabsProps {
+  tabs: TabOption[];
+  activeTab: string;
+  onChange: (tabId: string) => void;
+}
