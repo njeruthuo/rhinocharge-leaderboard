@@ -35,7 +35,7 @@ const StartForm = ({ driver }: { driver: Driver; totalColumns: number }) => {
               Start Time
             </label>
             <input
-              type="time"
+              type="date"
               value={startTime}
               onChange={(e) => setStartTime(e.target.value)}
               className="bg-gray-600 border border-stone-700 text-white text-sm px-3 py-1 rounded focus:outline-none focus:border-amber-600"
