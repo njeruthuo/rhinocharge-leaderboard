@@ -21,7 +21,7 @@ export default function AdminPage() {
   const navigate = useNavigate();
   const [currentTab, setCurrentTab] = useState<TabType>(TabOptionList.LIVEDATA);
   const [selections, setSelections] = useState<Record<number, string>>({});
-  const [isAuthenticated, setIsAuthenticated] = useState(true);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [toast, setToast] = useState<string | null>(null);
   const [file, setFile] = useState<File | null>(null);
 
