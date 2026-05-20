@@ -232,21 +232,9 @@ export default function SafariLeaderBoard({
 }: {
   showHeader?: boolean;
 }) {
-  /**
-   * TODO: we also need to store dates that can be
-   * used to fetch events data based on dates
-   */
-
   const { pathname } = useLocation();
-  const [date] = useState({
-    startDate: "2025-05-30T07:30:00",
-    endDate: "2025-06-1T17:30:00",
-  });
-  // const [date] = useState(() => ({
-  //   startDate: getSpecificTime(7, 30),
-  //   endDate: getSpecificTime(23, 59, 59),
-  // }));
-  const { data, LoadingVehicleList, LoadingCheckPoints } = useDriverList(date);
+
+  const { data, LoadingVehicleList, LoadingCheckPoints } = useDriverList();
 
   const drivers = useMemo(() => {
     return [...data].sort((a, b) => b.totalCps - a.totalCps);
