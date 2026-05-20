@@ -1,9 +1,21 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 
+interface DateStorage {
+  id: number;
+  start_date: string; // "YYYY-MM-DD HH:MM:SS"
+  end_date: string;
+  backup_status: boolean;
+}
+
+interface DateStoragePayload {
+  start_date: string;
+  end_date: string;
+}
+
 export const storage = createApi({
   reducerPath: "storage",
   baseQuery: fetchBaseQuery({
-    baseUrl: import.meta.env.VITE_APP_BASE,
+    baseUrl: "https://storage-service-4nwv.onrender.com/",
     prepareHeaders: (headers) => {
       const token = localStorage.getItem("token");
       if (token) {
@@ -13,21 +25,32 @@ export const storage = createApi({
     },
   }),
   endpoints: (build) => ({
-    createDataPoint: build.mutation({
-      query: () => ({
-        url: " ",
+    // POST /datestorage/  — fails with 400 if a row already exists
+    createDataPoint: build.mutation<DateStorage, DateStoragePayload>({
+      query: (body) => ({
+        url: "datestorage/",
+        method: "POST",
+        body,
       }),
     }),
 
-    updateDataPoint: build.mutation({
-      query: () => ({
-        url: " ",
+    // PATCH /datestorage/{id}/  — partial update, send only fields you want to change
+    updateDataPoint: build.mutation<
+      DateStorage,
+      { id: number } & Partial<DateStoragePayload>
+    >({
+      query: ({ id, ...body }) => ({
+        url: `datestorage/${id}/`,
+        method: "PATCH",
+        body,
       }),
     }),
 
-    getDataPoint: build.query({
-      query: () => ({
-        url: " ",
+    // GET /datestorage/{id}/  — fetch the single existing row by its id
+    getDataPoint: build.query<DateStorage, number>({
+      query: (id) => ({
+        url: `datestorage/${id}/`,
+        method: "GET",
       }),
     }),
   }),
