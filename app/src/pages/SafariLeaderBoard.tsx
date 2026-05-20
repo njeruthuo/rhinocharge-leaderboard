@@ -239,8 +239,8 @@ export default function SafariLeaderBoard({
 
   const { pathname } = useLocation();
   const [date] = useState({
-    startDate: "2025-05-31T07:30:00",
-    endDate: "2025-05-31T17:30:00",
+    startDate: "2025-05-30T07:30:00",
+    endDate: "2025-06-1T17:30:00",
   });
   // const [date] = useState(() => ({
   //   startDate: getSpecificTime(7, 30),
