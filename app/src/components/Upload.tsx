@@ -16,10 +16,38 @@ const Upload = ({ file, setFile, handleUpload }: UploadProps) => {
     }
   };
 
+  const downloadTemplate = () => {
+    const headers = [
+      "Car NO",
+      "Class",
+      "Full/Half Charge classification",
+      "Start CP",
+      "Sponsorship",
+    ];
+    const sampleRow = [
+      "101",
+      "Class A",
+      "Full Charge",
+      "CP-01",
+      "Sponsor Name",
+    ];
+
+    const csvContent =
+      "\uFEFF" + [headers.join(","), sampleRow.join(",")].join("\n");
+    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+
+    const link = document.createElement("a");
+    link.href = url;
+    link.setAttribute("download", "car_registration_template.csv");
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
   return (
     <>
       <div className="relative inline-block">
-        {/* Trigger Button */}
         <button
           onClick={() => setOpen(true)}
           className="flex items-center gap-2 px-3 py-2 rounded-full border transition-all hover:brightness-110"
@@ -44,7 +72,6 @@ const Upload = ({ file, setFile, handleUpload }: UploadProps) => {
           </span>
         </button>
 
-        {/* Hidden Native Input */}
         <input
           type="file"
           ref={fileInputRef}
@@ -52,7 +79,6 @@ const Upload = ({ file, setFile, handleUpload }: UploadProps) => {
           className="hidden"
         />
 
-        {/* Dropdown Panel */}
         {open && (
           <>
             <div
@@ -69,6 +95,17 @@ const Upload = ({ file, setFile, handleUpload }: UploadProps) => {
                 boxShadow: "0 16px 48px rgba(0,0,0,0.55)",
               }}
             >
+              {/* Template Download Link */}
+              <div className="mb-3 text-right">
+                <button
+                  onClick={downloadTemplate}
+                  className="text-[10px] uppercase hover:cursor-pointer font-bold tracking-wider transition-all hover:underline"
+                  style={{ color: "#D97706" }}
+                >
+                  Download Template
+                </button>
+              </div>
+
               {/* File Selector Area */}
               <div
                 onClick={() => fileInputRef?.current?.click()}
@@ -94,7 +131,6 @@ const Upload = ({ file, setFile, handleUpload }: UploadProps) => {
                 )}
               </div>
 
-              {/* Action Buttons */}
               <div className="flex gap-2 mt-4">
                 <button
                   onClick={() => setOpen(false)}
