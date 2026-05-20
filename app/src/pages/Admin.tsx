@@ -12,9 +12,9 @@ import useDriverList from "@/hooks/useDriverList";
 import { AdminTabs } from "@/components/AdminTabs";
 import SafariLeaderBoard from "./SafariLeaderBoard";
 import { TabOptionList, type TabType } from "@/types";
+import useGetStoredDates from "@/hooks/useGetStoredDates";
 import CompetitorInfo from "@/components/admintabsopt/CompetitorInfo";
 import LoginPage from "@/components/admintabsopt/components/LoginPage";
-import { useGetDataPointQuery } from "@/state/storage";
 
 export default function AdminPage() {
   const [currentTab, setCurrentTab] = useState<TabType>(TabOptionList.LIVEDATA);
@@ -23,17 +23,11 @@ export default function AdminPage() {
   const [toast, setToast] = useState<string | null>(null);
   const [file, setFile] = useState<File | null>(null);
 
-  const { data: DateData } = useGetDataPointQuery(1);
+  const DateData = useGetStoredDates();
 
-  console.log(DateData, "DateData");
+  const [time, setTime] = useState(() => DateData);
 
-  const [time, setTime] = useState(() => ({
-    startDate: DateData?.start_date.replace(" ", "T") ?? "2026-06-01T07:30:00",
-    endDate: DateData?.end_date.replace(" ", "T") ?? "2026-06-01T17:30:00",
-    isBackup: DateData?.backup_status ?? false,
-  }));
-
-  const { data, LoadingVehicleList, LoadingCheckPoints } = useDriverList(time);
+  const { data, LoadingVehicleList, LoadingCheckPoints } = useDriverList();
 
   const handleUpload = async () => {
     if (!file) return;

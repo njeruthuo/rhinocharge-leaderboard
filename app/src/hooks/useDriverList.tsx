@@ -3,12 +3,13 @@ import {
   useGetCheckPointsMutation,
   useGetVehicleListQuery,
 } from "@/state/rhinoApi";
-import type { GetPoiPayload } from "@/state/types";
 import { calculateHistory, parseTime } from "@/utils";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import useGetStoredDates from "./useGetStoredDates";
 
-const useDriverList = ({ startDate, endDate }: GetPoiPayload) => {
+const useDriverList = () => {
   const [tokenReady] = useState(() => !!localStorage.getItem("token"));
+  const DateData = useGetStoredDates();
   const {
     data: VehicleList,
     isLoading: LoadingVehicleList,
@@ -26,22 +27,31 @@ const useDriverList = ({ startDate, endDate }: GetPoiPayload) => {
     if (fired.current) return;
     fired.current = true;
     if (tokenReady) {
-      getCheckPoints({ startDate, endDate });
+      getCheckPoints({
+        startDate: DateData.startDate,
+        endDate: DateData.endDate,
+      });
     }
-  }, [tokenReady, getCheckPoints, startDate, endDate]);
+  }, [tokenReady, getCheckPoints, DateData.startDate, DateData.endDate]);
 
   useEffect(() => {
     if (!tokenReady) return;
     const interval = setInterval(() => {
-      getCheckPoints({ startDate, endDate });
+      getCheckPoints({
+        startDate: DateData.startDate,
+        endDate: DateData.endDate,
+      });
     }, REFETCH_INTERVAL);
     return () => clearInterval(interval);
-  }, [tokenReady, getCheckPoints, startDate, endDate]);
+  }, [tokenReady, getCheckPoints, DateData.startDate, DateData.endDate]);
 
   const refetch = useCallback(() => {
     refetchVehicles();
-    getCheckPoints({ startDate, endDate });
-  }, [refetchVehicles, getCheckPoints, startDate, endDate]);
+    getCheckPoints({
+      startDate: DateData.startDate,
+      endDate: DateData.endDate,
+    });
+  }, [refetchVehicles, getCheckPoints, DateData.startDate, DateData.endDate]);
 
   const driverList = useMemo(() => {
     if (

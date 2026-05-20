@@ -1,6 +1,6 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 
-interface DateStorage {
+export interface DateStorage {
   id: number;
   start_date: string; // "YYYY-MM-DD HH:MM:SS"
   end_date: string;
