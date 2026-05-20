@@ -32,8 +32,6 @@ export default function AdminPage() {
 
   const { data, LoadingVehicleList, LoadingCheckPoints } = useDriverList(time);
 
-  console.log(time, "time");
-
   const handleUpload = async () => {
     if (!file) return;
 
