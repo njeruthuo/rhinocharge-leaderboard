@@ -1,9 +1,9 @@
-import { ADMIN_PAGE_CLICKS } from "@/constants";
-import { useEffect, useRef, useState } from "react";
+import { lock } from "@/constants";
+import { useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 
 const LeaderboardHeader = () => {
-  const [clicks, setClicks] = useState(0);
+  // const [clicks, setClicks] = useState(0);
   const navigate = useNavigate();
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 
@@ -14,23 +14,21 @@ const LeaderboardHeader = () => {
   }, []);
 
   const handleOpenAdmin = () => {
-    if (timeoutRef.current) {
-      clearTimeout(timeoutRef.current);
-    }
-
-    const nextClicks = clicks + 1;
-
-    if (nextClicks >= ADMIN_PAGE_CLICKS) {
-      setClicks(0);
-      navigate("/management/admin");
-    } else {
-      setClicks(nextClicks);
-
-      timeoutRef.current = setTimeout(() => {
-        setClicks(0);
-      }, 2000);
-    }
+    // if (timeoutRef.current) {
+    //   clearTimeout(timeoutRef.current);
+    // }
+    // const nextClicks = clicks + 1;
+    // if (nextClicks >= ADMIN_PAGE_CLICKS) {
+    //   setClicks(0);
+    navigate("/management/admin");
+    // } else {
+    //   setClicks(nextClicks);
+    //   timeoutRef.current = setTimeout(() => {
+    //     setClicks(0);
+    //   }, 2000);
+    // }
   };
+
   return (
     <div className="mb-4 flex place-content-start">
       <div>
@@ -40,7 +38,7 @@ const LeaderboardHeader = () => {
             fontFamily: "'Oswald', sans-serif",
             letterSpacing: "0.04em",
           }}
-          onClick={handleOpenAdmin}
+          // onClick={handleOpenAdmin}
         >
           Rhino Charge 2026
         </div>
@@ -50,6 +48,10 @@ const LeaderboardHeader = () => {
       </div>
 
       <div className="flex items-center gap-3 flex-wrap ml-auto">
+        <span className="hover:cursor-pointer" onClick={handleOpenAdmin}>
+          <img src={lock} alt="" />
+        </span>
+
         <div
           className="flex items-center gap-2 px-3 py-1.5 rounded-full border"
           style={{

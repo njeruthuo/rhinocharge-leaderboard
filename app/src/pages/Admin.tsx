@@ -30,12 +30,7 @@ export default function AdminPage() {
   });
   const [selections, setSelections] = useState<Record<number, string>>({});
 
-  const { data, LoadingVehicleList, LoadingCheckPoints } = useDriverList({
-    // startDate: getSpecificTime(7, 30),
-    // endDate: getSpecificTime(23, 59, 59),
-    startDate: "2026-06-01T07:30:00",
-    endDate: "2026-06-01T17:30:00",
-  });
+  const { data, LoadingVehicleList, LoadingCheckPoints } = useDriverList(time);
 
   console.log(time, "time");
 
