@@ -15,11 +15,13 @@ import { TabOptionList, type TabType } from "@/types";
 import useGetStoredDates from "@/hooks/useGetStoredDates";
 import CompetitorInfo from "@/components/admintabsopt/CompetitorInfo";
 import LoginPage from "@/components/admintabsopt/components/LoginPage";
+import { useNavigate } from "react-router-dom";
 
 export default function AdminPage() {
+  const navigate = useNavigate();
   const [currentTab, setCurrentTab] = useState<TabType>(TabOptionList.LIVEDATA);
   const [selections, setSelections] = useState<Record<number, string>>({});
-  const [isAuthenticated, setIsAuthenticated] = useState(true);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [toast, setToast] = useState<string | null>(null);
   const [file, setFile] = useState<File | null>(null);
 
@@ -85,6 +87,7 @@ export default function AdminPage() {
                     letterSpacing: "0.04em",
                     color: "#716969",
                   }}
+                  onClick={() => navigate("/")}
                 >
                   Rhino Charge 2026
                 </h1>
