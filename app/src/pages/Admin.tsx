@@ -1,34 +1,37 @@
 import { useState } from "react";
+import * as Papa from "papaparse";
 import { AnimatePresence } from "framer-motion";
 
 import { ADMIN_TABS } from "@/data";
 import Toast from "@/components/Toast";
+
+import Upload from "@/components/Upload";
+import TimePicker from "@/components/RaceClock";
+import useDriverList from "@/hooks/useDriverList";
 
 import { AdminTabs } from "@/components/AdminTabs";
 import SafariLeaderBoard from "./SafariLeaderBoard";
 import { TabOptionList, type TabType } from "@/types";
 import CompetitorInfo from "@/components/admintabsopt/CompetitorInfo";
 import LoginPage from "@/components/admintabsopt/components/LoginPage";
-
-import * as Papa from "papaparse";
-import Upload from "@/components/Upload";
-
-import TimePicker from "@/components/RaceClock";
-import useDriverList from "@/hooks/useDriverList";
-
-// const d = new Date();
+import { useGetDataPointQuery } from "@/state/storage";
 
 export default function AdminPage() {
   const [currentTab, setCurrentTab] = useState<TabType>(TabOptionList.LIVEDATA);
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [toast, setToast] = useState<string | null>(null);
-
-  const [file, setFile] = useState<File | null>(null);
-  const [time, setTime] = useState({
-    startDate: "2026-06-01T07:30:00",
-    endDate: "2026-06-01T17:30:00",
-  });
   const [selections, setSelections] = useState<Record<number, string>>({});
+  const [isAuthenticated, setIsAuthenticated] = useState(true);
+  const [toast, setToast] = useState<string | null>(null);
+  const [file, setFile] = useState<File | null>(null);
+
+  const { data: DateData } = useGetDataPointQuery(1);
+
+  console.log(DateData, "DateData");
+
+  const [time, setTime] = useState(() => ({
+    startDate: DateData?.start_date.replace(" ", "T") ?? "2026-06-01T07:30:00",
+    endDate: DateData?.end_date.replace(" ", "T") ?? "2026-06-01T17:30:00",
+    isBackup: DateData?.backup_status ?? false,
+  }));
 
   const { data, LoadingVehicleList, LoadingCheckPoints } = useDriverList(time);
 
@@ -121,7 +124,10 @@ export default function AdminPage() {
                 <div className="flex items-center space-x-2 shrink-0 sm:mb-6">
                   <TimePicker
                     value={time}
-                    onChange={(selectedTime) => setTime(selectedTime)}
+                    onChange={(name: string, value: string | boolean) =>
+                      setTime((prev) => ({ ...prev, [name]: value }))
+                    }
+                    isUpdate={DateData !== undefined}
                   />
                 </div>
               )}

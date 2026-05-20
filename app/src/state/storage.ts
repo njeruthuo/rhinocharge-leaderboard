@@ -10,12 +10,15 @@ interface DateStorage {
 interface DateStoragePayload {
   start_date: string;
   end_date: string;
+  backup_status: boolean;
 }
 
 export const storage = createApi({
   reducerPath: "storage",
+  tagTypes: ["Dates"],
   baseQuery: fetchBaseQuery({
-    baseUrl: "https://storage-service-4nwv.onrender.com/",
+    // baseUrl: "https://storage-service-4nwv.onrender.com/",
+    baseUrl: "http://127.0.0.1:8000/",
     prepareHeaders: (headers) => {
       const token = localStorage.getItem("token");
       if (token) {
@@ -32,6 +35,7 @@ export const storage = createApi({
         method: "POST",
         body,
       }),
+      invalidatesTags: ["Dates"],
     }),
 
     // PATCH /datestorage/{id}/  — partial update, send only fields you want to change
@@ -44,6 +48,7 @@ export const storage = createApi({
         method: "PATCH",
         body,
       }),
+      invalidatesTags: ["Dates"],
     }),
 
     // GET /datestorage/{id}/  — fetch the single existing row by its id
@@ -52,6 +57,7 @@ export const storage = createApi({
         url: `datestorage/${id}/`,
         method: "GET",
       }),
+      providesTags: ["Dates"],
     }),
   }),
 });
