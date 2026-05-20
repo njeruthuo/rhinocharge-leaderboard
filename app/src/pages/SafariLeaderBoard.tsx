@@ -1,7 +1,7 @@
 import { useState, useMemo } from "react";
 import { motion, AnimatePresence, Reorder } from "framer-motion";
 import type { CheckPoint, Driver } from "@/types";
-import useDriverList, { getSpecificTime } from "@/hooks/useDriverList";
+import useDriverList from "@/hooks/useDriverList";
 import { colors, spinner } from "@/constants";
 import DesktopTable from "@/components/DesktopTable";
 import { CHECKPOINTS } from "@/data";
@@ -238,10 +238,14 @@ export default function SafariLeaderBoard({
    */
 
   const { pathname } = useLocation();
-  const [date] = useState(() => ({
-    startDate: getSpecificTime(7, 30),
-    endDate: getSpecificTime(23, 59, 59),
-  }));
+  const [date] = useState({
+    startDate: "2025-05-31T07:30:00",
+    endDate: "2025-05-31T17:30:00",
+  });
+  // const [date] = useState(() => ({
+  //   startDate: getSpecificTime(7, 30),
+  //   endDate: getSpecificTime(23, 59, 59),
+  // }));
   const { data, LoadingVehicleList, LoadingCheckPoints } = useDriverList(date);
 
   const drivers = useMemo(() => {
