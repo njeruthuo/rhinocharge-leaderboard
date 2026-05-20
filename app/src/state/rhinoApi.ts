@@ -14,7 +14,7 @@ import type {
 export const rhinoApi = createApi({
   reducerPath: "rhinoApi",
   baseQuery: baseQueryWithReauth,
-  tagTypes: ["VehicleList", "Time"],
+  tagTypes: ["VehicleList", "Time", "Pois"],
   endpoints: (build) => ({
     getPois: build.mutation<Poi[], string>({
       query: () => ({
@@ -44,14 +44,14 @@ export const rhinoApi = createApi({
     }),
 
     getCheckPoints: build.mutation<TripRecord[], GetPoiPayload>({
-      query: ({ startDate, endDate }) => {
+      query: ({ startDate, endDate, backup }) => {
         const requestBody = {
           api_action: "get_poi_summary",
           user_id: 1263,
           start_date: startDate,
           end_date: endDate,
           region_id: 0,
-          // backup: true,
+          backup: backup,
           // unit_id: "",
         };
 

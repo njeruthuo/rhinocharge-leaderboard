@@ -4,12 +4,23 @@ import {
   useGetVehicleListQuery,
 } from "@/state/rhinoApi";
 import { calculateHistory, parseTime } from "@/utils";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import useGetStoredDates from "./useGetStoredDates";
 
 const useDriverList = () => {
+  // const fired = useRef(false);
+  const { DateData: resolvedTime } = useGetStoredDates();
+
+  const DateData = useMemo(
+    () => ({
+      startDate: resolvedTime.startDate ?? "2025-06-01T7:30:00",
+      endDate: resolvedTime.endDate ?? "2025-06-01T17:30:00",
+      isBackup: resolvedTime.isBackup,
+    }),
+    [resolvedTime.startDate, resolvedTime.endDate, resolvedTime.isBackup],
+  );
+
   const [tokenReady] = useState(() => !!localStorage.getItem("token"));
-  const DateData = useGetStoredDates();
   const {
     data: VehicleList,
     isLoading: LoadingVehicleList,
@@ -21,37 +32,85 @@ const useDriverList = () => {
 
   const [getCheckPoints, { data: CheckPoints, isLoading: LoadingCheckPoints }] =
     useGetCheckPointsMutation();
-  const fired = useRef(false);
+
+  // useEffect(() => {
+  //   if (fired.current) return;
+  //   fired.current = true;
+  //   if (tokenReady) {
+  //     getCheckPoints({
+  //       startDate: DateData.startDate,
+  //       endDate: DateData.endDate,
+  //       backup: DateData.isBackup,
+  //     });
+  //   }
+  // }, [
+  //   tokenReady,
+  //   getCheckPoints,
+  //   DateData.startDate,
+  //   DateData.endDate,
+  //   DateData.isBackup,
+  // ]);
 
   useEffect(() => {
-    if (fired.current) return;
-    fired.current = true;
-    if (tokenReady) {
+    if (!tokenReady) return;
+
+    // Fire immediately when dates change
+    getCheckPoints({
+      startDate: DateData.startDate,
+      endDate: DateData.endDate,
+      backup: DateData.isBackup,
+    });
+
+    // Then keep polling
+    const interval = setInterval(() => {
       getCheckPoints({
         startDate: DateData.startDate,
         endDate: DateData.endDate,
+        backup: DateData.isBackup,
       });
-    }
-  }, [tokenReady, getCheckPoints, DateData.startDate, DateData.endDate]);
+    }, REFETCH_INTERVAL);
+
+    return () => clearInterval(interval);
+  }, [
+    tokenReady,
+    getCheckPoints,
+    DateData.startDate,
+    DateData.endDate,
+    DateData.isBackup,
+  ]);
 
   useEffect(() => {
     if (!tokenReady) return;
     const interval = setInterval(() => {
       getCheckPoints({
+        backup: DateData.isBackup,
         startDate: DateData.startDate,
         endDate: DateData.endDate,
       });
     }, REFETCH_INTERVAL);
     return () => clearInterval(interval);
-  }, [tokenReady, getCheckPoints, DateData.startDate, DateData.endDate]);
+  }, [
+    tokenReady,
+    getCheckPoints,
+    DateData.startDate,
+    DateData.endDate,
+    DateData.isBackup,
+  ]);
 
   const refetch = useCallback(() => {
     refetchVehicles();
     getCheckPoints({
+      backup: DateData.isBackup,
       startDate: DateData.startDate,
       endDate: DateData.endDate,
     });
-  }, [refetchVehicles, getCheckPoints, DateData.startDate, DateData.endDate]);
+  }, [
+    refetchVehicles,
+    getCheckPoints,
+    DateData.startDate,
+    DateData.endDate,
+    DateData.isBackup,
+  ]);
 
   const driverList = useMemo(() => {
     if (

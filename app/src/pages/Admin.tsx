@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import * as Papa from "papaparse";
 import { AnimatePresence } from "framer-motion";
 
@@ -15,17 +15,34 @@ import { TabOptionList, type TabType } from "@/types";
 import useGetStoredDates from "@/hooks/useGetStoredDates";
 import CompetitorInfo from "@/components/admintabsopt/CompetitorInfo";
 import LoginPage from "@/components/admintabsopt/components/LoginPage";
+import { useNavigate } from "react-router-dom";
 
 export default function AdminPage() {
+  const navigate = useNavigate();
   const [currentTab, setCurrentTab] = useState<TabType>(TabOptionList.LIVEDATA);
   const [selections, setSelections] = useState<Record<number, string>>({});
   const [isAuthenticated, setIsAuthenticated] = useState(true);
   const [toast, setToast] = useState<string | null>(null);
   const [file, setFile] = useState<File | null>(null);
 
-  const DateData = useGetStoredDates();
+  const { DateData, isUpdate } = useGetStoredDates();
 
-  const [time, setTime] = useState(() => DateData);
+  const resolvedTime = useMemo(
+    () => ({
+      startDate: DateData.startDate ?? "2025-06-01T7:30:00",
+      endDate: DateData.endDate ?? "2025-06-01T17:30:00",
+      isBackup: DateData.isBackup,
+    }),
+    [DateData.startDate, DateData.endDate, DateData.isBackup],
+  );
+
+  const [time, setTime] = useState(resolvedTime);
+
+  useEffect(() => {
+    setTime(resolvedTime);
+  }, [resolvedTime]);
+
+  console.log(time, "time");
 
   const { data, LoadingVehicleList, LoadingCheckPoints } = useDriverList();
 
@@ -85,6 +102,7 @@ export default function AdminPage() {
                     letterSpacing: "0.04em",
                     color: "#716969",
                   }}
+                  onClick={() => navigate("/")}
                 >
                   Rhino Charge 2026
                 </h1>
@@ -121,7 +139,7 @@ export default function AdminPage() {
                     onChange={(name: string, value: string | boolean) =>
                       setTime((prev) => ({ ...prev, [name]: value }))
                     }
-                    isUpdate={DateData !== undefined}
+                    isUpdate={isUpdate}
                   />
                 </div>
               )}
