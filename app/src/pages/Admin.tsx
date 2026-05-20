@@ -25,7 +25,7 @@ export default function AdminPage() {
   const [toast, setToast] = useState<string | null>(null);
   const [file, setFile] = useState<File | null>(null);
 
-  const DateData = useGetStoredDates();
+  const { DateData, isUpdate } = useGetStoredDates();
 
   const [time, setTime] = useState(() => DateData);
 
@@ -124,7 +124,7 @@ export default function AdminPage() {
                     onChange={(name: string, value: string | boolean) =>
                       setTime((prev) => ({ ...prev, [name]: value }))
                     }
-                    isUpdate={DateData !== undefined}
+                    isUpdate={isUpdate}
                   />
                 </div>
               )}
