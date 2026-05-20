@@ -1,12 +1,13 @@
-import { CHECKPOINTS } from "@/data";
-import CpCell from "./CpCell";
 import type { Driver } from "@/types";
+// import { CHECKPOINTS } from "@/data";
+// import CpCell from "./CpCell";
+// import { select } from "framer-motion/client";
 
 function CarRow({
   car,
   isExpanded,
   selectedCp,
-  onSelectCp,
+  // onSelectCp,
 }: {
   car: Driver;
   isExpanded: boolean;
@@ -14,6 +15,8 @@ function CarRow({
   selectedCp: string;
   onSelectCp: (cp: string) => void;
 }) {
+  // console.log(selectedCp, "selecyedCP");
+
   return (
     <>
       <tr
@@ -58,14 +61,17 @@ function CarRow({
           </div>
         </td>
 
-        {/* CP cells — one per checkpoint */}
+        <td className="py-3 pr-4 text-sm" style={{ minWidth: 160 }}>
+          <span style={{ color: "#78716c" }}> {selectedCp}</span>
+        </td>
+        {/* 
         {CHECKPOINTS.map((cp) => (
           <CpCell
             key={cp}
             isSelected={selectedCp === cp}
             onSelect={() => onSelectCp(selectedCp === cp ? "" : cp)}
           />
-        ))}
+        ))} */}
       </tr>
     </>
   );

@@ -2,7 +2,6 @@ import { CHECKPOINTS } from "@/data";
 import { AnimatePresence } from "framer-motion";
 import CarRow from "./components/CarRow";
 import FilterBtn from "./components/FilterBtn";
-import CpColumnHeader from "./components/CpColumnHeader";
 import { useMemo, useState } from "react";
 
 import { useConfigStartPointMutation } from "@/state/rhinoApi";
@@ -209,11 +208,33 @@ const CompetitorInfo = ({
                       Driver / Team
                     </span>
                   </th>
+                  <th className="py-3 pr-4 text-left" style={{ minWidth: 160 }}>
+                    <span
+                      className="text-[9px] font-black tracking-[0.2em] uppercase"
+                      style={{
+                        color: "white",
+                        fontFamily: "'Oswald', sans-serif",
+                      }}
+                    >
+                      Start Checkpoint
+                    </span>
+                  </th>
+                  <th className="py-3 pr-4 text-left" style={{ minWidth: 160 }}>
+                    <span
+                      className="text-[9px] font-black tracking-[0.2em] uppercase"
+                      style={{
+                        color: "white",
+                        fontFamily: "'Oswald', sans-serif",
+                      }}
+                    >
+                      Sponsorship
+                    </span>
+                  </th>
 
                   {/* Checkpoint columns */}
-                  {CHECKPOINTS.map((cp) => (
+                  {/* {CHECKPOINTS.map((cp) => (
                     <CpColumnHeader key={cp} cp={cp} />
-                  ))}
+                  ))} */}
 
                   <th className="pr-4 py-3 w-20" />
                 </tr>
