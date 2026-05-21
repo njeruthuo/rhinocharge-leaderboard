@@ -3,7 +3,7 @@ import { TabOptionList } from "./types";
 export const CHECKPOINTS = [
   "KWS",
   "TOOLCRAFT",
-  "AUTO XPRESS",
+  "AUTOXPRESS",
   "SATAO",
   "OCEAN AGRICULTURE",
   "MANTECH",
@@ -11,7 +11,7 @@ export const CHECKPOINTS = [
   "GRIDLESS",
   "COPY CAT",
   "AQUAMIST",
-  "FLOWERWATCH",
+  "FLOWER WATCH",
   "SOLEX",
   "SLATER & WHITTAKER",
   // "GAUNTLET",
