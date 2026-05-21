@@ -12,12 +12,16 @@ import StartForm from "./StartForm";
 function DesktopTable({
   drivers,
   isViewer,
+  reduceHeight,
 }: {
   drivers: Driver[];
   isViewer: boolean;
+  reduceHeight: boolean;
 }) {
   const [rowStatus, setRowStatus] = useState<RowStatus>({ 1: false });
   const { pathname } = useLocation();
+
+  console.log(reduceHeight, "reduceHeight");
 
   return (
     <div
@@ -27,7 +31,7 @@ function DesktopTable({
         backdropFilter: "blur(8px)",
         overflowX: "auto",
         overflowY: "auto",
-        maxHeight: "78vh",
+        maxHeight: !reduceHeight ? "70vh" : "80vh",
       }}
     >
       <table className="overflow-x-auto no-scrollbar w-full">

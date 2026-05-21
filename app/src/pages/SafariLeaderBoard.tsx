@@ -361,7 +361,11 @@ export default function SafariLeaderBoard({
                 />
               </div>
             ) : (
-              <DesktopTable isViewer={isViewer} drivers={drivers as Driver[]} />
+              <DesktopTable
+                reduceHeight={showHeader}
+                isViewer={isViewer}
+                drivers={drivers as Driver[]}
+              />
             )}
           </div>
           <div className="lg:hidden">
