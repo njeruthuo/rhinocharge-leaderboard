@@ -44,8 +44,6 @@ export default function AdminPage() {
     setTime(resolvedTime);
   }, [resolvedTime]);
 
-  console.log(time, "time");
-
   const { data, LoadingVehicleList, LoadingCheckPoints } = useDriverList();
 
   const handleUpload = async () => {
