@@ -22,7 +22,8 @@ export default function AdminPage() {
   const [currentTab, setCurrentTab] = useState<TabType>(TabOptionList.LIVEDATA);
   const [selections, setSelections] = useState<Record<number, string>>({});
   const [isAuthenticated, setIsAuthenticated] = useState(
-    import.meta.env.VITE_AUTHENTICATED === "true",
+    // import.meta.env.VITE_AUTHENTICATED === "true",
+    false,
   );
   const [toast, setToast] = useState<string | null>(null);
   const [file, setFile] = useState<File | null>(null);
