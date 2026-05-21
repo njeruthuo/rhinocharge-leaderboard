@@ -73,13 +73,14 @@ export function calculateHistory(
       checkpoint.poi_name.toLowerCase().trim() ===
       start_cp.toLowerCase().trim(),
   );
-  // console.log(orderedCheckPoints, "orderedCheckPoints");
 
   // Fallback to 0 if the start_cp isn't found
   const baseStartCp =
     startCpIndex !== -1
       ? orderedCheckPoints[startCpIndex]
       : orderedCheckPoints[0];
+
+  const baseOdometer = baseStartCp?.start_odo || 0;
 
   return orderedCheckPoints?.map((checkpoint, index) => {
     const time = parseTime(checkpoint?.start_time)?.split(":");
@@ -94,7 +95,7 @@ export function calculateHistory(
     }
     // RULE 2: For the very first chronological point (if it's not the start_cp)
     else if (index === 0) {
-      calculatedOdometer = checkpoint.start_odo - (baseStartCp?.start_odo || 0);
+      calculatedOdometer = checkpoint.start_odo - baseOdometer;
     }
     // RULE 3: Every subsequent point subtracts the previous checkpoint's odometer
     else {
@@ -102,16 +103,21 @@ export function calculateHistory(
         checkpoint.start_odo - orderedCheckPoints[index - 1].start_odo;
     }
 
-    // Force negative deltas to 0 just in case odometer resets or human error occurs
+    // Force negative segment deltas to 0 (handles edge-case anomalies)
     if (calculatedOdometer < 0) calculatedOdometer = 0;
+
+    // NEW LOGIC: Calculate cumulative distance from the designated start point baseline
+    // Math.abs handles scenarios where a tracked point chronologically occurred *before* the official start line
+    const distanceFromBase = Math.abs(checkpoint.start_odo - baseOdometer);
 
     return {
       point: checkpoint?.poi_name?.toUpperCase(),
       odometer: checkpoint?.start_odo,
       time: `${time[0]}:${time[1]}`,
       calculated_odometer: calculatedOdometer,
+      distanceFromBase: distanceFromBase, // <-- Added here
       next: "",
-      startOdometer: baseStartCp?.start_odo,
+      startOdometer: baseOdometer,
     };
   });
 }

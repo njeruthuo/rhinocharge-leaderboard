@@ -21,8 +21,6 @@ function DesktopTable({
   const [rowStatus, setRowStatus] = useState<RowStatus>({ 1: false });
   const { pathname } = useLocation();
 
-  console.log(reduceHeight, "reduceHeight");
-
   return (
     <div
       className="w-full rounded-xl border"
