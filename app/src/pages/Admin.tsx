@@ -16,6 +16,7 @@ import useGetStoredDates from "@/hooks/useGetStoredDates";
 import CompetitorInfo from "@/components/admintabsopt/CompetitorInfo";
 import LoginPage from "@/components/admintabsopt/components/LoginPage";
 import { useNavigate } from "react-router-dom";
+import { home } from "@/constants";
 
 export default function AdminPage() {
   const navigate = useNavigate();
@@ -94,7 +95,7 @@ export default function AdminPage() {
         >
           <div className="max-w-[1400px] flex flex-col mx-auto">
             {/* ── Header ── */}
-            <div className="flex flex-row items-start justify-between mb-6 flex-wrap gap-3">
+            <div className="flex place-items-center flex-row items-center justify-between mb-6 flex-wrap gap-3">
               <div>
                 <h1
                   className="text-3xl sm:text-4xl font-black leading-none mb-1"
@@ -114,15 +115,22 @@ export default function AdminPage() {
                   Admin · Checkpoint Control
                 </p>
               </div>
-              {currentTab === TabOptionList.COMPETITORS && (
-                <div className="ml-auto">
+
+              <div className="ml-auto flex place-items-center space-x-8">
+                <span
+                  className="hover:cursor-pointer ml-auto"
+                  onClick={() => navigate("/")}
+                >
+                  <img src={home} alt="" />
+                </span>
+                {currentTab === TabOptionList.COMPETITORS && (
                   <Upload
                     file={file}
                     setFile={setFile}
                     handleUpload={handleUpload}
                   />
-                </div>
-              )}
+                )}
+              </div>
             </div>
 
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 w-full mb-2">

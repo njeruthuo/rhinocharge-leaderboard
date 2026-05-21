@@ -1,11 +1,13 @@
 import { ADMIN_PASSWORD, ADMIN_USERNAME } from "@/constants";
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 const LoginPage = ({
   setIsAuthenticated,
 }: {
   setIsAuthenticated: React.Dispatch<React.SetStateAction<boolean>>;
 }) => {
+  const navigate = useNavigate();
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [authError, setAuthError] = useState<string | null>(null);
@@ -129,6 +131,12 @@ const LoginPage = ({
             Authenticate
           </button>
         </form>
+        <div
+          className="flex w-full items-center justify-center mt-8"
+          onClick={() => navigate("/")}
+        >
+          <p className="hover:cursor-pointer underline font-bold">Go back</p>
+        </div>
       </div>
     </div>
   );
