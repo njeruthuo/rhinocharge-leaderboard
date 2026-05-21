@@ -74,7 +74,7 @@ export function calculateHistory(
       start_cp.toLowerCase().trim(),
   );
 
-  console.log(startCpIndex, "startCpIndex");
+  // console.log(startCpIndex, "startCpIndex");
 
   // Fallback to 0 if the start_cp isn't found
   const baseStartCp =

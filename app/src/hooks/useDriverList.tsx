@@ -126,6 +126,8 @@ const useDriverList = () => {
         (checkpoint) => checkpoint.vehicle === item.asset_name,
       );
 
+      console.log(checkPointList, "checkPointList");
+
       const start_cp =
         item?.more_asset_details?.find(
           (item) => item?.column_name === "start_cp",
@@ -144,7 +146,6 @@ const useDriverList = () => {
       });
 
       const history = calculateHistory(checkPointList, start_cp);
-      console.log(history, "history");
 
       const cumulativeOdometer = history.reduce((accumulator, currentItem) => {
         return accumulator + (currentItem.calculated_odometer || 0);
