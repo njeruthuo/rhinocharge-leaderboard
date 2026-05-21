@@ -73,7 +73,7 @@ export function calculateHistory(
       checkpoint.poi_name.toLowerCase().trim() ===
       start_cp.toLowerCase().trim(),
   );
-  console.log(orderedCheckPoints, "orderedCheckPoints");
+  // console.log(orderedCheckPoints, "orderedCheckPoints");
 
   // Fallback to 0 if the start_cp isn't found
   const baseStartCp =
