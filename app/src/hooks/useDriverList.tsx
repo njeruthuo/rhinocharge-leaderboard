@@ -8,7 +8,6 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import useGetStoredDates from "./useGetStoredDates";
 
 const useDriverList = () => {
-  // const fired = useRef(false);
   const { DateData: resolvedTime } = useGetStoredDates();
 
   const DateData = useMemo(
