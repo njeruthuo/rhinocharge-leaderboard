@@ -230,11 +230,28 @@ const CompetitorInfo = ({
                       Sponsorship
                     </span>
                   </th>
-
-                  {/* Checkpoint columns */}
-                  {/* {CHECKPOINTS.map((cp) => (
-                    <CpColumnHeader key={cp} cp={cp} />
-                  ))} */}
+                  <th className="py-3 pr-4 text-left" style={{ minWidth: 160 }}>
+                    <span
+                      className="text-[9px] font-black tracking-[0.2em] uppercase"
+                      style={{
+                        color: "white",
+                        fontFamily: "'Oswald', sans-serif",
+                      }}
+                    >
+                      Class
+                    </span>
+                  </th>
+                  <th className="py-3 pr-4 text-left" style={{ minWidth: 160 }}>
+                    <span
+                      className="text-[9px] font-black tracking-[0.2em] uppercase"
+                      style={{
+                        color: "white",
+                        fontFamily: "'Oswald', sans-serif",
+                      }}
+                    >
+                      Half/Full Charge
+                    </span>
+                  </th>
 
                   <th className="pr-4 py-3 w-20" />
                 </tr>

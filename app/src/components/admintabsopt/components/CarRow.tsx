@@ -64,14 +64,15 @@ function CarRow({
         <td className="py-3 pr-4 text-sm" style={{ minWidth: 160 }}>
           <span style={{ color: "#78716c" }}> {selectedCp}</span>
         </td>
-        {/* 
-        {CHECKPOINTS.map((cp) => (
-          <CpCell
-            key={cp}
-            isSelected={selectedCp === cp}
-            onSelect={() => onSelectCp(selectedCp === cp ? "" : cp)}
-          />
-        ))} */}
+        <td className="py-3 pr-4 text-sm" style={{ minWidth: 160 }}>
+          <span style={{ color: "#78716c" }}> {}</span>
+        </td>
+        <td className="py-3 pr-4 text-sm" style={{ minWidth: 160 }}>
+          <span style={{ color: "#78716c" }}> {}</span>
+        </td>
+        <td className="py-3 pr-4 text-sm" style={{ minWidth: 160 }}>
+          <span style={{ color: "#78716c" }}> {}</span>
+        </td>
       </tr>
     </>
   );

@@ -99,15 +99,16 @@ function RaceSettingsTrigger({ value, onChange, isUpdate }: RaceSettingsProps) {
                   className="block text-[9px] uppercase tracking-widest text-stone-400 font-bold mb-1.5"
                   style={{ fontFamily: "'Oswald', sans-serif" }}
                 >
-                  Start date
+                  Event date
                 </label>
                 <input
                   type="date"
                   value={value?.startDate?.split("T")[0] ?? ""}
                   name="startDate"
-                  onChange={(e) =>
-                    onChange("startDate", `${e.target.value}T7:30:00`)
-                  }
+                  onChange={(e) => {
+                    onChange("startDate", `${e.target.value}T7:30:00`);
+                    onChange("endDate", `${e.target.value}T17:30:00`);
+                  }}
                   className="dp-input w-full rounded-lg px-3 py-2 text-sm outline-none border"
                   style={{
                     background: "rgba(255,255,255,0.03)",
@@ -116,7 +117,7 @@ function RaceSettingsTrigger({ value, onChange, isUpdate }: RaceSettingsProps) {
                   }}
                 />
               </div>
-              <div>
+              {/* <div>
                 <label
                   className="block text-[9px] uppercase tracking-widest text-stone-400 font-bold mb-1.5"
                   style={{ fontFamily: "'Oswald', sans-serif" }}
@@ -138,7 +139,7 @@ function RaceSettingsTrigger({ value, onChange, isUpdate }: RaceSettingsProps) {
                     color: "#e7e5e4",
                   }}
                 />
-              </div>
+              </div> */}
 
               {/* Fixed time banner */}
               <div className="p-2.5 rounded-lg border text-[10px] text-stone-400 bg-stone-900/50 border-stone-800">
