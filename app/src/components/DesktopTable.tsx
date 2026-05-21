@@ -7,7 +7,7 @@ import type { Driver, RowStatus } from "@/types";
 import { CHECKPOINTS } from "@/data";
 import { isOpen } from "@/utils";
 import DesktopTableRow from "./DesktopTableRow";
-import StartForm from "./StartForm";
+// import StartForm from "./StartForm";
 
 function DesktopTable({
   drivers,
@@ -32,16 +32,29 @@ function DesktopTable({
         maxHeight: !reduceHeight ? "70vh" : "80vh",
       }}
     >
-      <table className="overflow-x-auto no-scrollbar w-full">
+      <table
+        className="overflow-x-auto no-scrollbar w-full"
+        style={{
+          borderBottomColor: "rgba(217,119,6,0.15)",
+          background: "rgba(251,249,231,0.6)",
+          backdropFilter: "blur(8px)",
+        }}
+      >
         <thead>
           <tr
             style={{
               position: "sticky",
               top: 0,
-              zIndex: 10,
-              background: "#D9D7D7",
+              // backdropFilter: "blur(118px)",
+              // background: "rgba(0,0,0,0.3)",
+              background: "rgb(84, 89, 95)",
+              // background: "#1e293b",
+              // background: "rgba(251,249,231,0.3)",
+              zIndex: 20,
+              // background: "#F8FFD6",
             }}
-            className="text-sky-600 bg-gray-200 space-x-2"
+            // className="text-sky-600 bg-gray-200 space-x-2"
+            className="text-white bg-gray-200 space-x-2"
           >
             <th
               className="w-1"
@@ -65,7 +78,6 @@ function DesktopTable({
             </th>
             {CHECKPOINTS.map((cp) => (
               <th
-                className=""
                 key={cp}
                 style={{
                   width: 36,
@@ -79,7 +91,7 @@ function DesktopTable({
               >
                 <div style={{ display: "flex", justifyContent: "center" }}>
                   <span
-                    className="text-[9px] font-bold tracking-widest uppercase text-sky-600"
+                    className="text-[9px] font-bold tracking-widest uppercase "
                     style={{
                       display: "block",
                       lineHeight: 1,
@@ -170,7 +182,7 @@ function DesktopTable({
                       checkpoints={driver.checkpoints}
                     />
                   </motion.tr>
-                  <AnimatePresence>
+                  {/* <AnimatePresence>
                     {isOpen(index, rowStatus, pathname) && (
                       <motion.tr
                         initial={{ opacity: 0 }}
@@ -198,7 +210,7 @@ function DesktopTable({
                         </td>
                       </motion.tr>
                     )}
-                  </AnimatePresence>
+                  </AnimatePresence> */}
                 </React.Fragment>
               );
             })}

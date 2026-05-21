@@ -50,7 +50,8 @@ function CheckpointCell({
         <div className="w-full">
           <span className="text-stone-500 font-mono text-[11px] block leading-none text-center opacity-80">
             {new Intl.NumberFormat("en-US").format(
-              cp?.calculated_odometer || 0,
+              cp?.distanceFromBase || 0,
+              // cp?.calculated_odometer || 0,
             )}
           </span>
         </div>

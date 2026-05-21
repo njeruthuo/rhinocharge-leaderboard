@@ -20,6 +20,7 @@ export type CheckPoint = {
   next: string;
   calculated_odometer?: number;
   startOdometer?: number;
+  distanceFromBase?: number | undefined;
 };
 
 export type RowStatus = { [id: number]: boolean };

@@ -138,11 +138,13 @@ const useDriverList = () => {
           odometer: checkpoint?.start_odo,
           time: `${time[0]}:${time[1]}`,
           calculated_odometer: 0,
+          distanceFromBase: 0,
           next: "",
         };
       });
 
       const history = calculateHistory(checkPointList, start_cp);
+      console.log(history, "history");
 
       const cumulativeOdometer = history.reduce((accumulator, currentItem) => {
         return accumulator + (currentItem.calculated_odometer || 0);
@@ -194,6 +196,7 @@ export type DataType = {
     odometer: number;
     time: string;
     calculated_odometer: number;
+    distanceFromBase: number | undefined;
     next: string;
   }[];
   orderedCheckpoints: {
@@ -203,5 +206,6 @@ export type DataType = {
     calculated_odometer: number;
     next: string;
     startOdometer: number | undefined;
+    distanceFromBase: number | undefined;
   }[];
 };
