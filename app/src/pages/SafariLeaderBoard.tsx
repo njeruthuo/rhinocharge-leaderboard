@@ -2,7 +2,7 @@ import { useState, useMemo } from "react";
 import { motion, AnimatePresence, Reorder } from "framer-motion";
 import type { CheckPoint, Driver } from "@/types";
 import useDriverList from "@/hooks/useDriverList";
-import { colors, spinner } from "@/constants";
+import { colors, permanentColors, spinner } from "@/constants";
 import DesktopTable from "@/components/DesktopTable";
 import { CHECKPOINTS } from "@/data";
 import { getCheckpointStatus } from "@/utils";
@@ -328,7 +328,7 @@ export default function SafariLeaderBoard({
       </svg>
 
       <div
-        className={`${showHeader ? "min-h-screen" : "max-h-[65vh]"} text-stone-100 py-4 px-4`}
+        className={`${showHeader ? "min-h-screen py-4" : "max-h-[85vh]"} text-stone-100  px-4`}
         style={{
           background: "#FBFBFB",
           backgroundImage: `
@@ -417,11 +417,11 @@ export default function SafariLeaderBoard({
           </div>
           <div className="mt-4 flex items-center gap-4 flex-wrap justify-center">
             {[
-              { color: "bg-[#EF476F]", label: "Completed" },
-              { color: "bg-sky-400", label: "Active" },
-              { color: "bg-gray-300", label: "Pending" },
-              { color: "bg-[#BF1363]", label: "Start" },
-              { color: "bg-[#7DDE92]", label: "Finish" },
+              { color: permanentColors.complete, label: "Completed" },
+              { color: permanentColors.active, label: "Active" },
+              { color: permanentColors.pending, label: "Pending" },
+              { color: permanentColors.start, label: "Start" },
+              { color: permanentColors.finish, label: "Finish" },
             ].map(({ color, label }) => (
               <div key={label} className="flex items-center gap-1.5">
                 <span className={`w-2 h-2 rounded-full ${color}`} />

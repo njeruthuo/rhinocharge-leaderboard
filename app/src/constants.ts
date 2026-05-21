@@ -24,3 +24,18 @@ export const TD_CELL: React.CSSProperties = {
   paddingBottom: TD_V,
   verticalAlign: "middle",
 };
+
+// export const permanentColors = {
+//   start: "bg-[#BF1363]",
+//   complete: "bg-[#EF476F]",
+//   active: "bg-sky-400",
+//   pending: "bg-gray-300",
+//   finish: "bg-[#7DDE92]",
+// };
+export const permanentColors = {
+  start: "bg-[#D81159]", // Hot Magenta
+  active: "bg-[#00A8E8]", // Electric Cyan
+  pending: "bg-amber-500", // Vivid Amber
+  complete: "bg-[#00BB95]", // Neon Jade
+  finish: "bg-[#7209B7]", // Royal Indigo
+};

@@ -21,7 +21,9 @@ export default function AdminPage() {
   const navigate = useNavigate();
   const [currentTab, setCurrentTab] = useState<TabType>(TabOptionList.LIVEDATA);
   const [selections, setSelections] = useState<Record<number, string>>({});
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState(
+    Boolean(import.meta.env.VITE_AUTHENTICATED),
+  );
   const [toast, setToast] = useState<string | null>(null);
   const [file, setFile] = useState<File | null>(null);
 
@@ -29,8 +31,8 @@ export default function AdminPage() {
 
   const resolvedTime = useMemo(
     () => ({
-      startDate: DateData.startDate ?? "2025-06-01T7:30:00",
-      endDate: DateData.endDate ?? "2025-06-01T17:30:00",
+      startDate: DateData.startDate ?? "2026-05-20T7:30:00",
+      endDate: DateData.endDate ?? "2026-05-21T17:30:00",
       isBackup: DateData.isBackup,
     }),
     [DateData.startDate, DateData.endDate, DateData.isBackup],

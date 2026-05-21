@@ -8,7 +8,6 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import useGetStoredDates from "./useGetStoredDates";
 
 const useDriverList = () => {
-  // const fired = useRef(false);
   const { DateData: resolvedTime } = useGetStoredDates();
 
   const DateData = useMemo(
@@ -143,11 +142,17 @@ const useDriverList = () => {
         };
       });
 
+      const history = calculateHistory(checkPointList, start_cp);
+
+      const cumulativeOdometer = history.reduce((accumulator, currentItem) => {
+        return accumulator + (currentItem.calculated_odometer || 0);
+      }, 0);
+
       return {
         id: index,
         asset_id: item?.asset_id,
         carNo: item?.asset_name,
-        mileage: item?.realOdometer,
+        mileage: cumulativeOdometer,
         penalties: 0,
         start_cp: start_cp,
         entrantName: item?.last_driver,

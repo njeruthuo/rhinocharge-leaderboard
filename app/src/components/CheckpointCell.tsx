@@ -1,4 +1,4 @@
-import { colors } from "@/constants";
+import { colors, permanentColors } from "@/constants";
 import type { CheckPoint } from "@/types";
 import { getCheckpointStatus } from "@/utils";
 
@@ -9,37 +9,35 @@ function CheckpointCell({
   cp: CheckPoint;
   start_cp: string;
 }) {
-  const status = getCheckpointStatus(cp);
-
   if (start_cp === cp.point) {
     return (
-      <div className="flex flex-col items-center justify-center min-w-[40px] gap-0.5">
-        <div className={`bg-[#EF476F] rounded px-1 py-0.5 w-full`}>
+      <div className="flex flex-col items-center justify-center min-w-[40px] gap-0.5 mt-0.5 ">
+        <div className={`${permanentColors.start} rounded px-1 py-0.5 w-full`}>
           <span
-            className={`font-black text-[11px] block leading-none text-center text-`}
+            className={`text-white text-[11px] block leading-none text-center ${colors.primary}`}
           >
-            {cp.time ?? "00:00"}
+            7:30
           </span>
         </div>
 
         <div className="w-full">
-          <span className="text-[#EF476F] font-mono text-[11px] block leading-none text-center opacity-80">
-            {start_cp !== cp.point
-              ? new Intl.NumberFormat("en-US").format(
-                  cp?.calculated_odometer || 0,
-                )
-              : 0}
+          <span className="text-stone-500 font-mono text-[11px] block leading-none text-center opacity-80">
+            0
           </span>
         </div>
 
-        <div className={`w-full h-0.5  rounded-full mt-0.5 bg-[#EF476F]`} />
+        <div
+          className={`w-full h-0.5  rounded-full mt-0.5 ${permanentColors.start}`}
+        />
       </div>
     );
   }
 
+  const status = getCheckpointStatus(cp);
+
   if (status === "completed") {
     return (
-      <div className="flex flex-col items-center justify-center min-w-[40px] gap-0.5">
+      <div className="flex flex-col items-center justify-center min-w-[40px] gap-0.5 mx-2">
         <div className={`${colors.bgPale} rounded px-1 py-0.5 w-full`}>
           <span
             className={`font-black text-[11px] block leading-none text-center ${colors.primary}`}
@@ -64,7 +62,7 @@ function CheckpointCell({
 
   if (status === "active") {
     return (
-      <div className="flex flex-col items-center justify-center py-2">
+      <div className="flex flex-col items-center justify-center py-2 mx-2">
         <div className="relative">
           <span className="absolute inset-0 rounded-full bg-[#EF476F] animate-ping opacity-20" />
           <div className="w-3 h-3 rounded-full bg-[#EF476F] border border-[#EF476F] flex items-center justify-center shadow-[0_0_12px_#38bdf8]">
