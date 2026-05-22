@@ -3,11 +3,11 @@ import {
   useGetCheckPointsMutation,
   useGetVehicleListQuery,
   useGetStartPointOdometerMutation,
-  type OdometerType, // Import the raw mutation trigger
 } from "@/state/rhinoApi";
 import { calculateHistory, parseTime } from "@/utils";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import useGetStoredDates from "./useGetStoredDates";
+import type { DataType } from "@/types";
 
 const useDriverList = () => {
   const { DateData: resolvedTime } = useGetStoredDates();
@@ -100,7 +100,7 @@ const useDriverList = () => {
       try {
         // Map elements into an array of Promises so they execute in parallel
         const listPromises = VehicleList.map(
-          async (item, index): Promise<OdometerType[]> => {
+          async (item, index): Promise<DataType> => {
             const checkPointList = CheckPoints.filter(
               (checkpoint) => checkpoint.vehicle === item.asset_name,
             );

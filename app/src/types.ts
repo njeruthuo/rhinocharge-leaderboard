@@ -54,3 +54,60 @@ export const TabOptionList = {
   COMPETITORS: "competitors",
   RESULTS: "results",
 } as const;
+
+export type DataType = {
+  id: number | string;
+  asset_id: number;
+  carNo: string;
+  mileage: number;
+  penalties: number;
+  start_cp: string;
+  entrantName: string;
+  team_name: string;
+  totalCps: number;
+  checkpoints: {
+    point: string;
+    odometer: number;
+    time: string;
+    calculated_odometer: number;
+    distanceFromBase: number | undefined;
+    next: string;
+  }[];
+  orderedCheckpoints: {
+    point: string;
+    odometer: number;
+    time: string;
+    calculated_odometer: number;
+    next: string;
+    startOdometer: number | undefined;
+    distanceFromBase: number | undefined;
+  }[];
+};
+
+export type OdometerResponse = {
+  success: boolean | string;
+  data: OdometerType[];
+};
+
+export type OdometerPayload = {
+  unit_id: string;
+  start_date: string;
+  end_date: string;
+  user_id: number;
+  backup: boolean;
+};
+
+export type OdometerType = {
+  alerts: [];
+  course: number;
+  device_timezone: number;
+  driver: string;
+  fixtime: string;
+  latitude: number;
+  location: string;
+  longitude: number;
+  mileage: number;
+  no_of_satellite: number;
+  position_hdop: number;
+  speed: number;
+};

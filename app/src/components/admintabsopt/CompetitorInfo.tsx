@@ -5,9 +5,8 @@ import CarRow from "./components/CarRow";
 import { useMemo, useState } from "react";
 
 import { useConfigStartPointMutation } from "@/state/rhinoApi";
-import type { Driver } from "@/types";
+import type { DataType, Driver } from "@/types";
 import type { FilterTypes } from "@/state/types";
-import type { DataType } from "@/hooks/useDriverList";
 
 const CompetitorInfo = ({
   LoadingData,
