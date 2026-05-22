@@ -108,7 +108,7 @@ const useDriverList = () => {
         (checkpoint) => checkpoint.vehicle === item.asset_name,
       );
 
-      console.log(checkPointList, "checkPointList");
+      // console.log(checkPointList, "checkPointList");
 
       const start_cp =
         item?.more_asset_details?.find(

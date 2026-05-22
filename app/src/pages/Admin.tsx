@@ -28,7 +28,7 @@ export default function AdminPage() {
     true,
   );
 
-  console.log(currentTab, "currentTab");
+  // console.log(currentTab, "currentTab");
 
   const [toast, setToast] = useState<string | null>(null);
   const [file, setFile] = useState<File | null>(null);

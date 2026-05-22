@@ -244,6 +244,8 @@ export default function SafariLeaderBoard({
     return pathname !== "/";
   }, [pathname]);
 
+  console.log(isViewer, "isViewer");
+
   return (
     <>
       {showHeader && (

@@ -92,7 +92,7 @@ function DesktopTableRow({ driver, rank, isViewer }: DesktopRowType) {
             }}
           >
             <CheckpointCell
-              isViewer
+              isViewer={isViewer}
               cp={cpData}
               start_cp={driver?.start_cp || ""}
             />

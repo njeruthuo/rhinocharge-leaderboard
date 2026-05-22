@@ -22,7 +22,7 @@ function CheckpointCell({
           </span>
         </div>
 
-        {!isViewer && (
+        {isViewer && (
           <div className="w-full">
             <span className="text-stone-500 font-mono text-[11px] block leading-none text-center opacity-80">
               0
@@ -51,7 +51,7 @@ function CheckpointCell({
           </span>
         </div>
 
-        {!isViewer && (
+        {isViewer && (
           <div className="w-full">
             <span className="text-stone-500 font-mono text-[11px] block leading-none text-center opacity-80">
               {new Intl.NumberFormat("en-US").format(
