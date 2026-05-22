@@ -5,9 +5,11 @@ import { getCheckpointStatus } from "@/utils";
 function CheckpointCell({
   cp,
   start_cp,
+  isViewer,
 }: {
   cp: CheckPoint;
   start_cp: string;
+  isViewer: boolean;
 }) {
   if (start_cp === cp.point) {
     return (
@@ -20,11 +22,13 @@ function CheckpointCell({
           </span>
         </div>
 
-        <div className="w-full">
-          <span className="text-stone-500 font-mono text-[11px] block leading-none text-center opacity-80">
-            0
-          </span>
-        </div>
+        {!isViewer && (
+          <div className="w-full">
+            <span className="text-stone-500 font-mono text-[11px] block leading-none text-center opacity-80">
+              0
+            </span>
+          </div>
+        )}
 
         <div
           className={`w-full h-0.5  rounded-full mt-0.5 ${permanentColors.start}`}
@@ -47,14 +51,16 @@ function CheckpointCell({
           </span>
         </div>
 
-        <div className="w-full">
-          <span className="text-stone-500 font-mono text-[11px] block leading-none text-center opacity-80">
-            {new Intl.NumberFormat("en-US").format(
-              cp?.distanceFromBase || 0,
-              // cp?.calculated_odometer || 0,
-            )}
-          </span>
-        </div>
+        {!isViewer && (
+          <div className="w-full">
+            <span className="text-stone-500 font-mono text-[11px] block leading-none text-center opacity-80">
+              {new Intl.NumberFormat("en-US").format(
+                cp?.distanceFromBase || 0,
+                // cp?.calculated_odometer || 0,
+              )}
+            </span>
+          </div>
+        )}
 
         <div className={`w-full h-0.5  rounded-full mt-0.5 ${colors.pale}`} />
       </div>

@@ -91,7 +91,11 @@ function DesktopTableRow({ driver, rank, isViewer }: DesktopRowType) {
               margin: 20,
             }}
           >
-            <CheckpointCell cp={cpData} start_cp={driver?.start_cp || ""} />
+            <CheckpointCell
+              isViewer
+              cp={cpData}
+              start_cp={driver?.start_cp || ""}
+            />
           </td>
         );
       })}

@@ -32,24 +32,6 @@ const useDriverList = () => {
   const [getCheckPoints, { data: CheckPoints, isLoading: LoadingCheckPoints }] =
     useGetCheckPointsMutation();
 
-  // useEffect(() => {
-  //   if (fired.current) return;
-  //   fired.current = true;
-  //   if (tokenReady) {
-  //     getCheckPoints({
-  //       startDate: DateData.startDate,
-  //       endDate: DateData.endDate,
-  //       backup: DateData.isBackup,
-  //     });
-  //   }
-  // }, [
-  //   tokenReady,
-  //   getCheckPoints,
-  //   DateData.startDate,
-  //   DateData.endDate,
-  //   DateData.isBackup,
-  // ]);
-
   useEffect(() => {
     if (!tokenReady) return;
 
