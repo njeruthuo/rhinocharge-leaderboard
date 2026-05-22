@@ -43,12 +43,13 @@ export const rhinoApi = createApi({
       providesTags: ["VehicleList", "Time"],
     }),
 
-    getStartPointOdometer: build.mutation({
+    getStartPointOdometer: build.mutation<OdometerType[], OdometerPayload>({
       query: (args) => ({
         url: `AnalyticsService/gethistory`,
         method: "post",
         body: args,
       }),
+      transformResponse: (arg: OdometerResponse) => arg.data,
     }),
 
     getCheckPoints: build.mutation<TripRecord[], GetPoiPayload>({
@@ -108,3 +109,31 @@ export const {
   // Get start point odometer
   useGetStartPointOdometerMutation,
 } = rhinoApi;
+
+type OdometerResponse = {
+  success: boolean | string;
+  data: OdometerType[];
+};
+
+type OdometerPayload = {
+  unit_id: string;
+  start_date: string;
+  end_date: string;
+  user_id: number;
+  backup: boolean;
+};
+
+export type OdometerType = {
+  alerts: [];
+  course: number;
+  device_timezone: number;
+  driver: string;
+  fixtime: string;
+  latitude: number;
+  location: string;
+  longitude: number;
+  mileage: number;
+  no_of_satellite: number;
+  position_hdop: number;
+  speed: number;
+};

@@ -236,6 +236,11 @@ export default function SafariLeaderBoard({
 
   const { data, LoadingVehicleList, LoadingCheckPoints } = useDriverList();
 
+  const loadingState = useMemo(() => {
+    if (!data && (LoadingVehicleList || LoadingCheckPoints)) return true;
+    return false;
+  }, [data, LoadingVehicleList, LoadingCheckPoints]);
+
   const drivers = useMemo(() => {
     return [...data].sort((a, b) => b.totalCps - a.totalCps);
   }, [data]);
@@ -243,8 +248,6 @@ export default function SafariLeaderBoard({
   const isViewer = useMemo((): boolean => {
     return pathname !== "/";
   }, [pathname]);
-
-  console.log(isViewer, "isViewer");
 
   return (
     <>
@@ -345,7 +348,7 @@ export default function SafariLeaderBoard({
         <div className="max-w-3xl xl:max-w-[95vw] 2xl:max-w-[1600px] mx-auto">
           {showHeader && <LeaderboardHeader />}
           <div className="hidden lg:block mb-2">
-            {LoadingVehicleList || LoadingCheckPoints ? (
+            {loadingState ? (
               <div
                 className="flex justify-center items-center"
                 style={{

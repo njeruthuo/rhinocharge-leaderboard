@@ -61,6 +61,7 @@ export function getCheckpointStatus(
 export function calculateHistory(
   checkpointList: TripRecord[],
   start_cp: string,
+  startOdometer: number,
 ) {
   // 1. Sort the checkpoints chronologically by time first
   const orderedCheckPoints = [...checkpointList].sort((a, b) => {
@@ -68,21 +69,22 @@ export function calculateHistory(
   });
 
   // 2. Find the start checkpoint from the SORTED list to know its exact chronological position
-  const startCpIndex = orderedCheckPoints.findIndex(
-    (checkpoint) =>
-      checkpoint.poi_name.toLowerCase().trim() ===
-      start_cp.toLowerCase().trim(),
-  );
+  // const startCpIndex = orderedCheckPoints.findIndex(
+  //   (checkpoint) =>
+  //     checkpoint.poi_name.toLowerCase().trim() ===
+  //     start_cp.toLowerCase().trim(),
+  // );
 
   // console.log(startCpIndex, "startCpIndex");
 
   // Fallback to 0 if the start_cp isn't found
-  const baseStartCp =
-    startCpIndex !== -1
-      ? orderedCheckPoints[startCpIndex]
-      : orderedCheckPoints[0];
+  // const baseStartCp =
+  //   startCpIndex !== -1
+  //     ? orderedCheckPoints[startCpIndex]
+  //     : orderedCheckPoints[0];
 
-  const baseOdometer = baseStartCp?.start_odo || 0;
+  // const baseOdometer = baseStartCp?.start_odo || 0;
+  const baseOdometer = startOdometer;
 
   return orderedCheckPoints?.map((checkpoint, index) => {
     const time = parseTime(checkpoint?.start_time)?.split(":");
@@ -123,40 +125,3 @@ export function calculateHistory(
     };
   });
 }
-
-// export function calculateHistory(
-//   checkpointList: TripRecord[],
-//   start_cp: string,
-// ) {
-//   const startCheckPoint = checkpointList?.find(
-//     (checkpoint) =>
-//       checkpoint.poi_name.toLowerCase().trim() ===
-//       start_cp.toLowerCase().trim(),
-//   );
-
-//   const orderedCheckPoints = checkpointList.sort((a, b) => {
-//     const timeA = new Date(a.start_time);
-//     const timeB = new Date(b.start_time);
-//     return timeA.getTime() - timeB.getTime();
-//   });
-
-//   console.log(orderedCheckPoints, "orderedCheckPoints");
-
-//   // Create a new item in the checkpoints that contains the differences between points
-//   return orderedCheckPoints.map((checkpoint, index) => {
-//     const time = parseTime(checkpoint?.start_time)?.split(":");
-//     return {
-//       point: checkpoint?.poi_name?.toUpperCase(),
-//       odometer: checkpoint?.start_odo,
-//       time: `${time[0]}:${time[1]}`,
-//       // calculated_odometer:
-//       //   checkpoint.start_odo - (startCheckPoint?.start_odo || 0),
-//       calculated_odometer:
-//         index === 0
-//           ? checkpoint.start_odo - (startCheckPoint?.start_odo || 0)
-//           : checkpoint.start_odo - orderedCheckPoints[index - 1].start_odo,
-//       next: "",
-//       startOdometer: startCheckPoint?.start_odo,
-//     };
-//   });
-// }

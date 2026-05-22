@@ -2,6 +2,8 @@ import { REFETCH_INTERVAL } from "@/constants";
 import {
   useGetCheckPointsMutation,
   useGetVehicleListQuery,
+  useGetStartPointOdometerMutation,
+  type OdometerType, // Import the raw mutation trigger
 } from "@/state/rhinoApi";
 import { calculateHistory, parseTime } from "@/utils";
 import { useCallback, useEffect, useMemo, useState } from "react";
@@ -20,6 +22,7 @@ const useDriverList = () => {
   );
 
   const [tokenReady] = useState(() => !!localStorage.getItem("token"));
+
   const {
     data: VehicleList,
     isLoading: LoadingVehicleList,
@@ -32,17 +35,23 @@ const useDriverList = () => {
   const [getCheckPoints, { data: CheckPoints, isLoading: LoadingCheckPoints }] =
     useGetCheckPointsMutation();
 
+  // Bring the odometer mutation trigger to the top level
+  const [getStartOdometer] = useGetStartPointOdometerMutation();
+
+  // State to store processed drivers and extra loading indicator
+  const [driverList, setDriverList] = useState<DataType[]>([]);
+  const [loadingOdometers, setLoadingOdometers] = useState(false);
+
+  // Polling for checkpoints (Cleaned up: Only 1 interval setup now)
   useEffect(() => {
     if (!tokenReady) return;
 
-    // Fire immediately when dates change
     getCheckPoints({
       startDate: DateData.startDate,
       endDate: DateData.endDate,
       backup: DateData.isBackup,
     });
 
-    // Then keep polling
     const interval = setInterval(() => {
       getCheckPoints({
         startDate: DateData.startDate,
@@ -51,24 +60,6 @@ const useDriverList = () => {
       });
     }, REFETCH_INTERVAL);
 
-    return () => clearInterval(interval);
-  }, [
-    tokenReady,
-    getCheckPoints,
-    DateData.startDate,
-    DateData.endDate,
-    DateData.isBackup,
-  ]);
-
-  useEffect(() => {
-    if (!tokenReady) return;
-    const interval = setInterval(() => {
-      getCheckPoints({
-        backup: DateData.isBackup,
-        startDate: DateData.startDate,
-        endDate: DateData.endDate,
-      });
-    }, REFETCH_INTERVAL);
     return () => clearInterval(interval);
   }, [
     tokenReady,
@@ -93,102 +84,124 @@ const useDriverList = () => {
     DateData.isBackup,
   ]);
 
-  const driverList = useMemo(() => {
+  // Handle building your driver list asynchronously with your odometer data
+  useEffect(() => {
     if (
       LoadingVehicleList ||
       LoadingCheckPoints ||
       !VehicleList ||
       !CheckPoints
     ) {
-      return [];
+      return;
     }
 
-    return VehicleList.map((item, index): DataType => {
-      const checkPointList = CheckPoints.filter(
-        (checkpoint) => checkpoint.vehicle === item.asset_name,
-      );
+    const processDriverList = async () => {
+      setLoadingOdometers(true);
+      try {
+        // Map elements into an array of Promises so they execute in parallel
+        const listPromises = VehicleList.map(
+          async (item, index): Promise<OdometerType[]> => {
+            const checkPointList = CheckPoints.filter(
+              (checkpoint) => checkpoint.vehicle === item.asset_name,
+            );
 
-      // console.log(checkPointList, "checkPointList");
+            let odometerData = null;
+            if (item.device_id) {
+              try {
+                odometerData = await getStartOdometer({
+                  unit_id: String(item.device_id),
+                  start_date: "2026-05-20 10:42:00",
+                  end_date: "2026-05-20 10:42:59",
+                  user_id: 1263,
+                  backup: true,
+                }).unwrap();
+              } catch (err) {
+                console.error(
+                  `Failed to fetch odometer for device ${item.device_id}:`,
+                  err,
+                );
+              }
+            }
 
-      const start_cp =
-        item?.more_asset_details?.find(
-          (item) => item?.column_name === "start_cp",
-        )?.column_value || "";
+            const startOdometer =
+              odometerData && odometerData.length > 0
+                ? odometerData[0].mileage
+                : 0;
 
-      const checkPoints = checkPointList.map((checkpoint) => {
-        const time = parseTime(checkpoint?.start_time)?.split(":");
-        return {
-          point: checkpoint?.poi_name?.toUpperCase(),
-          odometer: checkpoint?.start_odo,
-          time: `${time[0]}:${time[1]}`,
-          calculated_odometer: 0,
-          distanceFromBase: 0,
-          next: "",
-        };
-      });
+            const start_cp =
+              item?.more_asset_details?.find(
+                (detail) => detail?.column_name === "start_cp",
+              )?.column_value || "";
 
-      const history = calculateHistory(checkPointList, start_cp);
+            const checkPoints = checkPointList.map((checkpoint) => {
+              const time = parseTime(checkpoint?.start_time)?.split(":");
+              return {
+                point: checkpoint?.poi_name?.toUpperCase(),
+                odometer: checkpoint?.start_odo,
+                time: `${time[0]}:${time[1]}`,
+                calculated_odometer: 0,
+                distanceFromBase: 0,
+                next: "",
+              };
+            });
 
-      const cumulativeOdometer = history.reduce((accumulator, currentItem) => {
-        return accumulator + (currentItem.calculated_odometer || 0);
-      }, 0);
+            // console.log(checkPointList, "checkPointList");
 
-      return {
-        id: index,
-        asset_id: item?.asset_id,
-        carNo: item?.asset_name,
-        mileage: cumulativeOdometer,
-        penalties: 0,
-        start_cp: start_cp,
-        entrantName: item?.last_driver,
-        team_name: item?.team_name,
-        totalCps: checkPointList.length,
-        checkpoints: checkPoints,
-        orderedCheckpoints: calculateHistory(checkPointList, start_cp),
-      };
-    });
-  }, [VehicleList, CheckPoints, LoadingVehicleList, LoadingCheckPoints]);
+            const history = calculateHistory(
+              checkPointList,
+              start_cp,
+              startOdometer,
+            );
 
-  return { data: driverList, refetch, LoadingVehicleList, LoadingCheckPoints };
+            const cumulativeOdometer = history.reduce(
+              (accumulator, currentItem) => {
+                return accumulator + (currentItem.calculated_odometer || 0);
+              },
+              0,
+            );
+
+            return {
+              id: index,
+              asset_id: item?.asset_id,
+              carNo: item?.asset_name,
+              mileage: cumulativeOdometer,
+              penalties: 0,
+              start_cp: start_cp,
+              entrantName: item?.last_driver,
+              team_name: item?.team_name,
+              totalCps: checkPointList.length,
+              checkpoints: checkPoints,
+              orderedCheckpoints: history,
+              // You can append the retrieved odometer directly here if your type supports it, e.g.:
+              // startOdometer: odometerData
+            };
+          },
+        );
+
+        const resolvedList = await Promise.all(listPromises);
+        setDriverList(resolvedList);
+      } catch (error) {
+        console.error("Error processing driver list data:", error);
+      } finally {
+        setLoadingOdometers(false);
+      }
+    };
+
+    processDriverList();
+  }, [
+    VehicleList,
+    CheckPoints,
+    LoadingVehicleList,
+    LoadingCheckPoints,
+    getStartOdometer,
+  ]);
+
+  return {
+    data: driverList,
+    refetch,
+    LoadingVehicleList: LoadingVehicleList || loadingOdometers,
+    LoadingCheckPoints,
+  };
 };
 
 export default useDriverList;
-
-export const getSpecificTime = (hours = 0, minutes = 0, seconds = 0) => {
-  const now = new Date();
-  now.setHours(hours, minutes, seconds, 0);
-
-  const datePart = now.toLocaleDateString("en-CA");
-  const timePart = now.toTimeString().split(" ")[0];
-
-  return `${datePart} ${timePart}`;
-};
-
-export type DataType = {
-  id: number | string;
-  asset_id: number;
-  carNo: string;
-  mileage: number;
-  penalties: number;
-  start_cp: string;
-  entrantName: string;
-  team_name: string;
-  totalCps: number;
-  checkpoints: {
-    point: string;
-    odometer: number;
-    time: string;
-    calculated_odometer: number;
-    distanceFromBase: number | undefined;
-    next: string;
-  }[];
-  orderedCheckpoints: {
-    point: string;
-    odometer: number;
-    time: string;
-    calculated_odometer: number;
-    next: string;
-    startOdometer: number | undefined;
-    distanceFromBase: number | undefined;
-  }[];
-};
