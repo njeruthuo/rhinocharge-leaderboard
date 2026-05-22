@@ -1,7 +1,7 @@
 import { CHECKPOINTS } from "@/data";
 import { AnimatePresence } from "framer-motion";
 import CarRow from "./components/CarRow";
-import FilterBtn from "./components/FilterBtn";
+// import FilterBtn from "./components/FilterBtn";
 import { useMemo, useState } from "react";
 
 import { useConfigStartPointMutation } from "@/state/rhinoApi";
@@ -28,7 +28,7 @@ const CompetitorInfo = ({
   const [isInitialized, setIsInitialized] = useState(false);
   const [expanded, setExpanded] = useState<number | null>(null);
 
-  const [filter, setFilter] = useState<FilterTypes>("all");
+  const [filter] = useState<FilterTypes>("all");
 
   const [configStartPoint, { isLoading: LoadingCreateStart }] =
     useConfigStartPointMutation();
@@ -123,7 +123,7 @@ const CompetitorInfo = ({
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Search by car no. or driver…"
-            className="w-full pl-9 pr-4 py-2 rounded-lg text-lg outline-none"
+            className="w-[650px] pl-9 pr-4 py-2 rounded-lg text-lg outline-none"
             style={{
               background: "#FBF9E7",
               border: "1px solid rgba(217,119,6,0.4)",
@@ -132,7 +132,7 @@ const CompetitorInfo = ({
             }}
           />
         </div>
-        <FilterBtn
+        {/* <FilterBtn
           value="all"
           label="All"
           filter={filter}
@@ -149,7 +149,7 @@ const CompetitorInfo = ({
           label="Not Started"
           filter={filter}
           setFilter={setFilter}
-        />
+        /> */}
       </div>
 
       {/* ── Table ── */}
