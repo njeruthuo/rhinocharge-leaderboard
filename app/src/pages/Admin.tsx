@@ -17,6 +17,7 @@ import CompetitorInfo from "@/components/admintabsopt/CompetitorInfo";
 import LoginPage from "@/components/admintabsopt/components/LoginPage";
 import { useNavigate } from "react-router-dom";
 import { home } from "@/constants";
+import Results from "@/components/admintabsopt/Results";
 
 export default function AdminPage() {
   const navigate = useNavigate();
@@ -26,6 +27,9 @@ export default function AdminPage() {
     // import.meta.env.VITE_AUTHENTICATED === "true",
     true,
   );
+
+  console.log(currentTab, "currentTab");
+
   const [toast, setToast] = useState<string | null>(null);
   const [file, setFile] = useState<File | null>(null);
 
@@ -79,7 +83,7 @@ export default function AdminPage() {
         time={time}
       />
     ),
-    [TabOptionList.RESULTS]: <></>,
+    [TabOptionList.RESULTS]: <Results />,
   };
 
   return (

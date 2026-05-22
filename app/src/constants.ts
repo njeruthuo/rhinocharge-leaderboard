@@ -18,7 +18,7 @@ export const colors = {
   bgPrimary: "bg-[#fff]",
 };
 
-export const REFETCH_INTERVAL = 15 * 60 * 1000;
+export const REFETCH_INTERVAL = 1 * 60 * 1000;
 export const TD_V = 12;
 export const TD_CELL: React.CSSProperties = {
   paddingTop: TD_V,
