@@ -25,7 +25,7 @@ export default function AdminPage() {
   const [selections, setSelections] = useState<Record<number, string>>({});
   const [isAuthenticated, setIsAuthenticated] = useState(
     // import.meta.env.VITE_AUTHENTICATED === "true",
-    true,
+    false,
   );
 
   // console.log(currentTab, "currentTab");
