@@ -24,7 +24,7 @@ export default function AdminPage() {
   const [selections, setSelections] = useState<Record<number, string>>({});
   const [isAuthenticated, setIsAuthenticated] = useState(
     // import.meta.env.VITE_AUTHENTICATED === "true",
-    false,
+    true,
   );
   const [toast, setToast] = useState<string | null>(null);
   const [file, setFile] = useState<File | null>(null);
