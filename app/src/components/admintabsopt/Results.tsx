@@ -42,24 +42,6 @@ const Results = () => {
             }}
           />
         </div>
-        {/* <FilterBtn
-              value="all"
-              label="All"
-              filter={filter}
-              setFilter={setFilter}
-            />
-            <FilterBtn
-              value="partial"
-              label="In Progress"
-              filter={filter}
-              setFilter={setFilter}
-            />
-            <FilterBtn
-              value="none"
-              label="Not Started"
-              filter={filter}
-              setFilter={setFilter}
-            /> */}
       </div>
 
       {/* ── Table ── */}
@@ -127,7 +109,7 @@ const Results = () => {
                         fontFamily: "'Oswald', sans-serif",
                       }}
                     >
-                      Start Checkpoint
+                      Position
                     </span>
                   </th>
                   <th className="py-3 pr-4 text-left" style={{ minWidth: 160 }}>
@@ -138,7 +120,7 @@ const Results = () => {
                         fontFamily: "'Oswald', sans-serif",
                       }}
                     >
-                      Sponsorship
+                      Sector
                     </span>
                   </th>
                   <th className="py-3 pr-4 text-left" style={{ minWidth: 160 }}>
@@ -149,18 +131,7 @@ const Results = () => {
                         fontFamily: "'Oswald', sans-serif",
                       }}
                     >
-                      Class
-                    </span>
-                  </th>
-                  <th className="py-3 pr-4 text-left" style={{ minWidth: 160 }}>
-                    <span
-                      className="text-[9px] font-black tracking-[0.2em] uppercase"
-                      style={{
-                        color: "white",
-                        fontFamily: "'Oswald', sans-serif",
-                      }}
-                    >
-                      Half/Full Charge
+                      Total Distance
                     </span>
                   </th>
 
