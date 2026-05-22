@@ -1,7 +1,7 @@
 import {
   useGetStartPointOdometerMutation,
-  type OdometerType,
 } from "@/state/rhinoApi";
+import type { OdometerType } from "@/types";
 import { useEffect, useState } from "react";
 
 const useGetStartOdometer = ({ unitId }: { unitId: string | number }) => {
