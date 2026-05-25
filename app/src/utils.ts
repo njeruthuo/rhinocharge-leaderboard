@@ -1,5 +1,5 @@
 import type { TripRecord } from "./state/types";
-import type { CheckPoint, RowStatus } from "./types";
+import type { CheckPoint, DataTypeCheckPoint, RowStatus } from "./types";
 
 export function getParsedTime(dateTime: string) {
   const regex = /(\d{1,2}:\d{2})(?::\d{2})?\s+([AP]M)/;
@@ -62,7 +62,7 @@ export function calculateHistory(
   checkpointList: TripRecord[],
   start_cp: string,
   startOdometer: number,
-) {
+): DataTypeCheckPoint[] {
   // 1. Sort the checkpoints chronologically by time first
   const orderedCheckPoints = [...checkpointList].sort((a, b) => {
     return new Date(a.start_time).getTime() - new Date(b.start_time).getTime();
@@ -86,7 +86,18 @@ export function calculateHistory(
   // const baseOdometer = baseStartCp?.start_odo || 0;
   const baseOdometer = startOdometer;
 
-  return orderedCheckPoints?.map((checkpoint, index) => {
+  const seenNames = new Set();
+  const uniqueCheckPoints: TripRecord[] = [];
+
+  orderedCheckPoints?.forEach((checkpoint) => {
+    const normalizedName = checkpoint?.poi_name?.toLowerCase().trim();
+    if (!seenNames.has(normalizedName)) {
+      seenNames.add(normalizedName);
+      uniqueCheckPoints.push(checkpoint);
+    }
+  });
+
+  return uniqueCheckPoints.map((checkpoint, index) => {
     const time = parseTime(checkpoint?.start_time)?.split(":");
 
     let calculatedOdometer = 0;

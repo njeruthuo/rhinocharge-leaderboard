@@ -78,7 +78,7 @@ function DesktopTableRow({
       </td>
       {CHECKPOINTS.map((cpName, index) => {
         const cpData = driver?.orderedCheckpoints?.find(
-          (c) => c.point === cpName.toUpperCase(),
+          (c) => c?.point === cpName.toUpperCase(),
         ) || {
           point: cpName,
           odometer: 0,

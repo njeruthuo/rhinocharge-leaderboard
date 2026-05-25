@@ -98,7 +98,6 @@ const useDriverList = () => {
     const processDriverList = async () => {
       setLoadingOdometers(true);
       try {
-        // Map elements into an array of Promises so they execute in parallel
         const listPromises = VehicleList.map(
           async (item, index): Promise<DataType> => {
             const checkPointList = CheckPoints.filter(
@@ -106,6 +105,7 @@ const useDriverList = () => {
             );
 
             let odometerData = null;
+
             if (item.device_id) {
               try {
                 odometerData = await getStartOdometer({
@@ -153,7 +153,7 @@ const useDriverList = () => {
 
             const cumulativeOdometer = history.reduce(
               (accumulator, currentItem) => {
-                return accumulator + (currentItem.calculated_odometer || 0);
+                return accumulator + (currentItem?.calculated_odometer || 0);
               },
               0,
             );

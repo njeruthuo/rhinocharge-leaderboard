@@ -76,16 +76,18 @@ export type DataType = {
     distanceFromBase: number | undefined;
     next: string;
   }[];
-  orderedCheckpoints: {
-    point: string;
-    odometer: number;
-    time: string;
-    calculated_odometer: number;
-    next: string;
-    startOdometer: number | undefined;
-    distanceFromBase: number | undefined;
-  }[];
+  orderedCheckpoints: DataTypeCheckPoint[];
 };
+
+export interface DataTypeCheckPoint {
+  point: string;
+  odometer: number;
+  time: string;
+  calculated_odometer: number;
+  next: string;
+  startOdometer: number | undefined;
+  distanceFromBase: number | undefined;
+}
 
 export type OdometerResponse = {
   success: boolean | string;

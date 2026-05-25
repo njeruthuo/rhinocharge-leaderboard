@@ -83,7 +83,6 @@ const Results = ({ setOpenFilter, openFilter }: ResultsProps) => {
                 )}
               </div>
 
-              {/* Filter Group: Categories */}
               <div className="space-y-2">
                 {["Vehicle class", "Full/Half charge"].map((category) => (
                   <label
@@ -96,23 +95,14 @@ const Results = ({ setOpenFilter, openFilter }: ResultsProps) => {
                       onChange={() => handleCategoryChange(category)}
                       className="h-4 w-4 rounded border-gray-300 text-white focus:ring-amber-500 accent-amber-600"
                     />
-                    <span className="text-sm text-stone-400  group-hover:text-gray-900 transition-colors">
+                    <span className="text-sm text-stone-400  transition-colors">
                       {category}
                     </span>
                   </label>
                 ))}
               </div>
 
-              {/* Apply Button */}
-              {/* <button
-                onClick={() => setOpenFilter(false)}
-                className="mt-4 w-full bg-amber-600 hover:bg-amber-700 text-white rounded-md py-1.5 text-sm font-medium transition-colors shadow-sm"
-              >
-                Apply Filters
-              </button> */}
-
               <button
-                // onClick={handleConfirm}
                 onClick={() => setOpenFilter(false)}
                 disabled={isLoading}
                 className="flex-1 rounded-lg py-2 text-xs font-black tracking-wider uppercase transition-colors disabled:opacity-40 disabled:cursor-not-allowed mt-4 w-full bg-amber-600 hover:bg-amber-700 text-white rounded-md py-1.5 text-sm font-medium transition-colors shadow-sm"
@@ -132,7 +122,6 @@ const Results = ({ setOpenFilter, openFilter }: ResultsProps) => {
         <Search search={search} setSearch={setSearch} />
       </div>
 
-      {/* ── Table ── */}
       <div
         className="rounded-xl border overflow-hidden"
         style={{
