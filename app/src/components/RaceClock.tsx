@@ -1,8 +1,9 @@
-import { useState } from "react";
+import { memo, useState } from "react";
 import {
   useCreateDataPointMutation,
   useUpdateDataPointMutation,
 } from "@/state/storage";
+// import { useDispatch } from "react-redux";
 
 interface RaceSettingsProps {
   isUpdate: boolean;
@@ -41,6 +42,10 @@ function RaceSettingsTrigger({ value, onChange, isUpdate }: RaceSettingsProps) {
       console.error("Failed to update race settings:", err);
     }
   }
+
+  console.log(value, "value");
+
+  // const dispatch = useDispatch();
 
   return (
     <>
@@ -102,12 +107,18 @@ function RaceSettingsTrigger({ value, onChange, isUpdate }: RaceSettingsProps) {
                   Event date
                 </label>
                 <input
-                  type="date"
-                  value={value?.startDate?.split("T")[0] ?? ""}
+                  type="datetime-local"
+                  value={value?.startDate}
                   name="startDate"
                   onChange={(e) => {
-                    onChange("startDate", `${e.target.value}T7:30:00`);
-                    onChange("endDate", `${e.target.value}T17:30:00`);
+                    // dispatch()
+                    onChange("startDate", `${e.target.value}`);
+                    onChange(
+                      "endDate",
+                      `${e.target.value.replace(/T.*$/, "T17:30:00")}`,
+                    );
+                    // onChange("startDate", `${e.target.value}T7:30:00`);
+                    // onChange("endDate", `${e.target.value}T17:30:00`);
                   }}
                   className="dp-input w-full rounded-lg px-3 py-2 text-sm outline-none border"
                   style={{
@@ -142,14 +153,16 @@ function RaceSettingsTrigger({ value, onChange, isUpdate }: RaceSettingsProps) {
               </div> */}
 
               {/* Fixed time banner */}
-              <div className="p-2.5 rounded-lg border text-[10px] text-stone-400 bg-stone-900/50 border-stone-800">
-                <div className="flex justify-between items-center mb-1">
+              <div className="p-2.5 rounded-lg border text-[10px] text-stone-400 bg-stone-900/50 border-stone-800 text-sm">
+                <div className="flex justify-between items-center mb-1 text-sm">
                   <span>Race open</span>
-                  <strong className="text-emerald-500 font-mono">
-                    07:30 AM
+                  <strong className="text-emerald-500 font-mono text-sm">
+                    {value
+                      ? `${value?.startDate?.split("T")[1]}`
+                      : `07:30 AM`}{" "}
                   </strong>
                 </div>
-                <div className="flex justify-between items-center">
+                <div className="flex justify-between items-center text-sm">
                   <span>Race close</span>
                   <strong className="text-amber-600 font-mono">05:30 PM</strong>
                 </div>
@@ -234,4 +247,4 @@ function RaceSettingsTrigger({ value, onChange, isUpdate }: RaceSettingsProps) {
   );
 }
 
-export default RaceSettingsTrigger;
+export default memo(RaceSettingsTrigger);
