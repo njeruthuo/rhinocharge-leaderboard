@@ -128,10 +128,11 @@ const useDriverList = () => {
                 ? odometerData[0].mileage
                 : 0;
 
-            const start_cp =
-              item?.more_asset_details?.find(
-                (detail) => detail?.column_name === "start_cp",
-              )?.column_value || "";
+            const start_cp = item?.more_asset_details?.find(
+              (detail) => detail?.column_name === "start_cp",
+            );
+
+            const start_cp_name = start_cp?.column_value || "";
 
             const checkPoints = checkPointList.map((checkpoint) => {
               const time = parseTime(checkpoint?.start_time)?.split(":");
@@ -147,7 +148,7 @@ const useDriverList = () => {
 
             const history = calculateHistory(
               checkPointList,
-              start_cp,
+              start_cp_name,
               startOdometer,
             );
 
@@ -158,19 +159,22 @@ const useDriverList = () => {
               0,
             );
 
+            const isTripComplete =
+              start_cp_name.length > 0 && checkPointList.length > 13;
+
             return {
               id: index,
               asset_id: item?.asset_id,
               carNo: item?.asset_name,
               mileage: cumulativeOdometer,
               penalties: 0,
-              start_cp: start_cp,
+              start_cp: start_cp_name,
               entrantName: item?.last_driver,
               team_name: item?.team_name,
               totalCps: checkPointList.length,
               checkpoints: checkPoints,
               orderedCheckpoints: history,
-              complete: start_cp.length > 0 && checkPointList.length > 13,
+              complete: isTripComplete,
             };
           },
         );

@@ -9,10 +9,10 @@ function CheckpointCell({
   completeTrip,
 }: {
   cp: CheckPoint;
+  mileage: number;
   start_cp: string;
   isViewer: boolean;
   completeTrip: boolean;
-  mileage: number;
 }) {
   if (start_cp === cp.point) {
     return (

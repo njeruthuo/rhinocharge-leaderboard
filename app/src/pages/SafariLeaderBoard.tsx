@@ -236,8 +236,6 @@ export default function SafariLeaderBoard({
 
   const { data, LoadingVehicleList, LoadingCheckPoints } = useDriverList();
 
-  // console.log(data, "data");
-
   const loadingState = useMemo(() => {
     return data.length < 1 && (LoadingVehicleList || LoadingCheckPoints);
   }, [data, LoadingVehicleList, LoadingCheckPoints]);
@@ -245,8 +243,6 @@ export default function SafariLeaderBoard({
   const drivers = useMemo(() => {
     return [...data].sort((a, b) => b.totalCps - a.totalCps);
   }, [data]);
-
-  console.log(drivers, "drivers");
 
   const isViewer = useMemo((): boolean => {
     return pathname !== "/";
