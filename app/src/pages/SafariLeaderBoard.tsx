@@ -236,9 +236,10 @@ export default function SafariLeaderBoard({
 
   const { data, LoadingVehicleList, LoadingCheckPoints } = useDriverList();
 
+  console.log(data, "data");
+
   const loadingState = useMemo(() => {
-    if (!data && (LoadingVehicleList || LoadingCheckPoints)) return true;
-    return false;
+    return data.length < 1 && (LoadingVehicleList || LoadingCheckPoints);
   }, [data, LoadingVehicleList, LoadingCheckPoints]);
 
   const drivers = useMemo(() => {

@@ -45,15 +45,9 @@ function DesktopTable({
             style={{
               position: "sticky",
               top: 0,
-              // backdropFilter: "blur(118px)",
-              // background: "rgba(0,0,0,0.3)",
               background: "rgb(84, 89, 95)",
-              // background: "#1e293b",
-              // background: "rgba(251,249,231,0.3)",
               zIndex: 20,
-              // background: "#F8FFD6",
             }}
-            // className="text-sky-600 bg-gray-200 space-x-2"
             className="text-white bg-gray-200 space-x-2"
           >
             <th
@@ -162,6 +156,7 @@ function DesktopTable({
                     className="hover:bg-white/[0.02] transition-colors duration-100"
                   >
                     <DesktopTableRow
+                      completeTrip={driver.complete}
                       isViewer={isViewer}
                       driver={driver}
                       rank={rank}

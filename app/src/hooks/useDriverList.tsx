@@ -145,8 +145,6 @@ const useDriverList = () => {
               };
             });
 
-            // console.log(checkPointList, "checkPointList");
-
             const history = calculateHistory(
               checkPointList,
               start_cp,
@@ -172,8 +170,7 @@ const useDriverList = () => {
               totalCps: checkPointList.length,
               checkpoints: checkPoints,
               orderedCheckpoints: history,
-              // You can append the retrieved odometer directly here if your type supports it, e.g.:
-              // startOdometer: odometerData
+              complete: start_cp.length > 0 && checkPointList.length > 13,
             };
           },
         );

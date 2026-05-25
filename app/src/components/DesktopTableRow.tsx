@@ -12,7 +12,12 @@ const TD_CELL: React.CSSProperties = {
   verticalAlign: "middle",
 };
 
-function DesktopTableRow({ driver, rank, isViewer }: DesktopRowType) {
+function DesktopTableRow({
+  driver,
+  rank,
+  isViewer,
+  completeTrip,
+}: DesktopRowType) {
   const totalCheckpoints = CHECKPOINTS.length + 1 || 0;
   const progress = Math.round((driver.totalCps / totalCheckpoints) * 100);
 
@@ -92,6 +97,7 @@ function DesktopTableRow({ driver, rank, isViewer }: DesktopRowType) {
             }}
           >
             <CheckpointCell
+              completeTrip={completeTrip}
               isViewer={isViewer}
               cp={cpData}
               start_cp={driver?.start_cp || ""}

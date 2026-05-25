@@ -11,6 +11,7 @@ export interface Driver {
   mileage: number;
   penalties: number;
   start_cp?: string;
+  complete: boolean;
 }
 
 export type CheckPoint = {
@@ -26,6 +27,7 @@ export type CheckPoint = {
 export type RowStatus = { [id: number]: boolean };
 
 export type DesktopRowType = {
+  completeTrip: boolean;
   driver: Driver;
   rank: number;
   checkpoints: CheckPoint[];
@@ -65,6 +67,7 @@ export type DataType = {
   entrantName: string;
   team_name: string;
   totalCps: number;
+  complete: boolean;
   checkpoints: {
     point: string;
     odometer: number;

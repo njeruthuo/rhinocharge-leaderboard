@@ -6,17 +6,19 @@ function CheckpointCell({
   cp,
   start_cp,
   isViewer,
+  completeTrip,
 }: {
   cp: CheckPoint;
   start_cp: string;
   isViewer: boolean;
+  completeTrip: boolean;
 }) {
   if (start_cp === cp.point) {
     return (
       <div className="flex flex-col items-center justify-center min-w-[40px] gap-0.5 mt-0.5 ">
         <div className={`${permanentColors.start} rounded px-1 py-0.5 w-full`}>
           <span
-            className={`text-white text-[11px] block leading-none text-center ${colors.primary}`}
+            className={`text-white text-[11px] block leading-none text-center ${completeTrip ? permanentColors.complete : colors.primary}`}
           >
             7:30
           </span>
