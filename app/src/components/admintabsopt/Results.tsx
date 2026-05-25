@@ -41,8 +41,6 @@ const Results = ({ setOpenFilter, openFilter }: ResultsProps) => {
     setSelectedCategories([]);
   };
 
-  console.log(openFilter, "search");
-
   return (
     <div>
       <div className="flex space-x-3 flex-row place-items-center">
