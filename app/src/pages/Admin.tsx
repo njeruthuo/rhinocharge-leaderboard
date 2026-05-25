@@ -1,7 +1,9 @@
-import { useEffect, useMemo, useState } from "react";
 import * as Papa from "papaparse";
+import { useNavigate } from "react-router-dom";
 import { AnimatePresence } from "framer-motion";
+import { useEffect, useMemo, useState } from "react";
 
+import { home } from "@/constants";
 import { ADMIN_TABS } from "@/data";
 import Toast from "@/components/Toast";
 
@@ -12,26 +14,21 @@ import useDriverList from "@/hooks/useDriverList";
 import { AdminTabs } from "@/components/AdminTabs";
 import SafariLeaderBoard from "./SafariLeaderBoard";
 import { TabOptionList, type TabType } from "@/types";
+import Results from "@/components/admintabsopt/Results";
 import useGetStoredDates from "@/hooks/useGetStoredDates";
 import CompetitorInfo from "@/components/admintabsopt/CompetitorInfo";
 import LoginPage from "@/components/admintabsopt/components/LoginPage";
-import { useNavigate } from "react-router-dom";
-import { home } from "@/constants";
-import Results from "@/components/admintabsopt/Results";
 
 export default function AdminPage() {
   const navigate = useNavigate();
-  const [currentTab, setCurrentTab] = useState<TabType>(TabOptionList.LIVEDATA);
+  const [isAuthenticated, setIsAuthenticated] = useState(true);
   const [selections, setSelections] = useState<Record<number, string>>({});
-  const [isAuthenticated, setIsAuthenticated] = useState(
-    // import.meta.env.VITE_AUTHENTICATED === "true",
-    false,
-  );
+  const [currentTab, setCurrentTab] = useState<TabType>(TabOptionList.LIVEDATA);
 
-  // console.log(currentTab, "currentTab");
-
-  const [toast, setToast] = useState<string | null>(null);
   const [file, setFile] = useState<File | null>(null);
+  const [toast, setToast] = useState<string | null>(null);
+
+  const [openFilter, setOpenFilter] = useState(false);
 
   const { DateData, isUpdate } = useGetStoredDates();
 
@@ -83,8 +80,12 @@ export default function AdminPage() {
         time={time}
       />
     ),
-    [TabOptionList.RESULTS]: <Results />,
+    [TabOptionList.RESULTS]: (
+      <Results setOpenFilter={setOpenFilter} openFilter={openFilter} />
+    ),
   };
+
+  const isGenerating = false;
 
   return (
     <>
@@ -154,6 +155,24 @@ export default function AdminPage() {
                     }
                     isUpdate={isUpdate}
                   />
+                </div>
+              )}
+              {currentTab === TabOptionList.RESULTS && (
+                <div className="flex items-center space-x-2 shrink-0 sm:mb-6">
+                  <button
+                    // onClick={handleConfirm}
+                    // onClick={() => setOpenFilter(false)}
+                    // disabled={isLoading}
+                    className="flex-1 rounded-lg py-2 text-xs font-black tracking-wider uppercase transition-colors disabled:opacity-40 disabled:cursor-not-allowed mt-4 w-full bg-amber-600 hover:bg-amber-700 text-white rounded-md py-1.5 text-sm font-medium transition-colors shadow-sm px-2"
+                    style={{
+                      background: "rgba(217,119,6,0.18)",
+                      color: "#D97706",
+                      border: "1px solid rgba(217,119,6,0.3)",
+                      fontFamily: "'Oswald', sans-serif",
+                    }}
+                  >
+                    {isGenerating ? "Generating..." : "Generate report"}
+                  </button>
                 </div>
               )}
             </div>
