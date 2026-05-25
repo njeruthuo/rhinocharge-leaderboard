@@ -21,8 +21,11 @@ function DesktopTableRow({
   const totalCheckpoints = CHECKPOINTS.length + 1 || 0;
   const progress = Math.round((driver.totalCps / totalCheckpoints) * 100);
 
-  const biggestOdometer =
-    driver?.orderedCheckpoints?.[-1]?.distanceFromBase || 0;
+  const biggestOdometer = Math.max(
+    0,
+    ...(driver?.orderedCheckpoints?.map((item) => item.distanceFromBase || 0) ??
+      []),
+  );
 
   return (
     <>
@@ -123,28 +126,11 @@ function DesktopTableRow({
         >
           <span className="font-black text-sm tracking-widest rounded py-3 text-[#46237A]">
             {new Intl.NumberFormat("en-US").format(
-              biggestOdometer ? driver?.mileage : 0,
+              biggestOdometer ? biggestOdometer : driver.mileage,
             )}
           </span>
         </td>
       )}
-
-      {/* {isViewer && (
-        <td
-          style={{
-            ...TD_CELL,
-            paddingRight: 16,
-            whiteSpace: "nowrap",
-            paddingTop: 3,
-            paddingBottom: 3,
-            textAlign: "right",
-          }}
-        >
-          <span className="font-black text-sm tracking-widest rounded py-3 pr-3 text-[#46237A]">
-            {driver?.penalties ?? 0}
-          </span>
-        </td>
-      )} */}
 
       <td
         style={{
