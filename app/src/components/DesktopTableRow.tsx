@@ -99,6 +99,7 @@ function DesktopTableRow({
             <CheckpointCell
               completeTrip={completeTrip}
               isViewer={isViewer}
+              mileage={driver.mileage}
               cp={cpData}
               start_cp={driver?.start_cp || ""}
             />
