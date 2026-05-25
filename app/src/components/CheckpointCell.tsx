@@ -17,7 +17,7 @@ function CheckpointCell({
     return (
       <div className="flex flex-col items-center justify-center min-w-[40px] gap-0.5 mt-0.5 ">
         <div
-          className={`${completeTrip ? "px-1 py-0.5" : `${permanentColors.start} px-1 py-0.5`} rounded  w-full`}
+          className={`${completeTrip ? "px-1 py-0" : `${permanentColors.start} px-1 py-0.5`} rounded  w-full`}
         >
           <span
             className={`text-white text-[11px] block leading-none text-center py-0.5 rounded ${completeTrip ? permanentColors.complete : colors.primary}`}
