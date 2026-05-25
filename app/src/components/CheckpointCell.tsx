@@ -7,7 +7,6 @@ function CheckpointCell({
   start_cp,
   isViewer,
   completeTrip,
-  mileage,
 }: {
   cp: CheckPoint;
   start_cp: string;
@@ -31,7 +30,7 @@ function CheckpointCell({
         {isViewer && (
           <div className="w-full">
             <span className="text-stone-500 font-mono text-[11px] block leading-none text-center opacity-80">
-              {completeTrip ? mileage.toFixed(2) : 0}
+              {completeTrip ? cp?.distanceFromBase?.toFixed(2) : 0}
             </span>
           </div>
         )}

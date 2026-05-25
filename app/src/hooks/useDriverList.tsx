@@ -106,7 +106,7 @@ const useDriverList = () => {
 
             let odometerData = null;
 
-            if (item.device_id) {
+            if (item.device_id && checkPointList.length > 0) {
               try {
                 odometerData = await getStartOdometer({
                   unit_id: String(item.device_id),

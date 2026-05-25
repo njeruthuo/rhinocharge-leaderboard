@@ -43,7 +43,7 @@ function RaceSettingsTrigger({ value, onChange, isUpdate }: RaceSettingsProps) {
     }
   }
 
-  console.log(value, "value");
+  // console.log(value, "value");
 
   // const dispatch = useDispatch();
 
