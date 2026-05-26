@@ -104,6 +104,25 @@ export const rhinoApi = createApi({
       }),
       invalidatesTags: ["Time", "VehicleList"],
     }),
+
+    getMovementSummary: build.mutation({
+      query: () => ({
+        url: `rest/analytics/vehicle`,
+        method: "POST",
+        body: {
+          pageIndex: 0,
+          pageSize: 0,
+          request: {
+            startDate: "2026-05-25T21:00:00.000Z",
+            endDate: "2026-05-26T10:00:00.000Z",
+            userId: 1263,
+            reportType: "FleetMovementSummary",
+            assets: [],
+            backup: true,
+          },
+        },
+      }),
+    }),
   }),
 });
 
@@ -120,4 +139,7 @@ export const {
 
   // Get all assets' location
   useGetAssetLocationsQuery,
+
+  // Get movement summary
+  useGetMovementSummaryMutation
 } = rhinoApi;
