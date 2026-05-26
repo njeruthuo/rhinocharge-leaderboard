@@ -115,7 +115,6 @@ const useDriverList = () => {
               (checkpoint) => checkpoint.vehicle === item.asset_name,
             );
 
-            console.log(item.device_id, "item.device_id");
 
             let odometerData = null;
 
