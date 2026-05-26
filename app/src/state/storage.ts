@@ -17,8 +17,7 @@ export const storage = createApi({
   reducerPath: "storage",
   tagTypes: ["Dates"],
   baseQuery: fetchBaseQuery({
-    baseUrl: "https://storage-service-4nwv.onrender.com/",
-    // baseUrl: "http://127.0.0.1:8000/",
+    baseUrl: import.meta.env.VITE_SETTINGS_API,
     prepareHeaders: (headers) => {
       const token = localStorage.getItem("token");
       if (token) {
