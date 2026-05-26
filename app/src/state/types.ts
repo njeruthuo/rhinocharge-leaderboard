@@ -128,3 +128,17 @@ export type GetPoiPayload = {
   endDate: string;
   backup: boolean;
 };
+
+export type AssetLocationType = {
+  alerts: null | string;
+  course: number;
+  device_timezone: number;
+  fixtime: string;
+  latitude: number;
+  location: string;
+  longitude: number;
+  mileage: number;
+  reg_no: string;
+  speed: number;
+  unit_id: string;
+};

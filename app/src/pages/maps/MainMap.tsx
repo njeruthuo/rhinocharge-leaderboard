@@ -13,9 +13,11 @@ import {
   MY_GOOGLE_MAP_PUBLIC_ID,
 } from "@/constants";
 import useGetCheckpointLocations from "@/hooks/useGetCheckpointLocations";
+import useAssetLocations from "@/hooks/useAssetLocations";
 
 const MainMap = () => {
   const { data: PoiLocations, isLoading } = useGetCheckpointLocations();
+  const { assetLocations, isLoading: LoadingLocations } = useAssetLocations();
   const [isMapsApiReady, setIsMapsApiReady] = useState(false);
   const [selectedPoi, setSelectedPoi] = useState<Poi | null>();
 
@@ -25,7 +27,7 @@ const MainMap = () => {
 
   return (
     <div className="bg-white h-screen w-full">
-      {!isLoading || !isMapsApiReady ? (
+      {!isLoading || !isMapsApiReady || LoadingLocations ? (
         <APIProvider
           apiKey={MY_GOOGLE_API_KEY}
           onLoad={() => setIsMapsApiReady(true)}
@@ -41,6 +43,10 @@ const MainMap = () => {
                 pois={PoiLocations ?? locations}
                 isCheckpoint={true}
               />
+
+              {assetLocations && (
+                <PoiMarkers pois={assetLocations} isCheckpoint={false} />
+              )}
 
               <GeofenceOverlay geofenceCoordinates={geoFenceCoordinates} />
 
@@ -156,7 +162,7 @@ const PoiMarkers = (props: { pois: Poi[]; isCheckpoint: boolean }) => {
             style={{
               width: 30,
               height: 30,
-              backgroundColor: "#00BD9D",
+              backgroundColor: props.isCheckpoint ? "#00BD9D" : "#FFB100",
               // backgroundColor: "#03191E",
               borderRadius: "50% 50% 50% 0",
               transform: "rotate(-45deg)",

@@ -2,6 +2,7 @@ import { createApi } from "@reduxjs/toolkit/query/react";
 import { baseQueryWithReauth } from "./baseQuery";
 import type {
   AssetListResponse,
+  AssetLocationType,
   ColumnData,
   ConfigType,
   GetPoiPayload,
@@ -30,10 +31,10 @@ export const rhinoApi = createApi({
       transformResponse: (arg: RhinoResponse) => arg.data.clientPois,
     }),
 
-    getAssetLocations: build.query({
+    getAssetLocations: build.query<AssetLocationType[], void>({
       query: () => ({
-        url: `'https://api.bluetrax.co.ke/settings/AssetManagement/fleet_current_locations/1263?backUp=false'`,
-        method: "POST",
+        url: `settings/AssetManagement/fleet_current_locations/1263?backUp=false`,
+        method: "GET",
       }),
     }),
 
@@ -116,4 +117,7 @@ export const {
 
   // Get start point odometer
   useGetStartPointOdometerMutation,
+
+  // Get all assets' location
+  useGetAssetLocationsQuery,
 } = rhinoApi;
