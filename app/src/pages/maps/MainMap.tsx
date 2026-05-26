@@ -15,9 +15,11 @@ const MainMap = () => {
   const [loading, setLoading] = useState(false);
 
   const geoFenceCoordinates = null;
-  const numericCoordinates = { lat: -1.2921, lng: 36.8219 };
 
   const { data: PoiLocations, isLoading } = useGetCheckpointLocations();
+
+  // const defaultCenter = {  lat: -1.2921, lng: 36.8219 };
+  const defaultCenter = PoiLocations?.[0].location;
 
   console.log(PoiLocations, "PoiList");
 
@@ -28,10 +30,10 @@ const MainMap = () => {
           apiKey={MY_GOOGLE_API_KEY}
           onLoad={() => setIsMapsApiReady(true)}
         >
-          {numericCoordinates && (
+          {defaultCenter && (
             <Map
               defaultZoom={15}
-              defaultCenter={numericCoordinates}
+              defaultCenter={defaultCenter}
               mapId={MY_GOOGLE_MAP_PUBLIC_ID}
               style={{ height: "100vh", width: "100%" }}
             >
