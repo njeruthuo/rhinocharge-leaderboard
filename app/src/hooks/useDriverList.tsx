@@ -14,8 +14,6 @@ const useDriverList = () => {
   const { DateData: resolvedTime } = useGetStoredDates();
   const { data } = useGetDataPointQuery();
 
-  console.log(data, resolvedTime, "these");
-
   const DateData = useMemo(
     () => ({
       startDate: resolvedTime.startDate ?? "2025-06-01T7:30:00",
@@ -114,7 +112,6 @@ const useDriverList = () => {
             const checkPointList = CheckPoints.filter(
               (checkpoint) => checkpoint.vehicle === item.asset_name,
             );
-
 
             let odometerData = null;
 
