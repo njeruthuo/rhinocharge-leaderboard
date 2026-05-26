@@ -1,8 +1,20 @@
+import { REFETCH_INTERVAL } from "@/constants";
 import { useGetAssetLocationsQuery } from "@/state/rhinoApi";
+import { useEffect } from "react";
 // import type { Poi } from "@/state/types";
 
 const useAssetLocations = () => {
-  const { data, isLoading } = useGetAssetLocationsQuery();
+  const { data, isLoading, refetch } = useGetAssetLocationsQuery();
+
+  useEffect(() => {
+    refetch();
+
+    const interval = setInterval(() => {
+      refetch();
+    }, REFETCH_INTERVAL);
+
+    return () => clearInterval(interval);
+  }, [refetch]);
 
   const assetLocations = data?.map((item) => ({
     time: item.fixtime,
