@@ -2,6 +2,8 @@ import spinner from "@/assets/progress_activity_24dp_434343_FILL0_wght400_GRAD0_
 import lock from "@/assets/lock-person.svg";
 import home from "@/assets/home_app_logo.svg";
 import tune from "@/assets/tune.svg";
+import flag from "@/assets/flag_circle.png";
+import car from "@/assets/car.svg";
 
 export const BASE_URL = import.meta.env.VITE_APP_BASE;
 export const ADMIN_USERNAME = import.meta.env.VITE_ADMIN_USERNAME;
@@ -11,7 +13,7 @@ export const BASE_REFETCH_INTERVAL = import.meta.env.VITE_BASE_REFETCH_INTERVAL;
 
 export const ADMIN_PAGE_CLICKS = import.meta.env.VITE_ADMIN_PAGE_CLICKS;
 
-export { spinner, lock, home, tune };
+export { spinner, lock, home, tune, flag, car };
 
 export const colors = {
   pale: "bg-amber-600/40",
@@ -36,3 +38,7 @@ export const permanentColors = {
   complete: "bg-[#00BB95]", // Neon Jade
   finish: "bg-[#7209B7]", // Royal Indigo
 };
+
+export const MY_GOOGLE_API_KEY = import.meta.env.VITE_GOOGLE_API_KEY;
+export const MY_GOOGLE_MAP_PUBLIC_ID = import.meta.env
+  .VITE_GOOGLE_MAP_PUBLIC_ID;

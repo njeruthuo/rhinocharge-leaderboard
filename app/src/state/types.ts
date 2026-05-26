@@ -8,6 +8,11 @@ export interface Geometry {
   coordinates: [number, number];
 }
 
+export interface Coordinates {
+  lat: number;
+  lng: number;
+}
+
 export interface Poi {
   id: number;
   town_name: string;
@@ -127,4 +132,18 @@ export type GetPoiPayload = {
   startDate: string;
   endDate: string;
   backup: boolean;
+};
+
+export type AssetLocationType = {
+  alerts: null | string;
+  course: number;
+  device_timezone: number;
+  fixtime: string;
+  latitude: number;
+  location: string;
+  longitude: number;
+  mileage: number;
+  reg_no: string;
+  speed: number;
+  unit_id: string;
 };
