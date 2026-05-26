@@ -8,6 +8,11 @@ export interface Geometry {
   coordinates: [number, number];
 }
 
+export interface Coordinates {
+  lat: number;
+  lng: number;
+}
+
 export interface Poi {
   id: number;
   town_name: string;

@@ -1,10 +1,10 @@
 import { useState } from "react";
-import { useEffect } from "react";
+// import { useEffect } from "react";
 
 import { APIProvider, Map, InfoWindow } from "@vis.gl/react-google-maps";
 import { AdvancedMarker } from "@vis.gl/react-google-maps";
 
-import { useMap } from "@vis.gl/react-google-maps";
+// import { useMap } from "@vis.gl/react-google-maps";
 
 import {
   car,
@@ -14,14 +14,13 @@ import {
 } from "@/constants";
 import useGetCheckpointLocations from "@/hooks/useGetCheckpointLocations";
 import useAssetLocations from "@/hooks/useAssetLocations";
+import type { Coordinates } from "@/state/types";
 
 const MainMap = () => {
   const { data: PoiLocations, isLoading } = useGetCheckpointLocations();
   const { assetLocations, isLoading: LoadingLocations } = useAssetLocations();
   const [isMapsApiReady, setIsMapsApiReady] = useState(false);
   const [selectedPoi, setSelectedPoi] = useState<Poi | null>();
-
-  const geoFenceCoordinates = null;
 
   const defaultCenter = PoiLocations?.[0].location;
 
@@ -48,7 +47,7 @@ const MainMap = () => {
                 <PoiMarkers pois={assetLocations} isCheckpoint={false} />
               )}
 
-              <GeofenceOverlay geofenceCoordinates={geoFenceCoordinates} />
+              {/* <GeofenceOverlay geofenceCoordinates={geoFenceCoordinates} /> */}
 
               {selectedPoi && (
                 <InfoWindow
@@ -104,12 +103,8 @@ const MainMap = () => {
 };
 export default MainMap;
 
-interface Coordinates {
-  lat: number;
-  lng: number;
-}
-
-export type Poi = { key: string; location: google.maps.LatLngLiteral };
+// export type Poi = { key: string; location: google.maps.LatLngLiteral };
+export type Poi = { key: string; location: Coordinates };
 
 // const PoiMarker = ({
 //   pois,
@@ -162,7 +157,7 @@ const PoiMarkers = (props: { pois: Poi[]; isCheckpoint: boolean }) => {
             style={{
               width: 30,
               height: 30,
-              backgroundColor: props.isCheckpoint ? "#00BD9D" : "#FFB100",
+              backgroundColor: props.isCheckpoint ? "#00BD9D" : "#FF3C38",
               // backgroundColor: "#03191E",
               borderRadius: "50% 50% 50% 0",
               transform: "rotate(-45deg)",
@@ -180,31 +175,31 @@ const PoiMarkers = (props: { pois: Poi[]; isCheckpoint: boolean }) => {
   );
 };
 
-export const GeofenceOverlay = ({
-  geofenceCoordinates,
-}: {
-  geofenceCoordinates: Coordinates[] | null;
-}) => {
-  const map = useMap();
+// export const GeofenceOverlay = ({
+//   geofenceCoordinates,
+// }: {
+//   geofenceCoordinates: Coordinates[] | null;
+// }) => {
+//   const map = useMap();
 
-  useEffect(() => {
-    if (!map || !geofenceCoordinates || geofenceCoordinates.length === 0)
-      return;
+//   useEffect(() => {
+//     if (!map || !geofenceCoordinates || geofenceCoordinates.length === 0)
+//       return;
 
-    const polygon = new google.maps.Polygon({
-      paths: geofenceCoordinates,
-      strokeColor: "#FF0000",
-      strokeWeight: 2,
-      fillColor: "#FF0000",
-      fillOpacity: 0.2,
-      map: map,
-    });
+//     const polygon = new google.maps.Polygon({
+//       paths: geofenceCoordinates,
+//       strokeColor: "#FF0000",
+//       strokeWeight: 2,
+//       fillColor: "#FF0000",
+//       fillOpacity: 0.2,
+//       map: map,
+//     });
 
-    return () => polygon.setMap(null); // cleanup
-  }, [map, geofenceCoordinates]);
+//     return () => polygon.setMap(null); // cleanup
+//   }, [map, geofenceCoordinates]);
 
-  return null;
-};
+//   return null;
+// };
 
 const locations: Poi[] = [
   { key: "operaHouse", location: { lat: -33.8567844, lng: 151.213108 } },
