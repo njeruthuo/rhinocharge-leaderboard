@@ -1,31 +1,31 @@
 import { useState } from "react";
 import { useEffect } from "react";
 
-import { APIProvider, Map, InfoWindow, Pin } from "@vis.gl/react-google-maps";
+import { APIProvider, Map, InfoWindow } from "@vis.gl/react-google-maps";
 import { AdvancedMarker } from "@vis.gl/react-google-maps";
 
 import { useMap } from "@vis.gl/react-google-maps";
 
-import { flag, MY_GOOGLE_API_KEY, MY_GOOGLE_MAP_PUBLIC_ID } from "@/constants";
+import {
+  car,
+  flag,
+  MY_GOOGLE_API_KEY,
+  MY_GOOGLE_MAP_PUBLIC_ID,
+} from "@/constants";
 import useGetCheckpointLocations from "@/hooks/useGetCheckpointLocations";
 
 const MainMap = () => {
+  const { data: PoiLocations, isLoading } = useGetCheckpointLocations();
   const [isMapsApiReady, setIsMapsApiReady] = useState(false);
   const [selectedPoi, setSelectedPoi] = useState<Poi | null>();
-  const [loading, setLoading] = useState(false);
 
   const geoFenceCoordinates = null;
 
-  const { data: PoiLocations, isLoading } = useGetCheckpointLocations();
-
-  // const defaultCenter = {  lat: -1.2921, lng: 36.8219 };
   const defaultCenter = PoiLocations?.[0].location;
-
-  console.log(PoiLocations, "PoiList");
 
   return (
     <div className="bg-white h-screen w-full">
-      {!isLoading ? (
+      {!isLoading || !isMapsApiReady ? (
         <APIProvider
           apiKey={MY_GOOGLE_API_KEY}
           onLoad={() => setIsMapsApiReady(true)}
@@ -37,7 +37,10 @@ const MainMap = () => {
               mapId={MY_GOOGLE_MAP_PUBLIC_ID}
               style={{ height: "100vh", width: "100%" }}
             >
-              <PoiMarkers pois={PoiLocations ?? locations} />
+              <PoiMarkers
+                pois={PoiLocations ?? locations}
+                isCheckpoint={true}
+              />
 
               <GeofenceOverlay geofenceCoordinates={geoFenceCoordinates} />
 
@@ -102,56 +105,68 @@ interface Coordinates {
 
 export type Poi = { key: string; location: google.maps.LatLngLiteral };
 
-const PoiMarker = ({
-  pois,
-  onMarkerClick,
-}: {
-  pois: Poi;
-  onMarkerClick: (poi: Poi) => void;
-}) => {
-  return (
-    <AdvancedMarker
-      key={pois.key}
-      position={pois.location}
-      onClick={() => onMarkerClick(pois)}
-    >
-      <div
-        style={{
-          width: 50,
-          height: 50,
-          backgroundColor: "#FF6B6B",
-          borderRadius: "50% 50% 50% 0",
-          transform: "rotate(-45deg)",
-          position: "relative",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          boxShadow: "0 2px 6px rgba(0,0,0,0.3)",
-        }}
-      >
-        <img
-          src={flag}
-          alt="Car"
-          style={{
-            width: 24,
-            height: 24,
-            transform: "rotate(45deg)",
-          }}
-        />
-      </div>
-    </AdvancedMarker>
-  );
-};
+// const PoiMarker = ({
+//   pois,
+//   onMarkerClick,
+// }: {
+//   pois: Poi;
+//   onMarkerClick: (poi: Poi) => void;
+// }) => {
+//   return (
+//     <AdvancedMarker
+//       key={pois.key}
+//       position={pois.location}
+//       onClick={() => onMarkerClick(pois)}
+//     >
+//       <div
+//         style={{
+//           width: 50,
+//           height: 50,
+//           backgroundColor: "#FF6B6B",
+//           borderRadius: "50% 50% 50% 0",
+//           transform: "rotate(-45deg)",
+//           position: "relative",
+//           display: "flex",
+//           alignItems: "center",
+//           justifyContent: "center",
+//           boxShadow: "0 2px 6px rgba(0,0,0,0.3)",
+//         }}
+//       >
+//         <img
+//           src={flag}
+//           alt="Car"
+//           style={{
+//             width: 24,
+//             height: 24,
+//             transform: "rotate(45deg)",
+//           }}
+//         />
+//       </div>
+//     </AdvancedMarker>
+//   );
+// };
 
-const PoiMarkers = (props: { pois: Poi[] }) => {
+const PoiMarkers = (props: { pois: Poi[]; isCheckpoint: boolean }) => {
   return (
     <>
       {props.pois.map((poi: Poi) => (
         <AdvancedMarker key={poi.key} position={poi.location}>
-          <Pin
-            background={"#FBBC04"}
-            glyphColor={"#000"}
-            borderColor={"#000"}
+          <img
+            src={props.isCheckpoint ? flag : car}
+            style={{
+              width: 30,
+              height: 30,
+              backgroundColor: "#00BD9D",
+              // backgroundColor: "#03191E",
+              borderRadius: "50% 50% 50% 0",
+              transform: "rotate(-45deg)",
+              position: "relative",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              boxShadow: "0 2px 6px rgba(0,0,0,0.3)",
+            }}
+            alt="Flag"
           />
         </AdvancedMarker>
       ))}
