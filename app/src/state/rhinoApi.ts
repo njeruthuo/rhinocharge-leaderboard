@@ -11,7 +11,13 @@ import type {
   RhinoResponse,
   TripRecord,
 } from "./types";
-import type { OdometerPayload, OdometerResponse, OdometerType } from "@/types";
+import type {
+  MileageResultsList,
+  MileageResultsType,
+  OdometerPayload,
+  OdometerResponse,
+  OdometerType,
+} from "@/types";
 
 export const rhinoApi = createApi({
   reducerPath: "rhinoApi",
@@ -105,7 +111,7 @@ export const rhinoApi = createApi({
       invalidatesTags: ["Time", "VehicleList"],
     }),
 
-    getMovementSummary: build.mutation({
+    getMovementSummary: build.mutation<MileageResultsList[], void>({
       query: () => ({
         url: `rest/analytics/vehicle`,
         method: "POST",
@@ -113,15 +119,17 @@ export const rhinoApi = createApi({
           pageIndex: 0,
           pageSize: 0,
           request: {
-            startDate: "2026-05-25T21:00:00.000Z",
-            endDate: "2026-05-26T10:00:00.000Z",
+            assets: [],
             userId: 1263,
             reportType: "FleetMovementSummary",
-            assets: [],
+
             backup: true,
+            endDate: "2026-05-26T10:00:00.000Z",
+            startDate: "2026-05-25T21:00:00.000Z",
           },
         },
       }),
+      transformResponse: (arg: MileageResultsType) => arg.items,
     }),
   }),
 });
@@ -141,5 +149,5 @@ export const {
   useGetAssetLocationsQuery,
 
   // Get movement summary
-  useGetMovementSummaryMutation
+  useGetMovementSummaryMutation,
 } = rhinoApi;
