@@ -4,13 +4,17 @@ import {
   useGetVehicleListQuery,
   useGetStartPointOdometerMutation,
 } from "@/state/rhinoApi";
-import { calculateHistory, parseTime } from "@/utils";
+import { calculateHistory, formatDate, parseTime } from "@/utils";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import useGetStoredDates from "./useGetStoredDates";
 import type { DataType } from "@/types";
+import { useGetDataPointQuery } from "@/state/storage";
 
 const useDriverList = () => {
   const { DateData: resolvedTime } = useGetStoredDates();
+  const { data } = useGetDataPointQuery();
+
+  console.log(data, resolvedTime, "these");
 
   const DateData = useMemo(
     () => ({
@@ -41,6 +45,14 @@ const useDriverList = () => {
   // State to store processed drivers and extra loading indicator
   const [driverList, setDriverList] = useState<DataType[]>([]);
   const [loadingOdometers, setLoadingOdometers] = useState(false);
+
+  const dates = useMemo(() => {
+    const startDate = new Date(data?.start_date ?? "");
+    const endDate = new Date(data?.start_date ?? "");
+    startDate.setMinutes(startDate.getMinutes() - 1);
+
+    return { startDate: formatDate(startDate), endDate: formatDate(endDate) };
+  }, [data]);
 
   // Polling for checkpoints (Cleaned up: Only 1 interval setup now)
   useEffect(() => {
@@ -84,7 +96,6 @@ const useDriverList = () => {
     DateData.isBackup,
   ]);
 
-  // Handle building your driver list asynchronously with your odometer data
   useEffect(() => {
     if (
       LoadingVehicleList ||
@@ -104,6 +115,8 @@ const useDriverList = () => {
               (checkpoint) => checkpoint.vehicle === item.asset_name,
             );
 
+            console.log(item.device_id, "item.device_id");
+
             let odometerData = null;
 
             if (item.device_id && checkPointList.length > 0) {
@@ -112,6 +125,8 @@ const useDriverList = () => {
                   unit_id: String(item.device_id),
                   start_date: "2026-05-25 10:35:00",
                   end_date: "2026-05-25 10:35:59",
+                  // start_date: dates.startDate ?? "2026-05-25 10:35:00",
+                  // end_date: dates.endDate ?? "2026-05-25 10:35:59",
                   user_id: 1263,
                   backup: true,
                 }).unwrap();
@@ -195,6 +210,8 @@ const useDriverList = () => {
     LoadingVehicleList,
     LoadingCheckPoints,
     getStartOdometer,
+    dates.endDate,
+    dates.startDate,
   ]);
 
   return {

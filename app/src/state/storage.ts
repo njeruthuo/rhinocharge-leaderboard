@@ -51,9 +51,9 @@ export const storage = createApi({
     }),
 
     // GET /datestorage/{id}/  — fetch the single existing row by its id
-    getDataPoint: build.query<DateStorage, number>({
-      query: (id) => ({
-        url: `datestorage/${id}/`,
+    getDataPoint: build.query<DateStorage, void>({
+      query: () => ({
+        url: `datestorage/1/`,
         method: "GET",
       }),
       providesTags: ["Dates"],

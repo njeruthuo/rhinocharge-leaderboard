@@ -1,7 +1,7 @@
 import { useGetDataPointQuery } from "@/state/storage";
 
 const useGetStoredDates = () => {
-  const { data: DateData } = useGetDataPointQuery(1);
+  const { data: DateData } = useGetDataPointQuery();
   const data = {
     startDate: DateData?.start_date.replace(" ", "T"),
     endDate: DateData?.end_date.replace(" ", "T"),
