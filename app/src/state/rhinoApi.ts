@@ -17,7 +17,7 @@ export const rhinoApi = createApi({
   baseQuery: baseQueryWithReauth,
   tagTypes: ["VehicleList", "Time", "Pois"],
   endpoints: (build) => ({
-    getPois: build.mutation<Poi[], string>({
+    getPois: build.mutation<Poi[], void>({
       query: () => ({
         url: `graphql`,
         method: "POST",
@@ -28,6 +28,13 @@ export const rhinoApi = createApi({
         },
       }),
       transformResponse: (arg: RhinoResponse) => arg.data.clientPois,
+    }),
+
+    getAssetLocations: build.query({
+      query: () => ({
+        url: `'https://api.bluetrax.co.ke/settings/AssetManagement/fleet_current_locations/1263?backUp=false'`,
+        method: "POST",
+      }),
     }),
 
     getPoiSummary: build.query<unknown, PoiSummary>({
