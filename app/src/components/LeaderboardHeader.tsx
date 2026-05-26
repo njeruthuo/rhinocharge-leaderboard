@@ -33,7 +33,7 @@ const LeaderboardHeader = () => {
         </div>
         <div className="text-stone-500 text-xs tracking-widest uppercase flex space-x-3 my-3">
           <div
-            className="hover:cursor-pointer"
+            className="hover:cursor-pointer select-none"
             onClick={() => {
               if (pathname === "/maps") navigate("/");
             }}
@@ -42,7 +42,7 @@ const LeaderboardHeader = () => {
           </div>
           <span>|</span>
           <div
-            className="hover:cursor-pointer"
+            className="hover:cursor-pointer select-none"
             onClick={() => {
               if (pathname === "/") navigate("/maps");
             }}
