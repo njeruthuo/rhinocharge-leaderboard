@@ -1,9 +1,10 @@
 import { lock } from "@/constants";
 import { useEffect, useRef } from "react";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 
 const LeaderboardHeader = () => {
   // const [clicks, setClicks] = useState(0);
+  const { pathname } = useLocation();
   const navigate = useNavigate();
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 
@@ -14,19 +15,7 @@ const LeaderboardHeader = () => {
   }, []);
 
   const handleOpenAdmin = () => {
-    // if (timeoutRef.current) {
-    //   clearTimeout(timeoutRef.current);
-    // }
-    // const nextClicks = clicks + 1;
-    // if (nextClicks >= ADMIN_PAGE_CLICKS) {
-    //   setClicks(0);
     navigate("/management/admin");
-    // } else {
-    //   setClicks(nextClicks);
-    //   timeoutRef.current = setTimeout(() => {
-    //     setClicks(0);
-    //   }, 2000);
-    // }
   };
 
   return (
@@ -42,8 +31,24 @@ const LeaderboardHeader = () => {
         >
           Rhino Charge 2026
         </div>
-        <div className="text-stone-500 text-xs tracking-widest uppercase">
-          Overall Leaderboard
+        <div className="text-stone-500 text-xs tracking-widest uppercase flex space-x-3 my-3">
+          <div
+            className="hover:cursor-pointer"
+            onClick={() => {
+              if (pathname === "/maps") navigate("/");
+            }}
+          >
+            Overall Leaderboard
+          </div>
+          <span>|</span>
+          <div
+            className="hover:cursor-pointer"
+            onClick={() => {
+              if (pathname === "/") navigate("/maps");
+            }}
+          >
+            View Live Maps
+          </div>
         </div>
       </div>
 
