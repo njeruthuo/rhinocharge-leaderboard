@@ -3,6 +3,8 @@ import {
   type BaseQueryFn,
   type FetchArgs,
   type FetchBaseQueryError,
+  type FetchBaseQueryMeta,
+  type QueryReturnValue,
 } from "@reduxjs/toolkit/query";
 import type { AuthData } from "./types";
 
@@ -29,6 +31,7 @@ export const baseQueryWithReauth: BaseQueryFn<
 > = async (args, api, extraOptions) => {
   const token = localStorage.getItem("token");
 
+  // 1. If there's no token from the start, try to authenticate right away
   if (!token) {
     const loginResult = await rawBaseQuery(
       {
@@ -41,22 +44,54 @@ export const baseQueryWithReauth: BaseQueryFn<
     );
 
     if (loginResult.data) {
-      const data = loginResult.data as AuthData;
-      localStorage.setItem("token", data.token);
-      localStorage.setItem(
-        "user",
-        JSON.stringify(data.selectUsersByUsernamePassword),
-      );
+      setResultsData(loginResult);
     } else {
-      return { error: { status: 401, data: "Auto-login failed" } };
+      return { error: { status: 401, data: "Initial auto-login failed" } };
     }
   }
 
-  const result = await rawBaseQuery(args, api, extraOptions);
+  // 2. Proceed with the primary API request
+  let result = await rawBaseQuery(args, api, extraOptions);
 
+  // 3. If the request fails with a 401, try to re-authenticate and retry the request
   if (result.error && result.error.status === 401) {
-    localStorage.removeItem("token");
+    console.warn("Token expired. Attempting automatic re-authentication...");
+    localStorage.removeItem("token"); // Clear the bad token
+
+    const loginResult = await rawBaseQuery(
+      {
+        url: "authservice/auth/login",
+        method: "POST",
+        body: AUTH_CREDENTIALS,
+      },
+      api,
+      extraOptions,
+    );
+
+    if (loginResult.data) {
+      setResultsData(loginResult);
+      result = await rawBaseQuery(args, api, extraOptions);
+    } else {
+      return {
+        error: { status: 401, data: "Automatic re-authentication failed" },
+      };
+    }
   }
 
   return result;
 };
+
+function setResultsData(
+  loginResult: QueryReturnValue<
+    unknown,
+    FetchBaseQueryError,
+    FetchBaseQueryMeta
+  >,
+) {
+  const data = loginResult.data as AuthData;
+  localStorage.setItem("token", data.token);
+  localStorage.setItem(
+    "user",
+    JSON.stringify(data.selectUsersByUsernamePassword),
+  );
+}

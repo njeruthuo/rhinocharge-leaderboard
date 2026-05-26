@@ -7,6 +7,8 @@ export const BASE_URL = import.meta.env.VITE_APP_BASE;
 export const ADMIN_USERNAME = import.meta.env.VITE_ADMIN_USERNAME;
 export const ADMIN_PASSWORD = import.meta.env.VITE_ADMIN_PASSWORD;
 
+export const BASE_REFETCH_INTERVAL = import.meta.env.VITE_BASE_REFETCH_INTERVAL;
+
 export const ADMIN_PAGE_CLICKS = import.meta.env.VITE_ADMIN_PAGE_CLICKS;
 
 export { spinner, lock, home, tune };
@@ -27,13 +29,6 @@ export const TD_CELL: React.CSSProperties = {
   verticalAlign: "middle",
 };
 
-// export const permanentColors = {
-//   start: "bg-[#BF1363]",
-//   complete: "bg-[#EF476F]",
-//   active: "bg-sky-400",
-//   pending: "bg-gray-300",
-//   finish: "bg-[#7DDE92]",
-// };
 export const permanentColors = {
   start: "bg-[#D81159]", // Hot Magenta
   active: "bg-[#00A8E8]", // Electric Cyan
