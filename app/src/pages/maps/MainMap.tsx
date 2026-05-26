@@ -1,4 +1,6 @@
 const MainMap = () => {
-  return <div>MainMap</div>;
+    return <div className="bg-white h-screen w-full">
+      
+  </div>;
 };
 export default MainMap;
