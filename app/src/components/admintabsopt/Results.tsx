@@ -1,20 +1,26 @@
+import { useEffect, useMemo, useRef } from "react";
 import { AnimatePresence } from "framer-motion";
-import Search from "../Search";
-import { useEffect, useRef, useState } from "react";
-import { tune } from "@/constants";
-// import CarRow from "./components/CarRow";
 
-interface ResultsProps {
-  setOpenFilter: React.Dispatch<React.SetStateAction<boolean>>;
-  openFilter?: boolean;
-}
+// import Search from "../Search";
+// import { tune } from "@/constants";
+import type { ResultsProps } from "@/types";
+import useDriverList from "@/hooks/useDriverList";
 
-const Results = ({ setOpenFilter, openFilter }: ResultsProps) => {
-  const [search, setSearch] = useState("");
-  const isLoading = false;
-
-  const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
+const Results = ({
+  setOpenFilter,
+  // openFilter
+}: ResultsProps) => {
+  // const [search, setSearch] = useState("");
   const dropdownRef = useRef<HTMLDivElement>(null);
+
+  const { data, LoadingVehicleList, LoadingCheckPoints } = useDriverList();
+  const isLoading = LoadingVehicleList || LoadingCheckPoints;
+
+  const orderedData = useMemo(() => {
+    return [...data].sort((a, b) => b.totalCps - a.totalCps);
+  }, [data]);
+
+  // const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
@@ -29,21 +35,21 @@ const Results = ({ setOpenFilter, openFilter }: ResultsProps) => {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [setOpenFilter]);
 
-  const handleCategoryChange = (category: string) => {
-    setSelectedCategories((prev) =>
-      prev.includes(category)
-        ? prev.filter((item) => item !== category)
-        : [...prev, category],
-    );
-  };
+  // const handleCategoryChange = (category: string) => {
+  //   setSelectedCategories((prev) =>
+  //     prev.includes(category)
+  //       ? prev.filter((item) => item !== category)
+  //       : [...prev, category],
+  //   );
+  // };
 
-  const handleClearFilters = () => {
-    setSelectedCategories([]);
-  };
+  // const handleClearFilters = () => {
+  //   setSelectedCategories([]);
+  // };
 
   return (
     <div>
-      <div className="flex space-x-3 flex-row place-items-center">
+      {/* <div className="flex space-x-3 flex-row place-items-center">
         <div className="relative" ref={dropdownRef}>
           <img
             style={{
@@ -58,7 +64,6 @@ const Results = ({ setOpenFilter, openFilter }: ResultsProps) => {
             alt="Filter Toggle"
           />
 
-          {/* Dropdown Menu */}
           {openFilter && (
             <div
               style={{
@@ -120,7 +125,7 @@ const Results = ({ setOpenFilter, openFilter }: ResultsProps) => {
         </div>
 
         <Search search={search} setSearch={setSearch} />
-      </div>
+      </div> */}
 
       <div
         className="rounded-xl border overflow-hidden"
@@ -148,7 +153,6 @@ const Results = ({ setOpenFilter, openFilter }: ResultsProps) => {
                   className="border-b"
                   style={{
                     borderColor: "rgba(255,255,255,0.06)",
-                    // background: "rgba(0,0,0,0.3)",
                     background: "rgb(84, 89, 95)",
                     position: "sticky",
                     top: 0,
@@ -218,52 +222,111 @@ const Results = ({ setOpenFilter, openFilter }: ResultsProps) => {
 
               <tbody>
                 <AnimatePresence mode="popLayout">
-                  {/* {filtered.map((car) => (
-                    <CarRow
-                      key={car.asset_id}
-                      car={car as Driver}
-                      isExpanded={expanded === car.asset_id}
-                      onToggle={() =>
-                        setExpanded((prev) =>
-                          prev === car.asset_id ? null : car.asset_id,
-                        )
-                      }
-                      selectedCp={selections[car.asset_id] ?? ""}
-                      onSelectCp={(cp) =>
-                        setSelections((prev) => ({
-                          ...prev,
-                          [car?.asset_id]: cp,
-                        }))
-                      }
-                    />
-                  ))} */}
+                  {orderedData?.map((car, index) => {
+                    const totalDistance =
+                      car.pointToPointMileage.checkpoints.reduce(
+                        (accumulator, currentItem) =>
+                          accumulator + currentItem.mileage,
+                        0,
+                      );
+                    return (
+                      <tr key={index}>
+                        <td
+                          style={{
+                            paddingRight: 10,
+                            whiteSpace: "nowrap",
+                            paddingTop: 10,
+                            paddingBottom: 10,
+                          }}
+                        >
+                          <span
+                            className="font-black text-sm tracking-widest px-2 rounded py-3 pr-3 text-[#46237A]"
+                            style={{
+                              fontFamily: "'Oswald', sans-serif",
+                            }}
+                          >
+                            {car.carNo}
+                          </span>
+                        </td>
+                        <td
+                          style={{
+                            paddingRight: 10,
+                            whiteSpace: "nowrap",
+                            paddingTop: 3,
+                            paddingBottom: 3,
+                          }}
+                        >
+                          <span
+                            className="font-black text-sm tracking-widest px-2 rounded py-3 pr-3 text-[#46237A]"
+                            style={{
+                              fontFamily: "'Oswald', sans-serif",
+                            }}
+                          >
+                            {car.entrantName}
+                          </span>
+                        </td>
+                        <td
+                          style={{
+                            paddingRight: 10,
+                            whiteSpace: "nowrap",
+                            paddingTop: 3,
+                            paddingBottom: 3,
+                          }}
+                        >
+                          <span
+                            className="font-black text-sm tracking-widest px-2 rounded py-3 pr-3 text-[#46237A]"
+                            style={{
+                              fontFamily: "'Oswald', sans-serif",
+                            }}
+                          >
+                            {index + 1}
+                          </span>
+                        </td>
+                        <td
+                          style={{
+                            paddingRight: 10,
+                            whiteSpace: "nowrap",
+                            paddingTop: 3,
+                            paddingBottom: 3,
+                          }}
+                        >
+                          <span
+                            className="font-black text-sm tracking-widest px-2 rounded py-3 pr-3 text-[#46237A]"
+                            style={{
+                              fontFamily: "'Oswald', sans-serif",
+                              margin: "20px 0",
+                            }}
+                          >
+                            {car.orderedCheckpoints.length + 1}
+                          </span>
+                        </td>
+                        <td
+                          style={{
+                            paddingRight: 10,
+                            whiteSpace: "nowrap",
+                            paddingTop: 3,
+                            paddingBottom: 3,
+                          }}
+                        >
+                          <span
+                            className="font-black text-sm tracking-widest px-2 rounded py-3 pr-3 text-[#46237A]"
+                            style={{
+                              fontFamily: "'Oswald', sans-serif",
+                            }}
+                          >
+                            {totalDistance}
+                          </span>
+                        </td>
+                      </tr>
+                    );
+                  })}
                 </AnimatePresence>
-
-                {/* {filtered.length === 0 && (
-                  <tr>
-                    <td
-                      colSpan={4 + CHECKPOINTS.length + 1}
-                      className="text-center py-16"
-                    >
-                      <span
-                        className="text-sm tracking-widest uppercase"
-                        style={{
-                          color: "#57534e",
-                          fontFamily: "'Oswald', sans-serif",
-                        }}
-                      >
-                        No entrants match your filters
-                      </span>
-                    </td>
-                  </tr>
-                )} */}
               </tbody>
             </table>
           </div>
         )}
       </div>
 
-      {/* ── Footer ── */}
       <div className="mt-8 flex items-center gap-4">
         <div className="h-px flex-1" style={{ background: "#292524" }} />
         <span
@@ -272,24 +335,9 @@ const Results = ({ setOpenFilter, openFilter }: ResultsProps) => {
             color: "#44403c",
             fontFamily: "'Oswald', sans-serif",
           }}
-        >
-          {/* {CHECKPOINTS.length + 1} Checkpoints · {data.length} Entrants */}
-        </span>
+        ></span>
         <div className="h-px flex-1" style={{ background: "#292524" }} />
       </div>
-      {/* <button
-        onClick={handleSaveStart}
-        disabled={disabled || isLoading || !file}
-        className="px-3 py-2 rounded-lg text-[10px] ml-auto shrink-0 font-bold tracking-[0.15em] uppercase transition-all disabled:cursor-not-allowed cursor-pointer"
-        style={{
-          fontFamily: "'Oswald', sans-serif",
-          background: disabled ? "#FBF9E7" : "rgba(28,25,23,0.7)",
-          border: `1px solid ${disabled || isLoading ? "rgba(217,119,6,0.4)" : "rgba(255,255,255,0.06)"}`,
-          color: disabled || isLoading ? "rgba(28,25,23,0.7)" : "#FCFCFC",
-        }}
-      >
-        Save start entries
-      </button> */}
     </div>
   );
 };

@@ -240,8 +240,6 @@ export default function SafariLeaderBoard({
     return data.length < 1 && (LoadingVehicleList || LoadingCheckPoints);
   }, [data, LoadingVehicleList, LoadingCheckPoints]);
 
-  // console.log(loadingState, "loadingState");
-
   const drivers = useMemo(() => {
     return [...data].sort((a, b) => b.totalCps - a.totalCps);
   }, [data]);
