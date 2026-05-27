@@ -12,6 +12,7 @@ import type {
   TripRecord,
 } from "./types";
 import type {
+  DateDataType,
   MileageResultsList,
   MileageResultsType,
   OdometerPayload,
@@ -111,8 +112,8 @@ export const rhinoApi = createApi({
       invalidatesTags: ["Time", "VehicleList"],
     }),
 
-    getMovementSummary: build.mutation<MileageResultsList[], void>({
-      query: () => ({
+    getMovementSummary: build.mutation<MileageResultsList[], DateDataType>({
+      query: (arg) => ({
         url: `rest/analytics/vehicle`,
         method: "POST",
         body: {
@@ -123,9 +124,9 @@ export const rhinoApi = createApi({
             userId: 1263,
             reportType: "FleetMovementSummary",
 
-            backup: true,
-            endDate: "2026-05-26T10:00:00.000Z",
-            startDate: "2026-05-25T21:00:00.000Z",
+            backup: arg.isBackup,
+            endDate: arg.endDate,
+            startDate: arg.startDate,
           },
         },
       }),

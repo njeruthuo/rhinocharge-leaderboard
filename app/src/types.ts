@@ -197,3 +197,9 @@ export type MileageResultsType = {
   totalItems: number;
   pageSize: 0;
 };
+
+export interface DateDataType {
+  startDate: string | undefined;
+  endDate: string | undefined;
+  isBackup: boolean;
+}
