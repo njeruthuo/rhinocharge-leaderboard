@@ -1,5 +1,14 @@
 import type { TripRecord } from "./state/types";
-import type { CheckPoint, DataTypeCheckPoint, RowStatus } from "./types";
+import type {
+  CheckPoint,
+  CheckPointType,
+  DataTypeCheckPoint,
+  // DateDataType,
+  DeviceData,
+  MileageResultsList,
+  PointToPointType,
+  RowStatus,
+} from "./types";
 
 export function getParsedTime(dateTime: string) {
   const regex = /(\d{1,2}:\d{2})(?::\d{2})?\s+([AP]M)/;
@@ -40,6 +49,25 @@ export function convertTo24Hour(timeStr: string) {
   const paddedHours = hours.toString().padStart(2, "0");
 
   return `${paddedHours}:${minutes}`;
+}
+
+function orderAndReturnUniqueCheckPoints(checkpointList: TripRecord[]) {
+  const orderedCheckPoints = [...checkpointList].sort((a, b) => {
+    return new Date(a.start_time).getTime() - new Date(b.start_time).getTime();
+  });
+
+  const seenNames = new Set();
+  const uniqueCheckPoints: TripRecord[] = [];
+
+  orderedCheckPoints?.forEach((checkpoint) => {
+    const normalizedName = checkpoint?.poi_name?.toLowerCase().trim();
+    if (!seenNames.has(normalizedName)) {
+      seenNames.add(normalizedName);
+      uniqueCheckPoints.push(checkpoint);
+    }
+  });
+
+  return uniqueCheckPoints;
 }
 
 export function isOpen(
@@ -140,7 +168,10 @@ export function calculateHistory(
   });
 }
 
-export function formatDate(dateString: Date | string) {
+export function formatDate(
+  dateString: Date | string,
+  subtract: boolean = false,
+) {
   const date = new Date(dateString);
 
   const year = date.getFullYear();
@@ -148,37 +179,102 @@ export function formatDate(dateString: Date | string) {
   const month = String(date.getMonth() + 1).padStart(2, "0");
   const day = String(date.getDate()).padStart(2, "0");
 
-  const hours = String(date.getHours()).padStart(2, "0");
+  const hours = String(
+    subtract ? date.getHours() - 3 : date.getHours(),
+  ).padStart(2, "0");
   const minutes = String(date.getMinutes()).padStart(2, "0");
   const seconds = String(date.getSeconds()).padStart(2, "0");
 
   return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
 }
 
-export function calculatePointToPointMileage(
-  checkpointList: TripRecord[],
-  getMovementSummary,
-  resolvedTime: DateDataType,
+export function formatDateWithZ(
+  dateString: Date | string,
+  subtract: boolean = false,
 ) {
-  const uniqueCheckPoints: TripRecord[] =
-    orderAndReturnUniqueCheckPoints(checkpointList);
+  const date = new Date(dateString);
+
+  const year = date.getFullYear();
+  // Months are 0-indexed in JS, so we add 1
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+
+  const hours = String(
+    subtract ? date.getHours() - 3 : date.getHours(),
+  ).padStart(2, "0");
+  const minutes = String(date.getMinutes()).padStart(2, "0");
+  const seconds = String(date.getSeconds()).padStart(2, "0");
+
+  return `${year}-${month}-${day}T${hours}:${minutes}:${seconds}Z`;
 }
 
-function orderAndReturnUniqueCheckPoints(checkpointList: TripRecord[]) {
-  const orderedCheckPoints = [...checkpointList].sort((a, b) => {
-    return new Date(a.start_time).getTime() - new Date(b.start_time).getTime();
-  });
+export async function calculatePointToPointMileage(
+  checkpointList: TripRecord[],
+  getMovementSummary: (dates: DeviceData) => Promise<unknown>, // Changed to any to comfortably read RTK .data wrapper
+  resolvedTime: boolean,
+  deviceID: string,
+  assetNumber: string,
+): Promise<PointToPointType> {
+  const uniqueCheckPoints: TripRecord[] =
+    orderAndReturnUniqueCheckPoints(checkpointList);
 
-  const seenNames = new Set();
-  const uniqueCheckPoints: TripRecord[] = [];
+  const summaryPromises = [];
 
-  orderedCheckPoints?.forEach((checkpoint) => {
-    const normalizedName = checkpoint?.poi_name?.toLowerCase().trim();
-    if (!seenNames.has(normalizedName)) {
-      seenNames.add(normalizedName);
-      uniqueCheckPoints.push(checkpoint);
+  // Keep track of the metadata for each segment so we can pair it with the API results later
+  const segmentMetadata: {
+    checkpoint1Name: string;
+    checkpoint2Name: string;
+  }[] = [];
+
+  for (let i = 0; i < uniqueCheckPoints.length - 1; i++) {
+    const currentPoint = uniqueCheckPoints[i];
+    const nextPoint = uniqueCheckPoints[i + 1];
+
+    if (currentPoint.start_time && nextPoint.start_time) {
+      const payload: DeviceData = {
+        startDate: formatDateWithZ(currentPoint.start_time, true),
+        endDate: formatDateWithZ(nextPoint.end_time, true),
+        isBackup: resolvedTime,
+        deviceID: deviceID,
+      };
+
+      summaryPromises.push(getMovementSummary(payload));
+
+      // Save names from the current loop context (adjust currentPoint.name / nextPoint.name to match your TripRecord structure)
+      segmentMetadata.push({
+        checkpoint1Name: currentPoint.poi_name || `Point ${i + 1}`,
+        checkpoint2Name: nextPoint.poi_name || `Point ${i + 2}`,
+      });
     }
-  });
+  }
 
-  return uniqueCheckPoints;
+  try {
+    const results = await Promise.all(summaryPromises);
+
+    // Map through results and construct the CheckPointType objects
+    const checkpoints: CheckPointType[] = results.map((res, index) => {
+      // RTK Query mutations encapsulate payload data inside a .data field
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-expect-error
+      const apiData: MileageResultsList[] = res.data ?? [];
+
+      // Extract mileage safely from the first list element if it exists
+      const totalMileage = apiData.length > 0 ? apiData[0].mileage : 0;
+      const metadata = segmentMetadata[index];
+
+      return {
+        Checkpoint1: metadata.checkpoint1Name,
+        Checkpoint2: metadata.checkpoint2Name,
+        mileage: totalMileage,
+      };
+    });
+
+    return {
+      assetName: assetNumber,
+      checkpoints: checkpoints,
+    };
+  } catch (error) {
+    console.error("Failed to fetch mileage segments:", error);
+    throw error;
+  }
 }

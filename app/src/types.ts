@@ -57,6 +57,16 @@ export const TabOptionList = {
   RESULTS: "results",
 } as const;
 
+export type CheckPointType = {
+  Checkpoint1: string; // to hold the name of the current endpoint (i)
+  Checkpoint2: string; // to hold the name of the next endpoint (i+1)
+  mileage: number; // to hold the result of their API request. I intend to extract the mileage from the payload returned
+};
+export type PointToPointType = {
+  assetName: string; // to hold assetNumber
+  checkpoints: CheckPointType[];
+};
+
 export type DataType = {
   id: number | string;
   asset_id: number;
@@ -77,6 +87,7 @@ export type DataType = {
     next: string;
   }[];
   orderedCheckpoints: DataTypeCheckPoint[];
+  pointToPointMileage: PointToPointType;
 };
 
 export interface DataTypeCheckPoint {
@@ -203,3 +214,5 @@ export interface DateDataType {
   endDate: string | undefined;
   isBackup: boolean;
 }
+
+export type DeviceData = DateDataType & { deviceID: string };

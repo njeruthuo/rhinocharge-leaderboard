@@ -5,7 +5,12 @@ import {
   useGetStartPointOdometerMutation,
   useGetMovementSummaryMutation,
 } from "@/state/rhinoApi";
-import { calculateHistory, formatDate, parseTime } from "@/utils";
+import {
+  calculateHistory,
+  calculatePointToPointMileage,
+  formatDate,
+  parseTime,
+} from "@/utils";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import useGetStoredDates from "./useGetStoredDates";
 import type { DataType } from "@/types";
@@ -120,16 +125,6 @@ const useDriverList = () => {
               (checkpoint) => checkpoint.vehicle === item.asset_name,
             );
 
-            // const mileagesCovered = MileageResults?.filter(
-            //   (result) =>
-            //     result.vehicle.toLowerCase() == item.asset_name.toLowerCase(),
-            // );
-
-            // console.log(
-            //   mileagesCovered,
-            //   `mileagesCovered on ${item.asset_name}`,
-            // );
-
             let odometerData = null;
 
             if (item.device_id && checkPointList.length > 0) {
@@ -178,11 +173,15 @@ const useDriverList = () => {
               startOdometer,
             );
 
-            const pointToPointMileage = calculatePointToPointMileage(
+            const pointToPointMileage = await calculatePointToPointMileage(
               checkPointList,
               getMovementSummary,
-              resolvedTime, // get the start time here for the first CP
+              resolvedTime.isBackup, // get the start time here for the first CP
+              String(item.device_id),
+              item.asset_name,
             );
+
+            console.log(pointToPointMileage, "pointToPointMileage");
 
             const cumulativeOdometer = history.reduce(
               (accumulator, currentItem) => {
@@ -207,6 +206,7 @@ const useDriverList = () => {
               checkpoints: checkPoints,
               orderedCheckpoints: history,
               complete: isTripComplete,
+              pointToPointMileage: pointToPointMileage,
             };
           },
         );
@@ -229,6 +229,8 @@ const useDriverList = () => {
     getStartOdometer,
     dates.endDate,
     dates.startDate,
+    resolvedTime.isBackup,
+    getMovementSummary
   ]);
 
   return {
