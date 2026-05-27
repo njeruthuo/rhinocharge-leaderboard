@@ -215,4 +215,4 @@ export interface DateDataType {
   isBackup: boolean;
 }
 
-export type DeviceData = DateDataType & { deviceID: string };
+export type DeviceData = DateDataType & { deviceID?: string };
