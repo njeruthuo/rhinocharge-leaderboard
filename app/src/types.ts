@@ -1,4 +1,5 @@
 import type { Dispatch, SetStateAction } from "react";
+import type { Coordinates } from "./state/types";
 
 export interface Driver {
   id: number;
@@ -197,3 +198,5 @@ export type MileageResultsType = {
   totalItems: number;
   pageSize: 0;
 };
+
+export type Poi = { key: string; location: Coordinates; time?: string | Date };
