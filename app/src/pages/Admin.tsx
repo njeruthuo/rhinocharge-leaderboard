@@ -14,11 +14,11 @@ import useDriverList from "@/hooks/useDriverList";
 import { AdminTabs } from "@/components/AdminTabs";
 import SafariLeaderBoard from "./SafariLeaderBoard";
 import { TabOptionList, type TabType } from "@/types";
-// import Results from "@/components/admintabsopt/Results";
+import Results from "@/components/admintabsopt/Results";
 import useGetStoredDates from "@/hooks/useGetStoredDates";
 import CompetitorInfo from "@/components/admintabsopt/CompetitorInfo";
 import LoginPage from "@/components/admintabsopt/components/LoginPage";
-import MileageResults from "./MileageResults";
+// import MileageResults from "./MileageResults";
 
 export default function AdminPage() {
   const navigate = useNavigate();
@@ -29,7 +29,7 @@ export default function AdminPage() {
   const [file, setFile] = useState<File | null>(null);
   const [toast, setToast] = useState<string | null>(null);
 
-  // const [openFilter, setOpenFilter] = useState(false);
+  const [openFilter, setOpenFilter] = useState(false);
 
   const { DateData, isUpdate } = useGetStoredDates();
 
@@ -81,10 +81,10 @@ export default function AdminPage() {
         time={time}
       />
     ),
-    [TabOptionList.RESULTS]: <MileageResults />,
-    // [TabOptionList.RESULTS]: (
-    //   <Results setOpenFilter={setOpenFilter} openFilter={openFilter} />
-    // ),
+    // [TabOptionList.RESULTS]: <MileageResults />,
+    [TabOptionList.RESULTS]: (
+      <Results setOpenFilter={setOpenFilter} openFilter={openFilter} />
+    ),
   };
 
   const isGenerating = false;

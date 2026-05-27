@@ -181,8 +181,6 @@ const useDriverList = () => {
               item.asset_name,
             );
 
-            console.log(pointToPointMileage, "pointToPointMileage");
-
             const cumulativeOdometer = history.reduce(
               (accumulator, currentItem) => {
                 return accumulator + (currentItem?.calculated_odometer || 0);
@@ -230,7 +228,7 @@ const useDriverList = () => {
     dates.endDate,
     dates.startDate,
     resolvedTime.isBackup,
-    getMovementSummary
+    getMovementSummary,
   ]);
 
   return {

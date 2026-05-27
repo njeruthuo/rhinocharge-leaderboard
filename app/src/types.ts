@@ -216,3 +216,8 @@ export interface DateDataType {
 }
 
 export type DeviceData = DateDataType & { deviceID?: string };
+
+export interface ResultsProps {
+  setOpenFilter: React.Dispatch<React.SetStateAction<boolean>>;
+  openFilter?: boolean;
+}
