@@ -8,7 +8,7 @@ import { AdvancedMarker } from "@vis.gl/react-google-maps";
 
 import {
   car,
-  flag,
+  star,
   MY_GOOGLE_API_KEY,
   MY_GOOGLE_MAP_PUBLIC_ID,
 } from "@/constants";
@@ -159,7 +159,7 @@ const PoiMarkers = (props: { pois: Poi[]; isCheckpoint: boolean }) => {
       {props.pois.map((poi: Poi) => (
         <AdvancedMarker key={poi.key} position={poi.location}>
           <img
-            src={props.isCheckpoint ? flag : car}
+            src={props.isCheckpoint ? star : car}
             style={{
               width: 30,
               height: 30,
