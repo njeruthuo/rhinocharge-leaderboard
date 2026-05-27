@@ -1,4 +1,5 @@
 import type { Dispatch, SetStateAction } from "react";
+import type { Coordinates } from "./state/types";
 
 export interface Driver {
   id: number;
@@ -221,3 +222,4 @@ export interface ResultsProps {
   setOpenFilter: React.Dispatch<React.SetStateAction<boolean>>;
   openFilter?: boolean;
 }
+export type Poi = { key: string; location: Coordinates; time?: string | Date };
