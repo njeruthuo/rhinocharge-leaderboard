@@ -1,12 +1,9 @@
-import useMileageResults from "@/hooks/useMileageResults";
+// import useMileageResults from "@/hooks/useMileageResults";
+
+import useDriverList from "@/hooks/useDriverList";
 
 const MileageResults = () => {
-  const { data } = useMileageResults();
-
-  const capturedCheckpoints = data?.map((item) => item.currentLocation);
-
-  console.log(new Set(capturedCheckpoints), "capturedCheckpoints");
-
+  useDriverList();
   return <div>MileageResults</div>;
 };
 export default MileageResults;

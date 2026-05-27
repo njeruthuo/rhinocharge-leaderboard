@@ -3,16 +3,23 @@ import {
   useGetCheckPointsMutation,
   useGetVehicleListQuery,
   useGetStartPointOdometerMutation,
+  useGetMovementSummaryMutation,
 } from "@/state/rhinoApi";
 import { calculateHistory, formatDate, parseTime } from "@/utils";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import useGetStoredDates from "./useGetStoredDates";
 import type { DataType } from "@/types";
 import { useGetDataPointQuery } from "@/state/storage";
+// import useMileageResults from "./useMileageResults";
 
 const useDriverList = () => {
   const { DateData: resolvedTime } = useGetStoredDates();
   const { data } = useGetDataPointQuery();
+
+  // const { data: MileageResults } = useMileageResults();
+  const [getMovementSummary] = useGetMovementSummaryMutation();
+
+  // console.log(MileageResults, "MileageResults");
 
   const DateData = useMemo(
     () => ({
@@ -113,6 +120,16 @@ const useDriverList = () => {
               (checkpoint) => checkpoint.vehicle === item.asset_name,
             );
 
+            // const mileagesCovered = MileageResults?.filter(
+            //   (result) =>
+            //     result.vehicle.toLowerCase() == item.asset_name.toLowerCase(),
+            // );
+
+            // console.log(
+            //   mileagesCovered,
+            //   `mileagesCovered on ${item.asset_name}`,
+            // );
+
             let odometerData = null;
 
             if (item.device_id && checkPointList.length > 0) {
@@ -121,8 +138,6 @@ const useDriverList = () => {
                   unit_id: String(item.device_id),
                   start_date: "2026-05-25 10:35:00",
                   end_date: "2026-05-25 10:35:59",
-                  // start_date: dates.startDate ?? "2026-05-25 10:35:00",
-                  // end_date: dates.endDate ?? "2026-05-25 10:35:59",
                   user_id: 1263,
                   backup: true,
                 }).unwrap();
@@ -161,6 +176,12 @@ const useDriverList = () => {
               checkPointList,
               start_cp_name,
               startOdometer,
+            );
+
+            const pointToPointMileage = calculatePointToPointMileage(
+              checkPointList,
+              getMovementSummary,
+              resolvedTime, // get the start time here for the first CP
             );
 
             const cumulativeOdometer = history.reduce(

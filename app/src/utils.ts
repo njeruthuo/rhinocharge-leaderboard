@@ -64,9 +64,9 @@ export function calculateHistory(
   startOdometer: number,
 ): DataTypeCheckPoint[] {
   // 1. Sort the checkpoints chronologically by time first
-  const orderedCheckPoints = [...checkpointList].sort((a, b) => {
-    return new Date(a.start_time).getTime() - new Date(b.start_time).getTime();
-  });
+  // const orderedCheckPoints = [...checkpointList].sort((a, b) => {
+  //   return new Date(a.start_time).getTime() - new Date(b.start_time).getTime();
+  // });
 
   // 2. Find the start checkpoint from the SORTED list to know its exact chronological position
   // const startCpIndex = orderedCheckPoints.findIndex(
@@ -86,16 +86,17 @@ export function calculateHistory(
   // const baseOdometer = baseStartCp?.start_odo || 0;
   const baseOdometer = startOdometer;
 
-  const seenNames = new Set();
-  const uniqueCheckPoints: TripRecord[] = [];
+  // const seenNames = new Set();
+  const uniqueCheckPoints: TripRecord[] =
+    orderAndReturnUniqueCheckPoints(checkpointList);
 
-  orderedCheckPoints?.forEach((checkpoint) => {
-    const normalizedName = checkpoint?.poi_name?.toLowerCase().trim();
-    if (!seenNames.has(normalizedName)) {
-      seenNames.add(normalizedName);
-      uniqueCheckPoints.push(checkpoint);
-    }
-  });
+  // orderedCheckPoints?.forEach((checkpoint) => {
+  //   const normalizedName = checkpoint?.poi_name?.toLowerCase().trim();
+  //   if (!seenNames.has(normalizedName)) {
+  //     seenNames.add(normalizedName);
+  //     uniqueCheckPoints.push(checkpoint);
+  //   }
+  // });
 
   return uniqueCheckPoints.map((checkpoint, index) => {
     const time = parseTime(checkpoint?.start_time)?.split(":");
@@ -114,8 +115,10 @@ export function calculateHistory(
     }
     // RULE 3: Every subsequent point subtracts the previous checkpoint's odometer
     else {
+      // calculatedOdometer =
+      //   checkpoint.start_odo - orderedCheckPoints[index - 1].start_odo;
       calculatedOdometer =
-        checkpoint.start_odo - orderedCheckPoints[index - 1].start_odo;
+        checkpoint.start_odo - uniqueCheckPoints[index - 1].start_odo;
     }
 
     // Force negative segment deltas to 0 (handles edge-case anomalies)
@@ -150,4 +153,32 @@ export function formatDate(dateString: Date | string) {
   const seconds = String(date.getSeconds()).padStart(2, "0");
 
   return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+}
+
+export function calculatePointToPointMileage(
+  checkpointList: TripRecord[],
+  getMovementSummary,
+  resolvedTime: DateDataType,
+) {
+  const uniqueCheckPoints: TripRecord[] =
+    orderAndReturnUniqueCheckPoints(checkpointList);
+}
+
+function orderAndReturnUniqueCheckPoints(checkpointList: TripRecord[]) {
+  const orderedCheckPoints = [...checkpointList].sort((a, b) => {
+    return new Date(a.start_time).getTime() - new Date(b.start_time).getTime();
+  });
+
+  const seenNames = new Set();
+  const uniqueCheckPoints: TripRecord[] = [];
+
+  orderedCheckPoints?.forEach((checkpoint) => {
+    const normalizedName = checkpoint?.poi_name?.toLowerCase().trim();
+    if (!seenNames.has(normalizedName)) {
+      seenNames.add(normalizedName);
+      uniqueCheckPoints.push(checkpoint);
+    }
+  });
+
+  return uniqueCheckPoints;
 }
