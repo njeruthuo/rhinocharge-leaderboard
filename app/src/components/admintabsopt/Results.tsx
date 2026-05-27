@@ -1,13 +1,16 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef } from "react";
 import { AnimatePresence } from "framer-motion";
 
-import Search from "../Search";
-import { tune } from "@/constants";
+// import Search from "../Search";
+// import { tune } from "@/constants";
 import type { ResultsProps } from "@/types";
 import useDriverList from "@/hooks/useDriverList";
 
-const Results = ({ setOpenFilter, openFilter }: ResultsProps) => {
-  const [search, setSearch] = useState("");
+const Results = ({
+  setOpenFilter,
+  // openFilter
+}: ResultsProps) => {
+  // const [search, setSearch] = useState("");
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   const { data, LoadingVehicleList, LoadingCheckPoints } = useDriverList();
@@ -17,7 +20,7 @@ const Results = ({ setOpenFilter, openFilter }: ResultsProps) => {
     return [...data].sort((a, b) => b.totalCps - a.totalCps);
   }, [data]);
 
-  const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
+  // const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
@@ -32,21 +35,21 @@ const Results = ({ setOpenFilter, openFilter }: ResultsProps) => {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [setOpenFilter]);
 
-  const handleCategoryChange = (category: string) => {
-    setSelectedCategories((prev) =>
-      prev.includes(category)
-        ? prev.filter((item) => item !== category)
-        : [...prev, category],
-    );
-  };
+  // const handleCategoryChange = (category: string) => {
+  //   setSelectedCategories((prev) =>
+  //     prev.includes(category)
+  //       ? prev.filter((item) => item !== category)
+  //       : [...prev, category],
+  //   );
+  // };
 
-  const handleClearFilters = () => {
-    setSelectedCategories([]);
-  };
+  // const handleClearFilters = () => {
+  //   setSelectedCategories([]);
+  // };
 
   return (
     <div>
-      <div className="flex space-x-3 flex-row place-items-center">
+      {/* <div className="flex space-x-3 flex-row place-items-center">
         <div className="relative" ref={dropdownRef}>
           <img
             style={{
@@ -122,7 +125,7 @@ const Results = ({ setOpenFilter, openFilter }: ResultsProps) => {
         </div>
 
         <Search search={search} setSearch={setSearch} />
-      </div>
+      </div> */}
 
       <div
         className="rounded-xl border overflow-hidden"

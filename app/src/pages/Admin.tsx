@@ -26,6 +26,8 @@ export default function AdminPage() {
   const [selections, setSelections] = useState<Record<number, string>>({});
   const [currentTab, setCurrentTab] = useState<TabType>(TabOptionList.RESULTS);
 
+  const [isGenerating, setIsGenerating] = useState(false);
+
   const [file, setFile] = useState<File | null>(null);
   const [toast, setToast] = useState<string | null>(null);
 
@@ -69,6 +71,57 @@ export default function AdminPage() {
     });
   };
 
+  const handleExport = () => {
+    setIsGenerating(true);
+
+    // 1. Accumulate all rows across all vehicles/assets in the data array
+    const flatRows = data.flatMap((item) => {
+      // Access the nested mileage object structure safely
+      const mileageGroup = item.pointToPointMileage;
+
+      if (!mileageGroup || !mileageGroup.checkpoints) return [];
+
+      // Map each checkpoint for this specific asset
+      return mileageGroup.checkpoints.map((cp) => ({
+        VEHICLE: mileageGroup.assetName,
+        "CP ONE": cp.Checkpoint1 ? cp.Checkpoint1.toUpperCase() : "",
+        "CP TWO": cp.Checkpoint2 ? cp.Checkpoint2.toUpperCase() : "",
+        "ACTUAL DISTANCE":
+          typeof cp.mileage === "number" ? cp.mileage.toFixed(3) : "0.000",
+      }));
+    });
+
+    if (flatRows.length === 0) {
+      console.warn("No checkpoint data found to export.");
+      setIsGenerating(false);
+      return;
+    }
+
+    // 2. Convert the flat JSON objects into a CSV raw text string using PapaParse
+    const csvString = Papa.unparse(flatRows, {
+      header: true,
+    });
+
+    // 3. Trigger the standard browser file download
+    const blob = new Blob([csvString], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+
+    // If exporting multiple cars, fallback to a generic name or use the first asset's name
+    const firstAssetName =
+      data[0]?.pointToPointMileage?.assetName || "vehicles";
+
+    link.setAttribute("href", url);
+    link.setAttribute("download", `${firstAssetName}_movement_summary.csv`);
+    link.style.visibility = "hidden";
+
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+
+    setIsGenerating(false);
+  };
+
   const TabOptions: Record<TabType, React.ReactNode> = {
     [TabOptionList.LIVEDATA]: <SafariLeaderBoard showHeader={false} />,
     [TabOptionList.COMPETITORS]: (
@@ -86,8 +139,6 @@ export default function AdminPage() {
       <Results setOpenFilter={setOpenFilter} openFilter={openFilter} />
     ),
   };
-
-  const isGenerating = false;
 
   return (
     <>
@@ -162,9 +213,9 @@ export default function AdminPage() {
               {currentTab === TabOptionList.RESULTS && (
                 <div className="flex items-center space-x-2 shrink-0 sm:mb-6">
                   <button
-                    // onClick={handleConfirm}
+                    onClick={handleExport}
                     // onClick={() => setOpenFilter(false)}
-                    // disabled={isLoading}
+                    disabled={isGenerating}
                     className="flex-1 rounded-lg py-2 text-xs font-black tracking-wider uppercase transition-colors disabled:opacity-40 disabled:cursor-not-allowed mt-4 w-full bg-amber-600 hover:bg-amber-700 text-white rounded-md py-1.5 text-sm font-medium transition-colors shadow-sm px-2"
                     style={{
                       background: "rgba(217,119,6,0.18)",
