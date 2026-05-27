@@ -297,7 +297,7 @@ const Results = ({
                               margin: "20px 0",
                             }}
                           >
-                            {car.orderedCheckpoints.length + 1}
+                            {car.orderedCheckpoints.length}
                           </span>
                         </td>
                         <td
