@@ -63,7 +63,6 @@ export default MainMap;
 const PoiMarkers = (props: { pois: Poi[]; isCheckpoint: boolean }) => {
   const [activeMarkerKey, setActiveMarkerKey] = useState<string | null>(null);
 
-  console.log(activeMarkerKey, "activeMarkerKey");
 
   return (
     <>
