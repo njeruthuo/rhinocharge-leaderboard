@@ -216,7 +216,7 @@ export default function AdminPage() {
                     onClick={handleExport}
                     // onClick={() => setOpenFilter(false)}
                     disabled={isGenerating}
-                    className="flex-1 rounded-lg py-2 text-xs font-black tracking-wider uppercase transition-colors disabled:opacity-40 disabled:cursor-not-allowed mt-4 w-full bg-amber-600 hover:bg-amber-700 text-white rounded-md py-1.5 text-sm font-medium transition-colors shadow-sm px-2"
+                    className="flex-1 rounded-lg py-2 text-xs font-black tracking-wider uppercase transition-colors disabled:opacity-40 disabled:cursor-not-allowed mt-4 w-full hover:cursor-pointer bg-amber-600 hover:bg-amber-700 text-white rounded-md py-1.5 text-sm font-medium transition-colors shadow-sm px-2"
                     style={{
                       background: "rgba(217,119,6,0.18)",
                       color: "#D97706",
