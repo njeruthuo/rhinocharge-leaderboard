@@ -203,9 +203,10 @@ export function formatDateWithZ(
     subtract ? date.getHours() - 3 : date.getHours(),
   ).padStart(2, "0");
   const minutes = String(date.getMinutes()).padStart(2, "0");
-  const seconds = String(date.getSeconds()).padStart(2, "0");
+  // const seconds = String(date.getSeconds()).padStart(2, "0");
 
-  return `${year}-${month}-${day}T${hours}:${minutes}:${seconds}Z`;
+  // return `${year}-${month}-${day}T${hours}:${minutes}:${seconds}Z`;
+  return `${year}-${month}-${day}T${hours}:${minutes}:00Z`;
 }
 
 export async function calculatePointToPointMileage(
@@ -232,10 +233,11 @@ export async function calculatePointToPointMileage(
 
     if (currentPoint.start_time && nextPoint.start_time) {
       const payload: DeviceData = {
-        startDate: formatDateWithZ(currentPoint.start_time, true),
-        endDate: formatDateWithZ(nextPoint.end_time, true),
+        startDate: formatDateWithZ(currentPoint.start_time),
+        endDate: formatDateWithZ(nextPoint.start_time),
         isBackup: resolvedTime,
         deviceID: deviceID,
+        // info: `startDate: ${formatDateWithZ(currentPoint.start_time)} at: ${currentPoint.poi_name}, endDate: ${formatDateWithZ(nextPoint.start_time)} at: ${nextPoint.poi_name} `,
       };
 
       summaryPromises.push(getMovementSummary(payload));

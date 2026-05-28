@@ -24,8 +24,6 @@ const useDriverList = () => {
   // const { data: MileageResults } = useMileageResults();
   const [getMovementSummary] = useGetMovementSummaryMutation();
 
-  // console.log(MileageResults, "MileageResults");
-
   const DateData = useMemo(
     () => ({
       startDate: resolvedTime.startDate ?? "2025-06-01T7:30:00",

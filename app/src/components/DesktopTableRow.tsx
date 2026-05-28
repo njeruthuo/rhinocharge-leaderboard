@@ -126,7 +126,9 @@ function DesktopTableRow({
         >
           <span className="font-black text-sm tracking-widest rounded py-3 text-[#46237A]">
             {new Intl.NumberFormat("en-US").format(
-              biggestOdometer ? biggestOdometer : driver.mileage,
+              biggestOdometer
+                ? Number(biggestOdometer.toFixed(1))
+                : driver.mileage,
             )}
           </span>
         </td>

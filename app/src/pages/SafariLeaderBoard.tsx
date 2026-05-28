@@ -244,6 +244,8 @@ export default function SafariLeaderBoard({
     return [...data].sort((a, b) => b.totalCps - a.totalCps);
   }, [data]);
 
+  console.log(data, "safari data");
+
   const isViewer = useMemo((): boolean => {
     return pathname !== "/";
   }, [pathname]);

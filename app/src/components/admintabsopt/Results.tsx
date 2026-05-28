@@ -150,7 +150,7 @@ const Results = ({
             <table className="w-full border-collapse" style={{ minWidth: 900 }}>
               <thead>
                 <tr
-                  className="border-b"
+                  className="border-b text-[12px]"
                   style={{
                     borderColor: "rgba(255,255,255,0.06)",
                     background: "rgb(84, 89, 95)",
@@ -162,7 +162,7 @@ const Results = ({
                 >
                   <th className="pr-2 py-3 pl-4 w-14 text-left">
                     <span
-                      className="text-[9px] tracking-[0.2em] uppercase"
+                      className=" tracking-[0.2em] uppercase"
                       style={{
                         color: "white",
                         fontFamily: "'Oswald', sans-serif",
@@ -173,7 +173,7 @@ const Results = ({
                   </th>
                   <th className="py-3 pr-4 text-left" style={{ minWidth: 160 }}>
                     <span
-                      className="text-[9px] font-black tracking-[0.2em] uppercase"
+                      className="font-black tracking-[0.2em] uppercase"
                       style={{
                         color: "white",
                         fontFamily: "'Oswald', sans-serif",
@@ -184,7 +184,7 @@ const Results = ({
                   </th>
                   <th className="py-3 pr-4 text-left" style={{ minWidth: 160 }}>
                     <span
-                      className="text-[9px] font-black tracking-[0.2em] uppercase"
+                      className=" font-black tracking-[0.2em] uppercase"
                       style={{
                         color: "white",
                         fontFamily: "'Oswald', sans-serif",
@@ -193,9 +193,12 @@ const Results = ({
                       Position
                     </span>
                   </th>
-                  <th className="py-3 pr-4 text-left" style={{ minWidth: 160 }}>
+                  <th
+                    className="py-3 pr-4 text-center"
+                    style={{ minWidth: 160 }}
+                  >
                     <span
-                      className="text-[9px] font-black tracking-[0.2em] uppercase"
+                      className="text-center font-black tracking-[0.2em] uppercase"
                       style={{
                         color: "white",
                         fontFamily: "'Oswald', sans-serif",
@@ -204,15 +207,18 @@ const Results = ({
                       Sector
                     </span>
                   </th>
-                  <th className="py-3 pr-4 text-left" style={{ minWidth: 160 }}>
+                  <th
+                    className="py-3 pr-4 text-center"
+                    style={{ minWidth: 160 }}
+                  >
                     <span
-                      className="text-[9px] font-black tracking-[0.2em] uppercase"
+                      className="font-black tracking-[0.2em] uppercase"
                       style={{
                         color: "white",
                         fontFamily: "'Oswald', sans-serif",
                       }}
                     >
-                      Total Distance
+                      Total Distance(KM)
                     </span>
                   </th>
 
@@ -254,12 +260,14 @@ const Results = ({
                             whiteSpace: "nowrap",
                             paddingTop: 3,
                             paddingBottom: 3,
+                            // textAlign: "center",
                           }}
                         >
                           <span
                             className="font-black text-sm tracking-widest px-2 rounded py-3 pr-3 text-[#46237A]"
                             style={{
                               fontFamily: "'Oswald', sans-serif",
+                              textAlign: "center",
                             }}
                           >
                             {car.entrantName}
@@ -271,18 +279,21 @@ const Results = ({
                             whiteSpace: "nowrap",
                             paddingTop: 3,
                             paddingBottom: 3,
+                            // textAlign: "center",
                           }}
                         >
                           <span
                             className="font-black text-sm tracking-widest px-2 rounded py-3 pr-3 text-[#46237A]"
                             style={{
                               fontFamily: "'Oswald', sans-serif",
+                              // textAlign: "center",
                             }}
                           >
                             {index + 1}
                           </span>
                         </td>
                         <td
+                          className="text-center"
                           style={{
                             paddingRight: 10,
                             whiteSpace: "nowrap",
@@ -291,7 +302,7 @@ const Results = ({
                           }}
                         >
                           <span
-                            className="font-black text-sm tracking-widest px-2 rounded py-3 pr-3 text-[#46237A]"
+                            className="font-black text-sm tracking-widest px-2 text-center rounded py-3 pr-3 text-[#46237A]"
                             style={{
                               fontFamily: "'Oswald', sans-serif",
                               margin: "20px 0",
@@ -301,6 +312,7 @@ const Results = ({
                           </span>
                         </td>
                         <td
+                          className="text-center"
                           style={{
                             paddingRight: 10,
                             whiteSpace: "nowrap",
@@ -314,7 +326,7 @@ const Results = ({
                               fontFamily: "'Oswald', sans-serif",
                             }}
                           >
-                            {totalDistance}
+                            {totalDistance.toFixed(1)}
                           </span>
                         </td>
                       </tr>

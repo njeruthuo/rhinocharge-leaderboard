@@ -127,6 +127,7 @@ export const rhinoApi = createApi({
             backup: arg.isBackup,
             endDate: arg.endDate,
             startDate: arg.startDate,
+            // info: arg.info,
           },
         },
       }),
