@@ -22,7 +22,7 @@ import LoginPage from "@/components/admintabsopt/components/LoginPage";
 
 export default function AdminPage() {
   const navigate = useNavigate();
-  const [isAuthenticated, setIsAuthenticated] = useState(true);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [selections, setSelections] = useState<Record<number, string>>({});
   const [currentTab, setCurrentTab] = useState<TabType>(TabOptionList.RESULTS);
 

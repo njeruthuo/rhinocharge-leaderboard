@@ -19,21 +19,20 @@ const LeaderboardHeader = () => {
   };
 
   return (
-    <div className="mb-4 flex place-content-start">
-      <div>
+    <div className="mb-4 flex place-content-start place-items-top">
+      <div className="flex flex-col justify-start">
         <div
           className="text-2xl select-none sm:text-4xl font-black text-[#716969] leading-none mb-1"
           style={{
             fontFamily: "'Oswald', sans-serif",
             letterSpacing: "0.04em",
           }}
-          // onClick={handleOpenAdmin}
         >
           Rhino Charge 2026
         </div>
-        <div className="text-stone-500 text-xs tracking-widest uppercase flex space-x-3 my-3">
+        <div className="text-stone-500 tracking-widest uppercase flex place-items-center space-x- lg:space-x-3 my-3">
           <div
-            className="hover:cursor-pointer select-none"
+            className="hover:cursor-pointer select-none text-[11px]"
             onClick={() => {
               if (pathname === "/maps") navigate("/");
             }}
@@ -42,7 +41,7 @@ const LeaderboardHeader = () => {
           </div>
           <span>|</span>
           <div
-            className="hover:cursor-pointer select-none"
+            className="hover:cursor-pointer select-none text-[11px]"
             onClick={() => {
               if (pathname === "/") navigate("/maps");
             }}
