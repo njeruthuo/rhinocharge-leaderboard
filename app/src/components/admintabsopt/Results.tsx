@@ -14,7 +14,10 @@ const Results = ({
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   const { data, LoadingVehicleList, LoadingCheckPoints } = useDriverList();
-  const isLoading = LoadingVehicleList || LoadingCheckPoints;
+
+  const isLoading = useMemo(() => {
+    return data.length < 1 && (LoadingVehicleList || LoadingCheckPoints);
+  }, [data, LoadingVehicleList, LoadingCheckPoints]);
 
   const orderedData = useMemo(() => {
     return [...data].sort((a, b) => b.totalCps - a.totalCps);
