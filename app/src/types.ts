@@ -214,6 +214,7 @@ export interface DateDataType {
   startDate: string | undefined;
   endDate: string | undefined;
   isBackup: boolean;
+  startTime: string;
 }
 
 export type DeviceData = DateDataType & { deviceID?: string };

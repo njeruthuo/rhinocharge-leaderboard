@@ -5,12 +5,14 @@ export interface DateStorage {
   start_date: string; // "YYYY-MM-DD HH:MM:SS"
   end_date: string;
   backup_status: boolean;
+  start_cp_time: string;
 }
 
 interface DateStoragePayload {
   start_date: string;
   end_date: string;
   backup_status: boolean;
+  start_cp_time: string;
 }
 
 export const storage = createApi({

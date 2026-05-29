@@ -8,7 +8,12 @@ import {
 interface RaceSettingsProps {
   isUpdate: boolean;
   recordId?: number;
-  value?: { startDate: string; endDate: string; isBackup: boolean };
+  value?: {
+    startDate: string;
+    endDate: string;
+    isBackup: boolean;
+    startTime: string;
+  };
   onChange: (name: string, value: string | boolean) => void;
 }
 
@@ -28,12 +33,14 @@ function RaceSettingsTrigger({ value, onChange, isUpdate }: RaceSettingsProps) {
           start_date: value?.startDate,
           end_date: value?.endDate,
           backup_status: value?.isBackup,
+          start_cp_time: value?.startTime,
         }).unwrap();
       } else {
         await createDataPoint({
           start_date: value?.startDate ?? "",
           end_date: value?.endDate ?? "",
           backup_status: value?.isBackup ?? false,
+          start_cp_time: value?.startTime ?? "",
         }).unwrap();
       }
       // onChange?.({ ...computedRange, isBackup });
@@ -42,10 +49,6 @@ function RaceSettingsTrigger({ value, onChange, isUpdate }: RaceSettingsProps) {
       console.error("Failed to update race settings:", err);
     }
   }
-
-  // console.log(value, "value");
-
-  // const dispatch = useDispatch();
 
   return (
     <>
@@ -151,6 +154,29 @@ function RaceSettingsTrigger({ value, onChange, isUpdate }: RaceSettingsProps) {
                   }}
                 />
               </div> */}
+
+              <div>
+                <label
+                  className="block text-[9px] uppercase tracking-widest text-stone-400 font-bold mb-1.5"
+                  style={{ fontFamily: "'Oswald', sans-serif" }}
+                >
+                  Start CP Time
+                </label>
+                <input
+                  type="time"
+                  value={value?.startTime ?? ""}
+                  name="startTime"
+                  onChange={(e) =>
+                    onChange("startTime", `${e.target.value}:00`)
+                  }
+                  className="dp-input w-full rounded-lg px-3 py-2 text-sm outline-none border"
+                  style={{
+                    background: "rgba(255,255,255,0.03)",
+                    borderColor: "rgba(255,255,255,0.1)",
+                    color: "#e7e5e4",
+                  }}
+                />
+              </div>
 
               {/* Fixed time banner */}
               <div className="p-2.5 rounded-lg border text-[10px] text-stone-400 bg-stone-900/50 border-stone-800 text-sm">

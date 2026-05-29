@@ -29,8 +29,14 @@ const useDriverList = () => {
       startDate: resolvedTime.startDate ?? "2025-06-01T7:30:00",
       endDate: resolvedTime.endDate ?? "2025-06-01T17:30:00",
       isBackup: resolvedTime.isBackup,
+      startTime: resolvedTime.startTime ?? "07:30:00",
     }),
-    [resolvedTime.startDate, resolvedTime.endDate, resolvedTime.isBackup],
+    [
+      resolvedTime.startDate,
+      resolvedTime.endDate,
+      resolvedTime.isBackup,
+      resolvedTime.startTime,
+    ],
   );
 
   const [tokenReady] = useState(() => !!localStorage.getItem("token"));
@@ -114,6 +120,19 @@ const useDriverList = () => {
       return;
     }
 
+    const fromDate = new Date(DateData?.startDate);
+    const startDate = new Date(DateData?.startDate);
+    if (DateData?.startTime) {
+      // Split "07:31:00" into [7, 31, 0]
+      const [hours, minutes, seconds] = DateData.startTime
+        .split(":")
+        .map(Number);
+      // setHours sets hours, minutes, and seconds all at once
+      startDate.setHours(hours, minutes, seconds || 0);
+    }
+
+    startDate.setMinutes(startDate.getMinutes() - 1);
+
     const processDriverList = async () => {
       setLoadingOdometers(true);
       try {
@@ -127,11 +146,9 @@ const useDriverList = () => {
 
             if (item.device_id && checkPointList.length > 0) {
               try {
-                const startDate = new Date(DateData?.startDate);
-                startDate.setMinutes(startDate.getMinutes() - 1);
                 odometerData = await getStartOdometer({
                   unit_id: String(item.device_id),
-                  start_date: DateData?.startDate.replace("T", " "),
+                  start_date: formatDate(fromDate),
                   end_date: formatDate(startDate),
                   user_id: 1263,
                   backup: true,
@@ -230,6 +247,7 @@ const useDriverList = () => {
     resolvedTime.isBackup,
     getMovementSummary,
     DateData?.startDate,
+    DateData.startTime,
   ]);
 
   return {

@@ -40,8 +40,14 @@ export default function AdminPage() {
       startDate: DateData.startDate ?? "2026-05-20T7:30:00",
       endDate: DateData.endDate ?? "2026-05-21T17:30:00",
       isBackup: DateData.isBackup,
+      startTime: DateData.startTime ?? "07:30:00",
     }),
-    [DateData.startDate, DateData.endDate, DateData.isBackup],
+    [
+      DateData.startDate,
+      DateData.endDate,
+      DateData.isBackup,
+      DateData.startTime,
+    ],
   );
 
   const [time, setTime] = useState(resolvedTime);
