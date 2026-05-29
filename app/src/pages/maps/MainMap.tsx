@@ -162,10 +162,14 @@ const PoiMarkers = (props: { pois: Poi[]; isCheckpoint: boolean }) => {
                         <h3>
                           <span className="font-light">TIME: </span>
                           {poi.time
-                            ? new Date(poi.time).toLocaleString([], {
-                                dateStyle: "short",
-                                timeStyle: "short",
-                              })
+                            ? (() => {
+                                const date = new Date(poi.time);
+                                date.setHours(date.getHours() + 3);
+                                return date.toLocaleString([], {
+                                  dateStyle: "short",
+                                  timeStyle: "short",
+                                });
+                              })()
                             : "N/A"}
                         </h3>
                       </div>
