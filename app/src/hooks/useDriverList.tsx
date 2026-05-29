@@ -229,6 +229,7 @@ const useDriverList = () => {
     dates.startDate,
     resolvedTime.isBackup,
     getMovementSummary,
+    DateData?.startDate,
   ]);
 
   return {
