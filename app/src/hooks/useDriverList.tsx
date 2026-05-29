@@ -127,10 +127,12 @@ const useDriverList = () => {
 
             if (item.device_id && checkPointList.length > 0) {
               try {
+                const startDate = new Date(DateData?.startDate);
+                startDate.setMinutes(startDate.getMinutes() - 1);
                 odometerData = await getStartOdometer({
                   unit_id: String(item.device_id),
-                  start_date: "2026-05-25 10:35:00",
-                  end_date: "2026-05-25 10:35:59",
+                  start_date: DateData?.startDate.replace("T", " "),
+                  end_date: formatDate(startDate),
                   user_id: 1263,
                   backup: true,
                 }).unwrap();
