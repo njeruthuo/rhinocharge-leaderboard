@@ -5,6 +5,7 @@ import tune from "@/assets/tune.svg";
 import flag from "@/assets/flag_circle.png";
 import car from "@/assets/car.svg";
 import star from "@/assets/star.svg";
+import banner from "@/assets/banner.jpeg";
 
 export const BASE_URL = import.meta.env.VITE_APP_BASE;
 export const ADMIN_USERNAME = import.meta.env.VITE_ADMIN_USERNAME;
@@ -14,7 +15,7 @@ export const BASE_REFETCH_INTERVAL = import.meta.env.VITE_BASE_REFETCH_INTERVAL;
 
 export const ADMIN_PAGE_CLICKS = import.meta.env.VITE_ADMIN_PAGE_CLICKS;
 
-export { spinner, lock, home, tune, flag, car, star };
+export { spinner, lock, home, tune, flag, car, star, banner };
 
 export const colors = {
   pale: "bg-amber-600/40",

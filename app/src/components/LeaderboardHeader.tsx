@@ -1,4 +1,4 @@
-import { lock } from "@/constants";
+import { banner, lock } from "@/constants";
 import { useEffect, useRef } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 
@@ -19,10 +19,10 @@ const LeaderboardHeader = () => {
   };
 
   return (
-    <div className="mb-4 flex place-content-start place-items-top">
-      <div className="flex flex-col justify-start">
+    <div className="mb-4 flex items-center justify-between w-full">
+      <div className="flex flex-1 flex-col justify-start">
         <div
-          className="text-2xl select-none sm:text-4xl font-black text-[#716969] leading-none mb-1"
+          className="text-xl select-none sm:text-3xl font-black text-[#716969] leading-none mb-1"
           style={{
             fontFamily: "'Oswald', sans-serif",
             letterSpacing: "0.04em",
@@ -30,7 +30,7 @@ const LeaderboardHeader = () => {
         >
           Rhino Charge 2026
         </div>
-        <div className="text-stone-500 tracking-widest uppercase flex place-items-center space-x- lg:space-x-3 my-3">
+        <div className="text-stone-500 tracking-widest uppercase flex place-items-center space-x-2 lg:space-x-3 my-3">
           <div
             className="hover:cursor-pointer select-none text-[11px]"
             onClick={() => {
@@ -51,7 +51,9 @@ const LeaderboardHeader = () => {
         </div>
       </div>
 
-      <div className="flex items-center gap-3 flex-wrap ml-auto">
+      <Banner />
+
+      <div className="flex flex-1 flex-row items-center justify-end gap-3 flex-wrap">
         <span className="hover:cursor-pointer" onClick={handleOpenAdmin}>
           <img src={lock} alt="" />
         </span>
@@ -77,3 +79,13 @@ const LeaderboardHeader = () => {
   );
 };
 export default LeaderboardHeader;
+
+export function Banner() {
+  return (
+    <a href="https://rivercrosstech.com/" target="blank">
+      <div className="hidden xl:flex flex-none justify-center">
+        <img src={banner} className="w-150 h-20" alt="" />
+      </div>
+    </a>
+  );
+}

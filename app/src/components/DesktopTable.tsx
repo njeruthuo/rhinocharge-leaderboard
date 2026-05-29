@@ -29,7 +29,7 @@ function DesktopTable({
         backdropFilter: "blur(8px)",
         overflowX: "auto",
         overflowY: "auto",
-        maxHeight: !reduceHeight ? "70vh" : "80vh",
+        maxHeight: !reduceHeight ? "70vh" : "70vh",
       }}
     >
       <table

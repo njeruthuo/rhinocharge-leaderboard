@@ -60,7 +60,6 @@ function DesktopTableRow({
           className="font-black text-sm tracking-widest px-2 rounded py-3 pr-3 text-[#46237A]"
           style={{
             background: "rgba(217,119,6,0.15)",
-            // color: "#ED6A5E",
             border: "1px solid rgba(217,119,6,0.3)",
             fontFamily: "'Oswald', sans-serif",
           }}

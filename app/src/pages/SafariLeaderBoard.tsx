@@ -249,90 +249,9 @@ export default function SafariLeaderBoard({
   }, [pathname]);
 
   return (
-    <>
-      {showHeader && (
-        <>
-          <div className="tread-bar tread-top" />
-          <div className="tread-bar tread-bottom" />
-        </>
-      )}
-
-      <svg
-        className="rhino-ghost"
-        style={{ width: 520, height: 340, bottom: "8%", right: "-4%" }}
-        viewBox="0 0 520 340"
-        fill="none"
-        xmlns="http://www.w3.org/2000/svg"
-        aria-hidden="true"
-      >
-        <ellipse cx="260" cy="210" rx="170" ry="100" fill="#D97706" />
-        <ellipse cx="90" cy="185" rx="72" ry="58" fill="#D97706" />
-        <path
-          d="M130 160 Q160 155 165 200 Q160 240 130 235 Q100 240 88 210Z"
-          fill="#D97706"
-        />
-        <path d="M30 155 Q18 110 38 95 Q55 108 50 150Z" fill="#D97706" />
-        <path d="M62 148 Q55 118 68 108 Q78 118 76 145Z" fill="#D97706" />
-        <path d="M112 135 Q118 112 132 118 Q130 135 118 140Z" fill="#D97706" />
-        <rect x="130" y="295" width="32" height="44" rx="8" fill="#D97706" />
-        <rect x="195" y="298" width="32" height="42" rx="8" fill="#D97706" />
-        <rect x="290" y="298" width="32" height="42" rx="8" fill="#D97706" />
-        <rect x="355" y="295" width="32" height="44" rx="8" fill="#D97706" />
-        <path d="M425 195 Q460 180 470 200 Q460 218 430 215Z" fill="#D97706" />
-        <circle cx="72" cy="178" r="7" fill="#1C1917" />
-        <circle cx="70" cy="176" r="2.5" fill="#D97706" />
-        <path
-          d="M150 140 Q165 180 150 220"
-          stroke="#1C1917"
-          strokeWidth="3"
-          strokeLinecap="round"
-          opacity="0.3"
-          fill="none"
-        />
-        <path
-          d="M320 120 Q330 170 322 220"
-          stroke="#1C1917"
-          strokeWidth="2.5"
-          strokeLinecap="round"
-          opacity="0.25"
-          fill="none"
-        />
-        <path
-          d="M240 125 Q248 170 242 215"
-          stroke="#1C1917"
-          strokeWidth="2"
-          strokeLinecap="round"
-          opacity="0.2"
-          fill="none"
-        />
-      </svg>
-      <svg
-        className="rhino-ghost rhino-ghost-2"
-        style={{ width: 220, height: 140, top: "12%", left: "2%" }}
-        viewBox="0 0 520 340"
-        fill="none"
-        xmlns="http://www.w3.org/2000/svg"
-        aria-hidden="true"
-      >
-        <ellipse cx="260" cy="210" rx="170" ry="100" fill="#D97706" />
-        <ellipse cx="90" cy="185" rx="72" ry="58" fill="#D97706" />
-        <path
-          d="M130 160 Q160 155 165 200 Q160 240 130 235 Q100 240 88 210Z"
-          fill="#D97706"
-        />
-        <path d="M30 155 Q18 110 38 95 Q55 108 50 150Z" fill="#D97706" />
-        <path d="M62 148 Q55 118 68 108 Q78 118 76 145Z" fill="#D97706" />
-        <path d="M112 135 Q118 112 132 118 Q130 135 118 140Z" fill="#D97706" />
-        <rect x="130" y="295" width="32" height="44" rx="8" fill="#D97706" />
-        <rect x="195" y="298" width="32" height="42" rx="8" fill="#D97706" />
-        <rect x="290" y="298" width="32" height="42" rx="8" fill="#D97706" />
-        <rect x="355" y="295" width="32" height="44" rx="8" fill="#D97706" />
-        <path d="M425 195 Q460 180 470 200 Q460 218 430 215Z" fill="#D97706" />
-        <circle cx="72" cy="178" r="7" fill="#1C1917" />
-      </svg>
-
+    <div style={{ background: "#FBFBFB" }}>
       <div
-        className={`${showHeader ? "min-h-screen py-4" : "max-h-[85vh]"} text-stone-100  px-4`}
+        className={`${showHeader ? "min-h-[90vh] py-3" : "max-h-[85vh]"} text-stone-100  px-4`}
         style={{
           background: "#FBFBFB",
           backgroundImage: `
@@ -344,7 +263,7 @@ export default function SafariLeaderBoard({
           zIndex: 2,
         }}
       >
-        <div className="max-w-3xl xl:max-w-[95vw] 2xl:max-w-[1600px] mx-auto">
+        <div className="xl:max-w-[95vw] max-w-400 mx-auto">
           {showHeader && <LeaderboardHeader />}
           <div className="hidden lg:block mb-2">
             {loadingState ? (
@@ -415,7 +334,7 @@ export default function SafariLeaderBoard({
             </Reorder.Group>
           </div>
           {/* ✅ use already-computed checkpoints variable, no hook call */}
-          <div className="mt-8 flex items-center gap-4 flex-wrap">
+          <div className="mt-6 flex items-center gap-4 flex-wrap">
             <div className="h-px flex-1 bg-stone-800" />
             <span className="text-[9px] tracking-widest text-stone-700 uppercase">
               {CHECKPOINTS ? CHECKPOINTS.length + 1 : 0} Checkpoints ·{" "}
@@ -423,7 +342,7 @@ export default function SafariLeaderBoard({
             </span>
             <div className="h-px flex-1 bg-stone-800" />
           </div>
-          <div className="mt-4 flex items-center gap-4 flex-wrap justify-center">
+          <div className="mt-3 flex items-center gap-4 flex-wrap justify-center">
             {[
               { color: permanentColors.complete, label: "Completed" },
               { color: permanentColors.active, label: "Active" },
@@ -441,6 +360,20 @@ export default function SafariLeaderBoard({
           </div>
         </div>
       </div>
-    </>
+
+      {/* <p className="text-sm text-center">Powered by Bluetrax</p> */}
+      <footer className="w-full py-2 mt-6 border-t border-stone-200/60">
+        <div className="flex flex-col items-center justify-center text-center gap-1">
+          <p className="text-xs font-medium tracking-wide text-stone-500">
+            © {new Date().getFullYear()} Rivercross Technologies. All rights
+            reserved.
+          </p>
+          <p className="text-[11px] tracking-wider uppercase text-stone-400 font-light">
+            Powered by{" "}
+            <span className="font-normal text-stone-500">Bluetrax</span>
+          </p>
+        </div>
+      </footer>
+    </div>
   );
 }

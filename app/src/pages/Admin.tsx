@@ -18,11 +18,12 @@ import Results from "@/components/admintabsopt/Results";
 import useGetStoredDates from "@/hooks/useGetStoredDates";
 import CompetitorInfo from "@/components/admintabsopt/CompetitorInfo";
 import LoginPage from "@/components/admintabsopt/components/LoginPage";
+import { Banner } from "@/components/LeaderboardHeader";
 // import MileageResults from "./MileageResults";
 
 export default function AdminPage() {
   const navigate = useNavigate();
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState(true);
   const [selections, setSelections] = useState<Record<number, string>>({});
   const [currentTab, setCurrentTab] = useState<TabType>(TabOptionList.LIVEDATA);
 
@@ -157,9 +158,9 @@ export default function AdminPage() {
               "repeating-linear-gradient(0deg,transparent,transparent 39px,rgba(217,119,6,0.018) 39px,rgba(217,119,6,0.018) 40px),repeating-linear-gradient(90deg,transparent,transparent 39px,rgba(217,119,6,0.018) 39px,rgba(217,119,6,0.018) 40px)",
           }}
         >
-          <div className="max-w-[1400px] flex flex-col mx-auto">
+          <div className="max-w-350 flex flex-col mx-auto">
             {/* ── Header ── */}
-            <div className="flex place-items-center flex-row items-center justify-between mb-6 flex-wrap gap-3">
+            <div className="flex place-items-center flex-row items-center justify-between mb-3 flex-wrap gap-3">
               <div>
                 <h1
                   className="text-3xl sm:text-4xl font-black leading-none mb-1"
@@ -180,7 +181,9 @@ export default function AdminPage() {
                 </p>
               </div>
 
-              <div className="ml-auto flex place-items-center space-x-8">
+              <Banner />
+
+              <div className="flex place-items-center space-x-8">
                 <span
                   className="hover:cursor-pointer ml-auto"
                   onClick={() => navigate("/")}
