@@ -5,11 +5,7 @@ import {
   type FetchBaseQueryError,
 } from "@reduxjs/toolkit/query";
 import type { AuthData } from "./types";
-
-const AUTH_CREDENTIALS = {
-  username: "rhino",
-  password: "rh1no",
-};
+import { AUTH_CREDENTIALS } from "@/data";
 
 const rawBaseQuery = fetchBaseQuery({
   baseUrl: import.meta.env.VITE_APP_BASE,

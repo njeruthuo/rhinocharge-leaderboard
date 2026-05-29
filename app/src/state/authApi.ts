@@ -1,11 +1,9 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 import type { AuthResponse } from "./types";
 import { authenticateUser } from "./authSlice";
+import { AUTH_CREDENTIALS } from "@/data";
 
-const AUTH_CREDENTIALS = {
-  username: "rhino",
-  password: "rh1no",
-};
+
 
 export const authApi = createApi({
   reducerPath: "authApi",

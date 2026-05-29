@@ -42,3 +42,9 @@ export const locations: Poi[] = [
   { key: "darlingHarbour", location: { lat: -33.87488, lng: 151.1987113 } },
   { key: "barangaroo", location: { lat: -33.8605523, lng: 151.1972205 } },
 ];
+
+
+export const AUTH_CREDENTIALS = {
+  username: "api@rhinocharge.com",
+  password: "@APIrhino1",
+};
