@@ -9,10 +9,11 @@ const useMileageResults = () => {
   const startDate = DateData?.startDate;
   const endDate = DateData?.endDate;
   const isBackup = DateData?.isBackup;
+  const startTime = DateData?.startTime;
 
   useEffect(() => {
-    getMovementSummary({ startDate, endDate, isBackup });
-  }, [getMovementSummary, startDate, endDate, isBackup]);
+    getMovementSummary({ startDate, endDate, isBackup, startTime });
+  }, [getMovementSummary, startDate, endDate, isBackup, startTime]);
 
   return { data };
 };
