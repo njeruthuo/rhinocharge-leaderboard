@@ -28,3 +28,12 @@ const useAssetLocations = () => {
   return { assetLocations, isLoading };
 };
 export default useAssetLocations;
+
+export type AssetLocationType = {
+  time: string;
+  key: string;
+  location: {
+    lat: number;
+    lng: number;
+  };
+}[];

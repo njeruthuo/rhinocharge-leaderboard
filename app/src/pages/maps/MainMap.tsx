@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import { APIProvider, InfoWindow, Map } from "@vis.gl/react-google-maps";
 import { AdvancedMarker } from "@vis.gl/react-google-maps";
@@ -10,15 +10,57 @@ import {
   MY_GOOGLE_MAP_PUBLIC_ID,
 } from "@/constants";
 import useGetCheckpointLocations from "@/hooks/useGetCheckpointLocations";
-import useAssetLocations from "@/hooks/useAssetLocations";
+import useAssetLocations, {
+  type AssetLocationType,
+} from "@/hooks/useAssetLocations";
 import LeaderboardHeader from "@/components/LeaderboardHeader";
 import type { Poi } from "@/types";
 import { locations } from "@/data";
+import Search from "@/components/Search";
+
+import { useMap } from "@vis.gl/react-google-maps"; // Ensure correct library import
+
+// 1. Create a Map Controller component to handle the zooming logic
+const MapCameraController = ({
+  search,
+  assetLocations,
+}: {
+  search: string;
+  assetLocations: AssetLocationType | undefined;
+}) => {
+  const map = useMap(); // Accesses the current Google Map instance
+
+  // Use a ref to track the last searched asset to avoid infinite loops or re-centering on every minor render
+  const lastSearchedRef = useRef<string>("");
+
+  useEffect(() => {
+    if (!map || !search || !assetLocations) return;
+
+    // Find the asset that matches the searched key (case-insensitive)
+    const matchedAsset = assetLocations.find(
+      (asset) => asset.key.trim().toLowerCase() === search.trim().toLowerCase(),
+    );
+
+    if (matchedAsset && matchedAsset.key !== lastSearchedRef.current) {
+      // Update our ref tracker
+      lastSearchedRef.current = matchedAsset.key;
+
+      // Pan smoothly to the asset coordinate layout
+      map.panTo(matchedAsset.location);
+
+      // Zoom into the asset closely (e.g., zoom level 16 or 17)
+      map.setZoom(17);
+    }
+  }, [search, assetLocations, map]);
+
+  return null; // This component doesn't render any UI, it just controls the camera
+};
 
 const MainMap = () => {
   const { data: PoiLocations, isLoading } = useGetCheckpointLocations();
   const { assetLocations, isLoading: LoadingLocations } = useAssetLocations();
   const [isMapsApiReady, setIsMapsApiReady] = useState(false);
+  const [search, setSearch] = useState("");
 
   const defaultCenter = PoiLocations?.[0].location;
 
@@ -27,6 +69,7 @@ const MainMap = () => {
       <div className="max-w-3xl xl:max-w-[95vw] 2xl:max-w-[1600px] mx-auto">
         <div className="mb-4">
           <LeaderboardHeader />
+          <Search search={search} setSearch={setSearch} />
         </div>
         {!isLoading || !isMapsApiReady || LoadingLocations ? (
           <APIProvider
@@ -49,6 +92,11 @@ const MainMap = () => {
                 {assetLocations && (
                   <PoiMarkers pois={assetLocations} isCheckpoint={false} />
                 )}
+
+                <MapCameraController
+                  search={search}
+                  assetLocations={assetLocations}
+                />
               </Map>
             )}
           </APIProvider>
