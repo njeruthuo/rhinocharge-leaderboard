@@ -70,15 +70,26 @@ export const rhinoApi = createApi({
 
     getCheckPoints: build.mutation<TripRecord[], GetPoiPayload>({
       query: ({ startDate, endDate, backup }) => {
+        console.log(startDate, endDate, backup);
+
         const requestBody = {
           api_action: "get_poi_summary",
-          user_id: 1263,
-          start_date: startDate,
-          end_date: endDate,
+          user_id: 11833,
+          start_date: "2026-05-30T04:30:00",
+          end_date: "2026-05-30T14:30:00",
           region_id: 0,
-          backup: backup,
+          backup: true,
           unit_id: "",
         };
+        // const requestBody = {
+        //   api_action: "get_poi_summary",
+        //   user_id: 1263,
+        //   start_date: startDate,
+        //   end_date: endDate,
+        //   region_id: 0,
+        //   backup: backup,
+        //   unit_id: "",
+        // };
 
         return {
           url: `AnalyticsService/GetPoiSummary`,

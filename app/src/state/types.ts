@@ -115,6 +115,8 @@ export type PoiSummary = {
   unit_id: string;
 };
 
+
+
 export type ConfigType = {
   column_id: number;
   column_value: string;

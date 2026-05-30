@@ -248,6 +248,8 @@ export default function SafariLeaderBoard({
     return pathname !== "/";
   }, [pathname]);
 
+  console.log(data, "data");
+
   return (
     <div style={{ background: "#FBFBFB" }}>
       <div
