@@ -91,27 +91,8 @@ export function calculateHistory(
   start_cp: string,
   startOdometer: number,
 ): DataTypeCheckPoint[] {
-  // 1. Sort the checkpoints chronologically by time first
-  // const orderedCheckPoints = [...checkpointList].sort((a, b) => {
-  //   return new Date(a.start_time).getTime() - new Date(b.start_time).getTime();
-  // });
+  console.log(startOdometer, "startOdometer");
 
-  // 2. Find the start checkpoint from the SORTED list to know its exact chronological position
-  // const startCpIndex = orderedCheckPoints.findIndex(
-  //   (checkpoint) =>
-  //     checkpoint.poi_name.toLowerCase().trim() ===
-  //     start_cp.toLowerCase().trim(),
-  // );
-
-  // console.log(startCpIndex, "startCpIndex");
-
-  // Fallback to 0 if the start_cp isn't found
-  // const baseStartCp =
-  //   startCpIndex !== -1
-  //     ? orderedCheckPoints[startCpIndex]
-  //     : orderedCheckPoints[0];
-
-  // const baseOdometer = baseStartCp?.start_odo || 0;
   const baseOdometer = startOdometer;
 
   // const seenNames = new Set();

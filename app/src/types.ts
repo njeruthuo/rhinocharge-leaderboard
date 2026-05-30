@@ -69,6 +69,7 @@ export type PointToPointType = {
 };
 
 export type DataType = {
+  startOdometer?: number;
   id: number | string;
   asset_id: number;
   carNo: string;
@@ -89,6 +90,7 @@ export type DataType = {
   }[];
   orderedCheckpoints: DataTypeCheckPoint[];
   pointToPointMileage: PointToPointType;
+  // startOdometer: number;
 };
 
 export interface DataTypeCheckPoint {

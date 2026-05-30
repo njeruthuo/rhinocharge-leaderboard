@@ -23,9 +23,11 @@ import { Banner } from "@/components/LeaderboardHeader";
 
 export default function AdminPage() {
   const navigate = useNavigate();
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState(true);
   const [selections, setSelections] = useState<Record<number, string>>({});
   const [currentTab, setCurrentTab] = useState<TabType>(TabOptionList.LIVEDATA);
+
+  const { data, LoadingVehicleList, LoadingCheckPoints } = useDriverList();
 
   const [isGenerating, setIsGenerating] = useState(false);
 
@@ -56,8 +58,6 @@ export default function AdminPage() {
   useEffect(() => {
     setTime(resolvedTime);
   }, [resolvedTime]);
-
-  const { data, LoadingVehicleList, LoadingCheckPoints } = useDriverList();
 
   const handleUpload = async () => {
     if (!file) return;
@@ -130,7 +130,14 @@ export default function AdminPage() {
   };
 
   const TabOptions: Record<TabType, React.ReactNode> = {
-    [TabOptionList.LIVEDATA]: <SafariLeaderBoard showHeader={false} />,
+    [TabOptionList.LIVEDATA]: (
+      <SafariLeaderBoard
+        data={data}
+        LoadingCheckPoints={LoadingCheckPoints}
+        LoadingVehicleList={LoadingVehicleList}
+        showHeader={false}
+      />
+    ),
     [TabOptionList.COMPETITORS]: (
       <CompetitorInfo
         LoadingData={LoadingCheckPoints || LoadingVehicleList}
@@ -143,7 +150,13 @@ export default function AdminPage() {
     ),
     // [TabOptionList.RESULTS]: <MileageResults />,
     [TabOptionList.RESULTS]: (
-      <Results setOpenFilter={setOpenFilter} openFilter={openFilter} />
+      <Results
+        data={data}
+        LoadingCheckPoints={LoadingCheckPoints}
+        LoadingVehicleList={LoadingVehicleList}
+        setOpenFilter={setOpenFilter}
+        openFilter={openFilter}
+      />
     ),
   };
 

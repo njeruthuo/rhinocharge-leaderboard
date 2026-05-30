@@ -3,17 +3,20 @@ import { AnimatePresence } from "framer-motion";
 
 // import Search from "../Search";
 // import { tune } from "@/constants";
-import type { ResultsProps } from "@/types";
-import useDriverList from "@/hooks/useDriverList";
+import type { DataType, ResultsProps } from "@/types";
 
 const Results = ({
   setOpenFilter,
-  // openFilter
-}: ResultsProps) => {
+  data,
+  LoadingCheckPoints,
+  LoadingVehicleList,
+}: ResultsProps & {
+  data: DataType[];
+  LoadingVehicleList: boolean;
+  LoadingCheckPoints: boolean;
+}) => {
   // const [search, setSearch] = useState("");
   const dropdownRef = useRef<HTMLDivElement>(null);
-
-  const { data, LoadingVehicleList, LoadingCheckPoints } = useDriverList();
 
   const isLoading = useMemo(() => {
     return data.length < 1 && (LoadingVehicleList || LoadingCheckPoints);

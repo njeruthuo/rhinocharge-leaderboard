@@ -120,7 +120,7 @@ const useDriverList = () => {
       return;
     }
 
-    const fromDate = new Date(DateData?.startDate);
+    // const fromDate = new Date(DateData?.startDate);
     const startDate = new Date(DateData?.startDate);
     if (DateData?.startTime) {
       // Split "07:31:00" into [7, 31, 0]
@@ -148,8 +148,10 @@ const useDriverList = () => {
               try {
                 odometerData = await getStartOdometer({
                   unit_id: String(item.device_id),
-                  start_date: formatDate(fromDate),
-                  end_date: formatDate(startDate),
+                  end_date: "2026-05-30T07:30:00",
+                  start_date: "2026-05-30T07:29:00",
+                  // start_date: formatDate(fromDate),
+                  // end_date: formatDate(startDate),
                   user_id: 1263,
                   backup: true,
                 }).unwrap();
@@ -181,6 +183,7 @@ const useDriverList = () => {
                 calculated_odometer: 0,
                 distanceFromBase: 0,
                 next: "",
+                startOdometer: startOdometer,
               };
             });
 
@@ -222,6 +225,7 @@ const useDriverList = () => {
               orderedCheckpoints: history,
               complete: isTripComplete,
               pointToPointMileage: pointToPointMileage,
+              startOdometer: startOdometer,
             };
           },
         );

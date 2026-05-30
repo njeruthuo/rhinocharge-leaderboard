@@ -1,13 +1,14 @@
 import { useState, useMemo } from "react";
 import { motion, AnimatePresence, Reorder } from "framer-motion";
 import type { CheckPoint, Driver } from "@/types";
-import useDriverList from "@/hooks/useDriverList";
 import { colors, permanentColors, spinner } from "@/constants";
 import DesktopTable from "@/components/DesktopTable";
 import { CHECKPOINTS } from "@/data";
 import { getCheckpointStatus } from "@/utils";
 import { useLocation } from "react-router-dom";
 import LeaderboardHeader from "@/components/LeaderboardHeader";
+import type { DataType } from "@/types";
+import useDriverList from "@/hooks/useDriverList";
 
 function CheckpointBadge({
   cp,
@@ -229,26 +230,47 @@ function LeaderboardRow({
 
 export default function SafariLeaderBoard({
   showHeader = true,
+  data,
+  LoadingCheckPoints,
+  LoadingVehicleList,
 }: {
   showHeader?: boolean;
+  data?: DataType[];
+  LoadingVehicleList?: boolean;
+  LoadingCheckPoints?: boolean;
 }) {
   const { pathname } = useLocation();
 
-  const { data, LoadingVehicleList, LoadingCheckPoints } = useDriverList();
+  const {
+    data: FreshData,
+    LoadingVehicleList: FreshIsLoading,
+    LoadingCheckPoints: FreshLoadingChecks,
+  } = useDriverList();
 
+  // 2. Determine active state values (prioritize incoming props ?? drop back to hook data)
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const activeData = data ?? FreshData ?? [];
+  const activeLoadingVehicleList = LoadingVehicleList ?? FreshIsLoading;
+  const activeLoadingCheckPoints = LoadingCheckPoints ?? FreshLoadingChecks;
+
+  // 3. Fixed the typo and mapped to active states
   const loadingState = useMemo(() => {
-    return data.length < 1 && (LoadingVehicleList || LoadingCheckPoints);
-  }, [data, LoadingVehicleList, LoadingCheckPoints]);
+    return (
+      activeData.length < 1 &&
+      (activeLoadingVehicleList || activeLoadingCheckPoints)
+    );
+  }, [activeData, activeLoadingVehicleList, activeLoadingCheckPoints]);
 
+  // 4. Sorts dynamically whenever the active resolved dataset shifts
   const drivers = useMemo(() => {
-    return [...data].sort((a, b) => b.totalCps - a.totalCps);
-  }, [data]);
+    return [...activeData].sort((a, b) => b.totalCps - a.totalCps);
+  }, [activeData]);
 
   const isViewer = useMemo((): boolean => {
     return pathname !== "/";
   }, [pathname]);
 
-  console.log(data, "data");
+  console.log(drivers, "drivers");
 
   return (
     <div style={{ background: "#FBFBFB" }}>
