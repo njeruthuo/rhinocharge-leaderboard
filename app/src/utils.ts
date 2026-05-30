@@ -91,7 +91,6 @@ export function calculateHistory(
   start_cp: string,
   startOdometer: number,
 ): DataTypeCheckPoint[] {
-  console.log(startOdometer, "startOdometer");
 
   const baseOdometer = startOdometer;
 

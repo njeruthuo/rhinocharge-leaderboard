@@ -7,13 +7,13 @@ import {
 } from "@/state/rhinoApi";
 import {
   calculateHistory,
-  calculatePointToPointMileage,
+  // calculatePointToPointMileage,
   formatDate,
   parseTime,
 } from "@/utils";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import useGetStoredDates from "./useGetStoredDates";
-import type { DataType } from "@/types";
+import type { DataType, PointToPointType } from "@/types";
 import { useGetDataPointQuery } from "@/state/storage";
 // import useMileageResults from "./useMileageResults";
 
@@ -193,13 +193,13 @@ const useDriverList = () => {
               startOdometer,
             );
 
-            const pointToPointMileage = await calculatePointToPointMileage(
-              checkPointList,
-              getMovementSummary,
-              resolvedTime.isBackup, // get the start time here for the first CP
-              String(item.device_id),
-              item.asset_name,
-            );
+            // const pointToPointMileage = await calculatePointToPointMileage(
+            //   checkPointList,
+            //   getMovementSummary,
+            //   resolvedTime.isBackup, // get the start time here for the first CP
+            //   String(item.device_id),
+            //   item.asset_name,
+            // );
 
             const cumulativeOdometer = history.reduce(
               (accumulator, currentItem) => {
@@ -224,7 +224,8 @@ const useDriverList = () => {
               checkpoints: checkPoints,
               orderedCheckpoints: history,
               complete: isTripComplete,
-              pointToPointMileage: pointToPointMileage,
+              pointToPointMileage: [] as unknown as PointToPointType,
+              // pointToPointMileage: pointToPointMileage,
               startOdometer: startOdometer,
             };
           },
