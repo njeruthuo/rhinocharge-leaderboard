@@ -241,6 +241,26 @@ export type ExportRow =
       POSITION: number;
       SECTOR: number;
       DISTANCE: number | string;
+    }
+  | {
+      CAR: string;
+      DRIVER: string;
+      TEAM: string;
+      MILEAGE: number;
+      CPS: number;
+      // KWS;
+      // TOOLCRAFT;
+      // AUTOXPRESS;
+      // SATAO;
+      // "OCEAN AGRICULTURE";
+      // MANTECH;
+      // "TIRE WORLD";
+      // GRIDLESS;
+      // "COPY CAT";
+      // AQUAMIST;
+      // "FLOWER WATCH";
+      // SOLEX;
+      // "SLATER & WHITTAKER";
     };
 
 export type DriverTypeProps = {

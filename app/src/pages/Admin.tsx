@@ -23,6 +23,7 @@ import useGetStoredDates from "@/hooks/useGetStoredDates";
 import CompetitorInfo from "@/components/admintabsopt/CompetitorInfo";
 import LoginPage from "@/components/admintabsopt/components/LoginPage";
 import { Banner } from "@/components/LeaderboardHeader";
+import ActionButton from "@/components/ActionButton";
 // import MileageResults from "./MileageResults";
 
 export default function AdminPage({
@@ -65,32 +66,6 @@ export default function AdminPage({
     setTime(resolvedTime);
   }, [resolvedTime]);
 
-  // const orderedData = useMemo(() => {
-  //   return [...data].sort((a, b) => {
-  //     // First sort by totalCps (descending)
-  //     if (b.totalCps !== a.totalCps) {
-  //       return b.totalCps - a.totalCps;
-  //     }
-
-  //     // Calculate total mileage for a
-  //     const mileageA =
-  //       a.pointToPointMileage?.checkpoints?.reduce(
-  //         (sum, checkpoint) => sum + checkpoint.mileage,
-  //         0,
-  //       ) ?? 0;
-
-  //     // Calculate total mileage for b
-  //     const mileageB =
-  //       b.pointToPointMileage?.checkpoints?.reduce(
-  //         (sum, checkpoint) => sum + checkpoint.mileage,
-  //         0,
-  //       ) ?? 0;
-
-  //     // Least mileage first
-  //     return mileageA - mileageB;
-  //   });
-  // }, [data]);
-
   const handleUpload = async () => {
     if (!file) return;
 
@@ -110,61 +85,78 @@ export default function AdminPage({
     });
   };
 
-  const handleExport = (exportTable: boolean = false) => {
+  const handleExport = (
+    exportTable: boolean = false,
+    exportLiveData = false,
+  ) => {
     setIsGenerating(true);
 
     let flatRows: ExportRow[] = [];
-    if (!exportTable) {
-      flatRows = data.flatMap((item) => {
-        // Access the nested mileage object structure safely
-        const mileageGroup = item.pointToPointMileage;
-
-        if (!mileageGroup || !mileageGroup.checkpoints) return [];
-
-        // Map each checkpoint for this specific asset
-        const rows = mileageGroup.checkpoints.map((cp) => ({
-          VEHICLE: mileageGroup.assetName,
-          "CP ONE": cp.Checkpoint1 ? cp.Checkpoint1.toUpperCase() : "",
-          "CP TWO": cp.Checkpoint2 ? cp.Checkpoint2.toUpperCase() : "",
-          "ACTUAL DISTANCE":
-            typeof cp.mileage === "number" ? cp.mileage.toFixed(3) : "0.000",
-        }));
-
-        return [
-          ...rows,
-          { VEHICLE: "", "CP ONE": "", "CP TWO": "", "ACTUAL DISTANCE": "" },
-        ];
-      });
+    if (exportLiveData) {
+      if (data) {
+        flatRows = data.map((item) => {
+          return {
+            CAR: item.carNo,
+            DRIVER: item.entrantName,
+            TEAM: item.team_name,
+            MILEAGE: item.mileage,
+            CPS: item.totalCps,
+          };
+        });
+      }
     } else {
-      flatRows = data.flatMap((item, index) => {
-        // Access the nested mileage object structure safely
-        const mileageGroup = item.pointToPointMileage;
+      if (!exportTable) {
+        flatRows = data.flatMap((item) => {
+          // Access the nested mileage object structure safely
+          const mileageGroup = item.pointToPointMileage;
 
-        if (!mileageGroup || !mileageGroup.checkpoints) return [];
+          if (!mileageGroup || !mileageGroup.checkpoints) return [];
 
-        // Map each checkpoint for this specific asset
-        return {
-          CAR: mileageGroup.assetName,
-          DRIVER: item.entrantName,
-          TEAM: item.team_name,
-          POSITION: index + 1,
-          SECTOR:
-            item.orderedCheckpoints.length > 1
-              ? item.orderedCheckpoints.length - 1
-              : 0,
-          DISTANCE: mileageGroup.checkpoints
-            .reduce(
-              (accumulator, currentItem) => accumulator + currentItem.mileage,
-              0,
-            )
-            .toFixed(3),
-        };
-      });
+          // Map each checkpoint for this specific asset
+          const rows = mileageGroup.checkpoints.map((cp) => ({
+            VEHICLE: mileageGroup.assetName,
+            "CP ONE": cp.Checkpoint1 ? cp.Checkpoint1.toUpperCase() : "",
+            "CP TWO": cp.Checkpoint2 ? cp.Checkpoint2.toUpperCase() : "",
+            "ACTUAL DISTANCE":
+              typeof cp.mileage === "number" ? cp.mileage.toFixed(3) : "0.000",
+          }));
+
+          return [
+            ...rows,
+            { VEHICLE: "", "CP ONE": "", "CP TWO": "", "ACTUAL DISTANCE": "" },
+          ];
+        });
+      } else {
+        flatRows = data.flatMap((item, index) => {
+          // Access the nested mileage object structure safely
+          const mileageGroup = item.pointToPointMileage;
+
+          if (!mileageGroup || !mileageGroup.checkpoints) return [];
+
+          // Map each checkpoint for this specific asset
+          return {
+            CAR: mileageGroup.assetName,
+            DRIVER: item.entrantName,
+            TEAM: item.team_name,
+            POSITION: index + 1,
+            SECTOR:
+              item.orderedCheckpoints.length > 1
+                ? item.orderedCheckpoints.length - 1
+                : 0,
+            DISTANCE: mileageGroup.checkpoints
+              .reduce(
+                (accumulator, currentItem) => accumulator + currentItem.mileage,
+                0,
+              )
+              .toFixed(3),
+          };
+        });
+      }
     }
 
     if (flatRows.length === 0) {
-      console.warn("No checkpoint data found to export.");
       setIsGenerating(false);
+      alert("No checkpoint data found to export.");
       return;
     }
 
@@ -179,13 +171,11 @@ export default function AdminPage({
     const link = document.createElement("a");
 
     // If exporting multiple cars, fallback to a generic name or use the first asset's name
-    const firstAssetName =
-      data[0]?.pointToPointMileage?.assetName || "vehicles";
 
     link.setAttribute("href", url);
     link.setAttribute(
       "download",
-      `${!exportTable ? `${firstAssetName}_movement_summary` : `Exported Table Data`}.csv`,
+      `${exportLiveData ? "Live Data" : !exportTable ? `Movement_summary` : `Exported Table Data`}.csv`,
     );
     link.style.visibility = "hidden";
 
@@ -289,7 +279,13 @@ export default function AdminPage({
                 />
               </div>
               {currentTab === TabOptionList.LIVEDATA && (
-                <div className="flex items-center space-x-2 shrink-0 sm:mb-6">
+                <div className="flex place-items-center justify-center   space-x-2 shrink-0 sm:mb-6">
+                  <ActionButton
+                    clickHandler={() => handleExport(false, true)}
+                    isLoading={isGenerating}
+                    text="Export table data"
+                    textLoading="Exporting..."
+                  />
                   <TimePicker
                     value={time}
                     onChange={(name: string, value: string | boolean) =>
@@ -301,38 +297,18 @@ export default function AdminPage({
               )}
               {currentTab === TabOptionList.RESULTS && (
                 <div className="flex flex-row space-x-2 ">
-                  <div className="flex items-center space-x-2 shrink-0 sm:mb-6">
-                    <button
-                      onClick={() => handleExport(true)}
-                      // onClick={() => setOpenFilter(false)}
-                      disabled={isGenerating}
-                      className="flex-1 rounded-lg py-2 text-xs font-black tracking-wider uppercase transition-colors disabled:opacity-40 disabled:cursor-not-allowed mt-4 w-full hover:cursor-pointer bg-amber-600 hover:bg-amber-700 text-white rounded-md py-1.5 text-sm font-medium transition-colors shadow-sm px-2"
-                      style={{
-                        background: "rgba(217,119,6,0.18)",
-                        color: "#D97706",
-                        border: "1px solid rgba(217,119,6,0.3)",
-                        fontFamily: "'Oswald', sans-serif",
-                      }}
-                    >
-                      {isGenerating ? "Exporting..." : "Export table data"}
-                    </button>
-                  </div>
-                  <div className="flex items-center space-x-2 shrink-0 sm:mb-6">
-                    <button
-                      onClick={() => handleExport(false)}
-                      // onClick={() => setOpenFilter(false)}
-                      disabled={isGenerating}
-                      className="flex-1 rounded-lg py-2 text-xs font-black tracking-wider uppercase transition-colors disabled:opacity-40 disabled:cursor-not-allowed mt-4 w-full hover:cursor-pointer bg-amber-600 hover:bg-amber-700 text-white rounded-md py-1.5 text-sm font-medium transition-colors shadow-sm px-2"
-                      style={{
-                        background: "rgba(217,119,6,0.18)",
-                        color: "#D97706",
-                        border: "1px solid rgba(217,119,6,0.3)",
-                        fontFamily: "'Oswald', sans-serif",
-                      }}
-                    >
-                      {isGenerating ? "Generating..." : "Generate report"}
-                    </button>
-                  </div>
+                  <ActionButton
+                    clickHandler={() => handleExport(true)}
+                    isLoading={isGenerating}
+                    text="Export table data"
+                    textLoading="Exporting..."
+                  />
+                  <ActionButton
+                    clickHandler={() => handleExport(false)}
+                    isLoading={isGenerating}
+                    text="Generate report"
+                    textLoading="Generating..."
+                  />
                 </div>
               )}
             </div>
