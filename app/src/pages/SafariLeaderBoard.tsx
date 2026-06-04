@@ -1,14 +1,12 @@
 import { useState, useMemo } from "react";
 import { motion, AnimatePresence, Reorder } from "framer-motion";
-import type { CheckPoint, Driver } from "@/types";
+import type { CheckPoint, Driver, DriverTypeProps } from "@/types";
 import { colors, permanentColors, spinner } from "@/constants";
 import DesktopTable from "@/components/DesktopTable";
 import { CHECKPOINTS } from "@/data";
 import { getCheckpointStatus } from "@/utils";
 import { useLocation } from "react-router-dom";
 import LeaderboardHeader from "@/components/LeaderboardHeader";
-import type { DataType } from "@/types";
-import useDriverList from "@/hooks/useDriverList";
 
 function CheckpointBadge({
   cp,
@@ -70,7 +68,9 @@ function LeaderboardRow({
 }) {
   const [isOpen, setIsOpen] = useState(false);
   const totalCheckpoints = checkpoints.length;
-  const progress = Math.round((driver.totalCps / totalCheckpoints) * 100);
+  const progress = Math.round(
+    (driver.orderedCheckpoints.length / totalCheckpoints) * 100,
+  );
 
   return (
     <motion.div layout className="relative">
@@ -235,42 +235,21 @@ export default function SafariLeaderBoard({
   LoadingVehicleList,
 }: {
   showHeader?: boolean;
-  data?: DataType[];
-  LoadingVehicleList?: boolean;
-  LoadingCheckPoints?: boolean;
-}) {
+} & DriverTypeProps) {
   const { pathname } = useLocation();
 
-  const {
-    data: FreshData,
-    LoadingVehicleList: FreshIsLoading,
-    LoadingCheckPoints: FreshLoadingChecks,
-  } = useDriverList();
-
-  // 2. Determine active state values (prioritize incoming props ?? drop back to hook data)
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  const activeData = data ?? FreshData ?? [];
-  const activeLoadingVehicleList = LoadingVehicleList ?? FreshIsLoading;
-  const activeLoadingCheckPoints = LoadingCheckPoints ?? FreshLoadingChecks;
-
-  // 3. Fixed the typo and mapped to active states
   const loadingState = useMemo(() => {
-    return (
-      activeData.length < 1 &&
-      (activeLoadingVehicleList || activeLoadingCheckPoints)
-    );
-  }, [activeData, activeLoadingVehicleList, activeLoadingCheckPoints]);
+    return data.length < 1 && (LoadingVehicleList || LoadingCheckPoints);
+  }, [data, LoadingVehicleList, LoadingCheckPoints]);
 
   // 4. Sorts dynamically whenever the active resolved dataset shifts
   const drivers = useMemo(() => {
-    return [...activeData].sort((a, b) => b.totalCps - a.totalCps);
-  }, [activeData]);
+    return [...data].sort((a, b) => b.totalCps - a.totalCps);
+  }, [data]);
 
   const isViewer = useMemo((): boolean => {
     return pathname !== "/";
   }, [pathname]);
-
-  console.log(drivers, "drivers");
 
   return (
     <div style={{ background: "#FBFBFB" }}>
@@ -357,7 +336,6 @@ export default function SafariLeaderBoard({
               </AnimatePresence>
             </Reorder.Group>
           </div>
-          {/* ✅ use already-computed checkpoints variable, no hook call */}
           <div className="mt-6 flex items-center gap-4 flex-wrap">
             <div className="h-px flex-1 bg-stone-800" />
             <span className="text-[9px] tracking-widest text-stone-700 uppercase">

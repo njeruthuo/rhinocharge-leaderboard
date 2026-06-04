@@ -9,11 +9,15 @@ import Toast from "@/components/Toast";
 
 import Upload from "@/components/Upload";
 import TimePicker from "@/components/RaceClock";
-import useDriverList from "@/hooks/useDriverList";
 
 import { AdminTabs } from "@/components/AdminTabs";
 import SafariLeaderBoard from "./SafariLeaderBoard";
-import { TabOptionList, type ExportRow, type TabType } from "@/types";
+import {
+  TabOptionList,
+  type DriverTypeProps,
+  type ExportRow,
+  type TabType,
+} from "@/types";
 import Results from "@/components/admintabsopt/Results";
 import useGetStoredDates from "@/hooks/useGetStoredDates";
 import CompetitorInfo from "@/components/admintabsopt/CompetitorInfo";
@@ -21,13 +25,15 @@ import LoginPage from "@/components/admintabsopt/components/LoginPage";
 import { Banner } from "@/components/LeaderboardHeader";
 // import MileageResults from "./MileageResults";
 
-export default function AdminPage() {
+export default function AdminPage({
+  data,
+  LoadingCheckPoints,
+  LoadingVehicleList,
+}: DriverTypeProps) {
   const navigate = useNavigate();
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [selections, setSelections] = useState<Record<number, string>>({});
   const [currentTab, setCurrentTab] = useState<TabType>(TabOptionList.LIVEDATA);
-
-  const { data, LoadingVehicleList, LoadingCheckPoints } = useDriverList();
 
   const [isGenerating, setIsGenerating] = useState(false);
 
@@ -146,7 +152,7 @@ export default function AdminPage() {
               (accumulator, currentItem) => accumulator + currentItem.mileage,
               0,
             )
-            .toFixed(3)
+            .toFixed(3),
         };
       });
     }

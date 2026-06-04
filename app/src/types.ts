@@ -242,3 +242,9 @@ export type ExportRow =
       SECTOR: number;
       DISTANCE: number | string;
     };
+
+export type DriverTypeProps = {
+  data: DataType[];
+  LoadingVehicleList: boolean;
+  LoadingCheckPoints: boolean;
+};

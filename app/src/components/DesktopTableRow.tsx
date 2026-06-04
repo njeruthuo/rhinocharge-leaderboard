@@ -81,6 +81,7 @@ function DesktopTableRow({
           {driver.team_name}
         </div>
       </td>
+
       {CHECKPOINTS.map((cpName, index) => {
         const cpData = driver?.orderedCheckpoints?.find(
           (c) => c?.point === cpName.toUpperCase(),
