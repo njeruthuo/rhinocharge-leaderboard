@@ -23,7 +23,29 @@ const Results = ({
   }, [data, LoadingVehicleList, LoadingCheckPoints]);
 
   const orderedData = useMemo(() => {
-    return [...data].sort((a, b) => b.totalCps - a.totalCps);
+    return [...data].sort((a, b) => {
+      // First sort by totalCps (descending)
+      if (b.totalCps !== a.totalCps) {
+        return b.totalCps - a.totalCps;
+      }
+
+      // Calculate total mileage for a
+      const mileageA =
+        a.pointToPointMileage?.checkpoints?.reduce(
+          (sum, checkpoint) => sum + checkpoint.mileage,
+          0,
+        ) ?? 0;
+
+      // Calculate total mileage for b
+      const mileageB =
+        b.pointToPointMileage?.checkpoints?.reduce(
+          (sum, checkpoint) => sum + checkpoint.mileage,
+          0,
+        ) ?? 0;
+
+      // Least mileage first
+      return mileageA - mileageB;
+    });
   }, [data]);
 
   // const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
@@ -314,7 +336,9 @@ const Results = ({
                               margin: "20px 0",
                             }}
                           >
-                            {car.orderedCheckpoints.length}
+                            {car.orderedCheckpoints.length > 1
+                              ? car.orderedCheckpoints.length - 1
+                              : 0}
                           </span>
                         </td>
                         <td
