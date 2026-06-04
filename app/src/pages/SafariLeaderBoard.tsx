@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, memo } from "react";
 import { motion, AnimatePresence, Reorder } from "framer-motion";
 import type { CheckPoint, Driver, DriverTypeProps } from "@/types";
 import { colors, permanentColors, spinner } from "@/constants";
@@ -228,7 +228,7 @@ function LeaderboardRow({
   );
 }
 
-export default function SafariLeaderBoard({
+function SafariLeaderBoard({
   showHeader = true,
   data,
   LoadingCheckPoints,
@@ -379,3 +379,4 @@ export default function SafariLeaderBoard({
     </div>
   );
 }
+export default memo(SafariLeaderBoard);

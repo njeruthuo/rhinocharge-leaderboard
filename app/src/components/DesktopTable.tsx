@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { memo, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
 import { useLocation } from "react-router-dom";
@@ -204,4 +204,4 @@ function DesktopTable({
     </div>
   );
 }
-export default DesktopTable;
+export default memo(DesktopTable);

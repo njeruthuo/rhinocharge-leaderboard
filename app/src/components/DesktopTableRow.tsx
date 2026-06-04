@@ -2,7 +2,7 @@ import { CHECKPOINTS } from "@/data";
 import type { DesktopRowType } from "@/types";
 import { motion } from "framer-motion";
 
-import React from "react";
+import React, { memo } from "react";
 import CheckpointCell from "./CheckpointCell";
 
 const TD_V = 12;
@@ -103,6 +103,7 @@ function DesktopTableRow({
             }}
           >
             <CheckpointCell
+              driver={driver}
               completeTrip={completeTrip}
               isViewer={isViewer}
               mileage={driver.mileage}
@@ -170,4 +171,4 @@ function DesktopTableRow({
   );
 }
 
-export default DesktopTableRow;
+export default memo(DesktopTableRow);
