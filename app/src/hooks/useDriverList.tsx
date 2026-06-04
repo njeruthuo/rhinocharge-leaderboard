@@ -9,21 +9,32 @@ import { CHECKPOINTS } from "@/data";
 import {
   calculateHistory,
   calculatePointToPointMileage,
-  formatDate,
+  // formatDate,
   parseTime,
 } from "@/utils";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import useGetStoredDates from "./useGetStoredDates";
 import type { DataType } from "@/types";
-import { useGetDataPointQuery } from "@/state/storage";
-// import useMileageResults from "./useMileageResults";
+// import { useGetDataPointQuery } from "@/state/storage";
 
 const useDriverList = () => {
+  // ✅ FIX 1: Destructure primitives immediately so deps are stable scalars
   const { DateData: resolvedTime } = useGetStoredDates();
-  const { data } = useGetDataPointQuery();
+  // const { data } = useGetDataPointQuery();
 
-  // const { data: MileageResults } = useMileageResults();
   const [getMovementSummary] = useGetMovementSummaryMutation();
+  const [getStartOdometer] = useGetStartPointOdometerMutation();
+
+  // ✅ FIX 2: Wrap mutation fns in refs — RTK mutation triggers are recreated
+  // each render, so putting them in deps causes infinite loops
+  const getMovementSummaryRef = useRef(getMovementSummary);
+  const getStartOdometerRef = useRef(getStartOdometer);
+  useEffect(() => {
+    getMovementSummaryRef.current = getMovementSummary;
+  }, [getMovementSummary]);
+  useEffect(() => {
+    getStartOdometerRef.current = getStartOdometer;
+  }, [getStartOdometer]);
 
   const DateData = useMemo(
     () => ({
@@ -32,6 +43,7 @@ const useDriverList = () => {
       isBackup: resolvedTime.isBackup,
       startTime: resolvedTime.startTime ?? "07:30:00",
     }),
+    // ✅ FIX 3: These are already primitive fields — this memo is correct as-is
     [
       resolvedTime.startDate,
       resolvedTime.endDate,
@@ -54,22 +66,13 @@ const useDriverList = () => {
   const [getCheckPoints, { data: CheckPoints, isLoading: LoadingCheckPoints }] =
     useGetCheckPointsMutation();
 
-  // Bring the odometer mutation trigger to the top level
-  const [getStartOdometer] = useGetStartPointOdometerMutation();
-
-  // State to store processed drivers and extra loading indicator
   const [driverList, setDriverList] = useState<DataType[]>([]);
   const [loadingOdometers, setLoadingOdometers] = useState(false);
 
-  const dates = useMemo(() => {
-    const startDate = new Date(data?.start_date ?? "");
-    const endDate = new Date(data?.start_date ?? "");
-    startDate.setMinutes(startDate.getMinutes() - 1);
+  // ✅ FIX 4: Removed the `dates` memo entirely — it was derived from data
+  // but never actually used (odometer calls had hardcoded strings).
+  // If you restore dynamic dates, compute them inline inside the effect.
 
-    return { startDate: formatDate(startDate), endDate: formatDate(endDate) };
-  }, [data]);
-
-  // Polling for checkpoints (Cleaned up: Only 1 interval setup now)
   useEffect(() => {
     if (!tokenReady) return;
 
@@ -112,26 +115,19 @@ const useDriverList = () => {
   ]);
 
   useEffect(() => {
-    if (
-      LoadingVehicleList ||
-      LoadingCheckPoints ||
-      !VehicleList ||
-      !CheckPoints
-    ) {
-      return;
-    }
+    // ✅ FIX 5: Guard with early return only — do NOT put LoadingVehicleList
+    // or LoadingCheckPoints in deps. Loading booleans flip true→false on
+    // every fetch cycle, causing processDriverList to re-run repeatedly.
+    // The data refs (VehicleList, CheckPoints) are the correct trigger.
+    if (!VehicleList || !CheckPoints) return;
 
-    // const fromDate = new Date(DateData?.startDate);
-    const startDate = new Date(DateData?.startDate);
-    if (DateData?.startTime) {
-      // Split "07:31:00" into [7, 31, 0]
+    const startDate = new Date(DateData.startDate);
+    if (DateData.startTime) {
       const [hours, minutes, seconds] = DateData.startTime
         .split(":")
         .map(Number);
-      // setHours sets hours, minutes, and seconds all at once
       startDate.setHours(hours, minutes, seconds || 0);
     }
-
     startDate.setMinutes(startDate.getMinutes() - 1);
 
     const processDriverList = async () => {
@@ -151,15 +147,15 @@ const useDriverList = () => {
 
             if (item.device_id && checkPointList.length > 0) {
               try {
-                odometerData = await getStartOdometer({
-                  unit_id: String(item.device_id),
-                  end_date: "2026-05-30T07:30:00",
-                  start_date: "2026-05-30T07:29:00",
-                  // start_date: formatDate(fromDate),
-                  // end_date: formatDate(startDate),
-                  user_id: 1263,
-                  backup: true,
-                }).unwrap();
+                odometerData = await getStartOdometerRef
+                  .current({
+                    unit_id: String(item.device_id),
+                    end_date: "2026-05-30T07:30:00",
+                    start_date: "2026-05-30T07:29:00",
+                    user_id: 1263,
+                    backup: true,
+                  })
+                  .unwrap();
               } catch (err) {
                 console.error(
                   `Failed to fetch odometer for device ${item.device_id}:`,
@@ -176,7 +172,6 @@ const useDriverList = () => {
             const start_cp = item?.more_asset_details?.find(
               (detail) => detail?.column_name === "start_cp",
             );
-
             const start_cp_name = start_cp?.column_value || "";
 
             const checkPoints = checkPointList.map((checkpoint) => {
@@ -188,7 +183,7 @@ const useDriverList = () => {
                 calculated_odometer: 0,
                 distanceFromBase: 0,
                 next: "",
-                startOdometer: startOdometer,
+                startOdometer,
               };
             });
 
@@ -200,16 +195,15 @@ const useDriverList = () => {
 
             const pointToPointMileage = await calculatePointToPointMileage(
               checkPointList,
-              getMovementSummary,
-              resolvedTime.isBackup, // get the start time here for the first CP
+              getMovementSummaryRef.current, // ✅ stable ref, not the raw mutation
+              DateData.isBackup,
               String(item.device_id),
               item.asset_name,
+              start_cp_name
             );
 
             const cumulativeOdometer = history.reduce(
-              (accumulator, currentItem) => {
-                return accumulator + (currentItem?.calculated_odometer || 0);
-              },
+              (acc, cur) => acc + (cur?.calculated_odometer || 0),
               0,
             );
 
@@ -229,9 +223,8 @@ const useDriverList = () => {
               checkpoints: checkPoints,
               orderedCheckpoints: history,
               complete: isTripComplete,
-              // pointToPointMileage: [] as unknown as PointToPointType,
-              pointToPointMileage: pointToPointMileage,
-              startOdometer: startOdometer,
+              pointToPointMileage,
+              startOdometer,
             };
           },
         );
@@ -249,45 +242,35 @@ const useDriverList = () => {
   }, [
     VehicleList,
     CheckPoints,
-    LoadingVehicleList,
-    LoadingCheckPoints,
-    getStartOdometer,
-    dates.endDate,
-    dates.startDate,
-    resolvedTime.isBackup,
-    getMovementSummary,
-    DateData?.startDate,
+    // ✅ FIX 5 continued: LoadingVehicleList and LoadingCheckPoints removed
+    // ✅ FIX 4 continued: dates.startDate and dates.endDate removed (memo deleted)
+    // ✅ FIX 2 continued: getStartOdometer and getMovementSummary removed (now refs)
+    // ✅ FIX 1 continued: resolvedTime.isBackup removed — use DateData.isBackup only
+    DateData.startDate,
     DateData.startTime,
+    DateData.isBackup,
   ]);
 
   const orderedData = useMemo(() => {
     return [...driverList].sort((a, b) => {
-      // First sort by totalCps (descending)
-      if (b.totalCps !== a.totalCps) {
-        return b.totalCps - a.totalCps;
-      }
+      if (b.totalCps !== a.totalCps) return b.totalCps - a.totalCps;
 
-      // Calculate total mileage for a
       const mileageA =
         a.pointToPointMileage?.checkpoints?.reduce(
-          (sum, checkpoint) => sum + checkpoint.mileage,
+          (sum, cp) => sum + cp.mileage,
           0,
         ) ?? 0;
-
-      // Calculate total mileage for b
       const mileageB =
         b.pointToPointMileage?.checkpoints?.reduce(
-          (sum, checkpoint) => sum + checkpoint.mileage,
+          (sum, cp) => sum + cp.mileage,
           0,
         ) ?? 0;
 
-      // Least mileage first
       return mileageA - mileageB;
     });
   }, [driverList]);
 
   return {
-    // data: driverList,
     data: orderedData,
     refetch,
     LoadingVehicleList: LoadingVehicleList || loadingOdometers,

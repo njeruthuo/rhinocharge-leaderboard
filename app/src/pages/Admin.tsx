@@ -122,13 +122,18 @@ export default function AdminPage({
         if (!mileageGroup || !mileageGroup.checkpoints) return [];
 
         // Map each checkpoint for this specific asset
-        return mileageGroup.checkpoints.map((cp) => ({
+        const rows = mileageGroup.checkpoints.map((cp) => ({
           VEHICLE: mileageGroup.assetName,
           "CP ONE": cp.Checkpoint1 ? cp.Checkpoint1.toUpperCase() : "",
           "CP TWO": cp.Checkpoint2 ? cp.Checkpoint2.toUpperCase() : "",
           "ACTUAL DISTANCE":
             typeof cp.mileage === "number" ? cp.mileage.toFixed(3) : "0.000",
         }));
+
+        return [
+          ...rows,
+          { VEHICLE: "", "CP ONE": "", "CP TWO": "", "ACTUAL DISTANCE": "" },
+        ];
       });
     } else {
       flatRows = data.flatMap((item, index) => {

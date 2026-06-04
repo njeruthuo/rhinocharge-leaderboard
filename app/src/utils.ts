@@ -51,21 +51,108 @@ export function convertTo24Hour(timeStr: string) {
   return `${paddedHours}:${minutes}`;
 }
 
-function orderAndReturnUniqueCheckPoints(checkpointList: TripRecord[]) {
-  const orderedCheckPoints = [...checkpointList].sort((a, b) => {
-    return new Date(a.start_time).getTime() - new Date(b.start_time).getTime();
-  });
+function orderAndReturnUniqueCheckPoints(
+  checkpointList: TripRecord[],
+  start_cp_name: string,
+) {
+  if (!checkpointList || checkpointList.length === 0) return [];
 
-  const seenNames = new Set();
+  const normalizedStartName = start_cp_name.toLowerCase().trim();
+
+  // 1. Get all checkpoints EXCEPT the starting ones, and sort them
+  const orderedCheckPoints = [...checkpointList]
+    .filter(
+      (checkpoint) =>
+        checkpoint.poi_name?.toLowerCase().trim() !== normalizedStartName,
+    )
+    .sort((a, b) => {
+      return (
+        new Date(a.start_time).getTime() - new Date(b.start_time).getTime()
+      );
+    });
+
+  // 2. Gather all potential start checkpoints (normalized to lowercase)
+  const startCp = checkpointList.filter(
+    (checkpoint) =>
+      checkpoint.poi_name?.toLowerCase().trim() === normalizedStartName,
+  );
+
+  // 3. Deduplicate the non-start checkpoints
+  const seenNames = new Set<string>();
   const uniqueCheckPoints: TripRecord[] = [];
 
-  orderedCheckPoints?.forEach((checkpoint) => {
+  orderedCheckPoints.forEach((checkpoint) => {
     const normalizedName = checkpoint?.poi_name?.toLowerCase().trim();
     if (!seenNames.has(normalizedName)) {
       seenNames.add(normalizedName);
       uniqueCheckPoints.push(checkpoint);
     }
   });
+
+  if (startCp.length > 0) {
+    if (startCp.length > 1) {
+
+      const findClosestCheckpoint = (
+        targetHour: number,
+        targetMinute: number,
+        direction: "forward" | "backward",
+      ): TripRecord | null => {
+        let closestCp: TripRecord | null = null;
+        let minDifference = Infinity;
+        const ONE_HOUR_MS = 60 * 60 * 1000;
+
+        startCp.forEach((cp) => {
+          const cpDate = new Date(cp.start_time);
+
+          const targetDate = new Date(cpDate);
+          targetDate.setHours(targetHour, targetMinute, 0, 0);
+
+          const differenceInMs = cpDate.getTime() - targetDate.getTime();
+
+          if (direction === "forward") {
+            if (differenceInMs >= 0 && differenceInMs <= ONE_HOUR_MS) {
+              if (differenceInMs < minDifference) {
+                minDifference = differenceInMs;
+                closestCp = cp;
+              }
+            }
+          } else if (direction === "backward") {
+            const absoluteDifference = Math.abs(differenceInMs);
+            if (differenceInMs <= 0 && absoluteDifference <= ONE_HOUR_MS) {
+              if (absoluteDifference < minDifference) {
+                minDifference = absoluteDifference;
+                closestCp = cp;
+              }
+            }
+          }
+        });
+
+        return closestCp;
+      };
+
+      // Update your function calls to pass the direction parameter:
+      const morningCp = findClosestCheckpoint(7, 30, "forward"); // 7:30 AM to 8:30 AM
+      const eveningCp = findClosestCheckpoint(17, 30, "backward");
+
+      if (morningCp) uniqueCheckPoints.push(morningCp);
+
+      // Prevent pushing the exact same record twice if one record somehow fits both (unlikely, but safe)
+      if (eveningCp && eveningCp !== morningCp)
+        uniqueCheckPoints.push(eveningCp);
+
+      // --- END OF NEW TIME-MATCHING LOGIC ---
+    } else {
+      // If there's only 1 start checkpoint, just push it
+      uniqueCheckPoints.push(startCp[0]);
+    }
+
+    // 5. Final sort to integrate the added start checkpoints back into chronological order
+    uniqueCheckPoints.sort((a, b) => {
+      return (
+        new Date(a.start_time).getTime() - new Date(b.start_time).getTime()
+      );
+    });
+  }
 
   return uniqueCheckPoints;
 }
@@ -91,12 +178,13 @@ export function calculateHistory(
   start_cp: string,
   startOdometer: number,
 ): DataTypeCheckPoint[] {
-
   const baseOdometer = startOdometer;
 
   // const seenNames = new Set();
-  const uniqueCheckPoints: TripRecord[] =
-    orderAndReturnUniqueCheckPoints(checkpointList);
+  const uniqueCheckPoints: TripRecord[] = orderAndReturnUniqueCheckPoints(
+    checkpointList,
+    start_cp,
+  );
 
   // orderedCheckPoints?.forEach((checkpoint) => {
   //   const normalizedName = checkpoint?.poi_name?.toLowerCase().trim();
@@ -195,9 +283,12 @@ export async function calculatePointToPointMileage(
   resolvedTime: boolean,
   deviceID: string,
   assetNumber: string,
+  start_cp_name: string,
 ): Promise<PointToPointType> {
-  const uniqueCheckPoints: TripRecord[] =
-    orderAndReturnUniqueCheckPoints(checkpointList);
+  const uniqueCheckPoints: TripRecord[] = orderAndReturnUniqueCheckPoints(
+    checkpointList,
+    start_cp_name,
+  );
 
   const summaryPromises = [];
 
