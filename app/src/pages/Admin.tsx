@@ -13,7 +13,7 @@ import useDriverList from "@/hooks/useDriverList";
 
 import { AdminTabs } from "@/components/AdminTabs";
 import SafariLeaderBoard from "./SafariLeaderBoard";
-import { TabOptionList, type TabType } from "@/types";
+import { TabOptionList, type ExportRow, type TabType } from "@/types";
 import Results from "@/components/admintabsopt/Results";
 import useGetStoredDates from "@/hooks/useGetStoredDates";
 import CompetitorInfo from "@/components/admintabsopt/CompetitorInfo";
@@ -59,6 +59,32 @@ export default function AdminPage() {
     setTime(resolvedTime);
   }, [resolvedTime]);
 
+  const orderedData = useMemo(() => {
+    return [...data].sort((a, b) => {
+      // First sort by totalCps (descending)
+      if (b.totalCps !== a.totalCps) {
+        return b.totalCps - a.totalCps;
+      }
+
+      // Calculate total mileage for a
+      const mileageA =
+        a.pointToPointMileage?.checkpoints?.reduce(
+          (sum, checkpoint) => sum + checkpoint.mileage,
+          0,
+        ) ?? 0;
+
+      // Calculate total mileage for b
+      const mileageB =
+        b.pointToPointMileage?.checkpoints?.reduce(
+          (sum, checkpoint) => sum + checkpoint.mileage,
+          0,
+        ) ?? 0;
+
+      // Least mileage first
+      return mileageA - mileageB;
+    });
+  }, [data]);
+
   const handleUpload = async () => {
     if (!file) return;
 
@@ -78,25 +104,52 @@ export default function AdminPage() {
     });
   };
 
-  const handleExport = () => {
+  const handleExport = (exportTable: boolean = false) => {
     setIsGenerating(true);
 
-    // 1. Accumulate all rows across all vehicles/assets in the data array
-    const flatRows = data.flatMap((item) => {
-      // Access the nested mileage object structure safely
-      const mileageGroup = item.pointToPointMileage;
+    let flatRows: ExportRow[] = [];
+    if (!exportTable) {
+      flatRows = data.flatMap((item) => {
+        // Access the nested mileage object structure safely
+        const mileageGroup = item.pointToPointMileage;
 
-      if (!mileageGroup || !mileageGroup.checkpoints) return [];
+        if (!mileageGroup || !mileageGroup.checkpoints) return [];
 
-      // Map each checkpoint for this specific asset
-      return mileageGroup.checkpoints.map((cp) => ({
-        VEHICLE: mileageGroup.assetName,
-        "CP ONE": cp.Checkpoint1 ? cp.Checkpoint1.toUpperCase() : "",
-        "CP TWO": cp.Checkpoint2 ? cp.Checkpoint2.toUpperCase() : "",
-        "ACTUAL DISTANCE":
-          typeof cp.mileage === "number" ? cp.mileage.toFixed(3) : "0.000",
-      }));
-    });
+        // Map each checkpoint for this specific asset
+        return mileageGroup.checkpoints.map((cp) => ({
+          VEHICLE: mileageGroup.assetName,
+          "CP ONE": cp.Checkpoint1 ? cp.Checkpoint1.toUpperCase() : "",
+          "CP TWO": cp.Checkpoint2 ? cp.Checkpoint2.toUpperCase() : "",
+          "ACTUAL DISTANCE":
+            typeof cp.mileage === "number" ? cp.mileage.toFixed(3) : "0.000",
+        }));
+      });
+    } else {
+      flatRows = orderedData.flatMap((item, index) => {
+        // Access the nested mileage object structure safely
+        const mileageGroup = item.pointToPointMileage;
+
+        if (!mileageGroup || !mileageGroup.checkpoints) return [];
+
+        // Map each checkpoint for this specific asset
+        return {
+          CAR: mileageGroup.assetName,
+          DRIVER: item.entrantName,
+          TEAM: item.team_name,
+          POSITION: index + 1,
+          SECTOR:
+            item.orderedCheckpoints.length > 1
+              ? item.orderedCheckpoints.length - 1
+              : 0,
+          DISTANCE: mileageGroup.checkpoints
+            .reduce(
+              (accumulator, currentItem) => accumulator + currentItem.mileage,
+              0,
+            )
+            .toFixed(3)
+        };
+      });
+    }
 
     if (flatRows.length === 0) {
       console.warn("No checkpoint data found to export.");
@@ -119,7 +172,10 @@ export default function AdminPage() {
       data[0]?.pointToPointMileage?.assetName || "vehicles";
 
     link.setAttribute("href", url);
-    link.setAttribute("download", `${firstAssetName}_movement_summary.csv`);
+    link.setAttribute(
+      "download",
+      `${!exportTable ? `${firstAssetName}_movement_summary` : `Exported Table Data`}.csv`,
+    );
     link.style.visibility = "hidden";
 
     document.body.appendChild(link);
@@ -233,21 +289,39 @@ export default function AdminPage() {
                 </div>
               )}
               {currentTab === TabOptionList.RESULTS && (
-                <div className="flex items-center space-x-2 shrink-0 sm:mb-6">
-                  <button
-                    onClick={handleExport}
-                    // onClick={() => setOpenFilter(false)}
-                    disabled={isGenerating}
-                    className="flex-1 rounded-lg py-2 text-xs font-black tracking-wider uppercase transition-colors disabled:opacity-40 disabled:cursor-not-allowed mt-4 w-full hover:cursor-pointer bg-amber-600 hover:bg-amber-700 text-white rounded-md py-1.5 text-sm font-medium transition-colors shadow-sm px-2"
-                    style={{
-                      background: "rgba(217,119,6,0.18)",
-                      color: "#D97706",
-                      border: "1px solid rgba(217,119,6,0.3)",
-                      fontFamily: "'Oswald', sans-serif",
-                    }}
-                  >
-                    {isGenerating ? "Generating..." : "Generate report"}
-                  </button>
+                <div className="flex flex-row space-x-2 ">
+                  <div className="flex items-center space-x-2 shrink-0 sm:mb-6">
+                    <button
+                      onClick={() => handleExport(true)}
+                      // onClick={() => setOpenFilter(false)}
+                      disabled={isGenerating}
+                      className="flex-1 rounded-lg py-2 text-xs font-black tracking-wider uppercase transition-colors disabled:opacity-40 disabled:cursor-not-allowed mt-4 w-full hover:cursor-pointer bg-amber-600 hover:bg-amber-700 text-white rounded-md py-1.5 text-sm font-medium transition-colors shadow-sm px-2"
+                      style={{
+                        background: "rgba(217,119,6,0.18)",
+                        color: "#D97706",
+                        border: "1px solid rgba(217,119,6,0.3)",
+                        fontFamily: "'Oswald', sans-serif",
+                      }}
+                    >
+                      {isGenerating ? "Exporting..." : "Export table data"}
+                    </button>
+                  </div>
+                  <div className="flex items-center space-x-2 shrink-0 sm:mb-6">
+                    <button
+                      onClick={() => handleExport(false)}
+                      // onClick={() => setOpenFilter(false)}
+                      disabled={isGenerating}
+                      className="flex-1 rounded-lg py-2 text-xs font-black tracking-wider uppercase transition-colors disabled:opacity-40 disabled:cursor-not-allowed mt-4 w-full hover:cursor-pointer bg-amber-600 hover:bg-amber-700 text-white rounded-md py-1.5 text-sm font-medium transition-colors shadow-sm px-2"
+                      style={{
+                        background: "rgba(217,119,6,0.18)",
+                        color: "#D97706",
+                        border: "1px solid rgba(217,119,6,0.3)",
+                        fontFamily: "'Oswald', sans-serif",
+                      }}
+                    >
+                      {isGenerating ? "Generating..." : "Generate report"}
+                    </button>
+                  </div>
                 </div>
               )}
             </div>

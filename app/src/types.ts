@@ -226,3 +226,19 @@ export interface ResultsProps {
   openFilter?: boolean;
 }
 export type Poi = { key: string; location: Coordinates; time?: string | Date };
+
+export type ExportRow =
+  | {
+      VEHICLE: string;
+      "CP ONE": string;
+      "CP TWO": string;
+      "ACTUAL DISTANCE": string;
+    }
+  | {
+      CAR: string;
+      DRIVER: string;
+      TEAM: string;
+      POSITION: number;
+      SECTOR: number;
+      DISTANCE: number | string;
+    };
