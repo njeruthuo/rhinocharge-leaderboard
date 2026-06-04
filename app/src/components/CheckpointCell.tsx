@@ -17,10 +17,11 @@ function CheckpointCell({
   completeTrip: boolean;
   driver: Driver;
 }) {
+  const specificItem = driver.orderedCheckpoints.find(
+    (item) => item.point === start_cp,
+  );
+
   if (start_cp === cp.point) {
-    const specificItem = driver.orderedCheckpoints.find(
-      (item) => item.point === start_cp,
-    );
     // console.log("====================================");
     // console.log(`Car: ${driver.carNo}`);
     // console.log(` start Odometer: ${cp.startOdometer}`);
@@ -67,12 +68,12 @@ function CheckpointCell({
 
   return (
     <div className="flex flex-col items-center justify-center min-w-[40px] gap-0.5 mx-2">
-      {cp.time && (
+      {cp.time && specificItem && (
         <div className={`${colors.bgPale} rounded px-1 py-0.5 w-full`}>
           <span
             className={`font-black text-[11px] block leading-none text-center ${colors.primary}`}
           >
-            {cp?.time}
+            {cp?.time ?? specificItem.time}
           </span>
         </div>
       )}
