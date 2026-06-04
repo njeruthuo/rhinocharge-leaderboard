@@ -65,31 +65,31 @@ export default function AdminPage({
     setTime(resolvedTime);
   }, [resolvedTime]);
 
-  const orderedData = useMemo(() => {
-    return [...data].sort((a, b) => {
-      // First sort by totalCps (descending)
-      if (b.totalCps !== a.totalCps) {
-        return b.totalCps - a.totalCps;
-      }
+  // const orderedData = useMemo(() => {
+  //   return [...data].sort((a, b) => {
+  //     // First sort by totalCps (descending)
+  //     if (b.totalCps !== a.totalCps) {
+  //       return b.totalCps - a.totalCps;
+  //     }
 
-      // Calculate total mileage for a
-      const mileageA =
-        a.pointToPointMileage?.checkpoints?.reduce(
-          (sum, checkpoint) => sum + checkpoint.mileage,
-          0,
-        ) ?? 0;
+  //     // Calculate total mileage for a
+  //     const mileageA =
+  //       a.pointToPointMileage?.checkpoints?.reduce(
+  //         (sum, checkpoint) => sum + checkpoint.mileage,
+  //         0,
+  //       ) ?? 0;
 
-      // Calculate total mileage for b
-      const mileageB =
-        b.pointToPointMileage?.checkpoints?.reduce(
-          (sum, checkpoint) => sum + checkpoint.mileage,
-          0,
-        ) ?? 0;
+  //     // Calculate total mileage for b
+  //     const mileageB =
+  //       b.pointToPointMileage?.checkpoints?.reduce(
+  //         (sum, checkpoint) => sum + checkpoint.mileage,
+  //         0,
+  //       ) ?? 0;
 
-      // Least mileage first
-      return mileageA - mileageB;
-    });
-  }, [data]);
+  //     // Least mileage first
+  //     return mileageA - mileageB;
+  //   });
+  // }, [data]);
 
   const handleUpload = async () => {
     if (!file) return;
@@ -131,7 +131,7 @@ export default function AdminPage({
         }));
       });
     } else {
-      flatRows = orderedData.flatMap((item, index) => {
+      flatRows = data.flatMap((item, index) => {
         // Access the nested mileage object structure safely
         const mileageGroup = item.pointToPointMileage;
 

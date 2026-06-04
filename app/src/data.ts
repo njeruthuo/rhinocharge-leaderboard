@@ -14,7 +14,6 @@ export const CHECKPOINTS = [
   "FLOWER WATCH",
   "SOLEX",
   "SLATER & WHITTAKER",
-  // "GAUNTLET",
 ] as const;
 
 export type CheckpointName = (typeof CHECKPOINTS)[number];

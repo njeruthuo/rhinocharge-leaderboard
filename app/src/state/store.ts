@@ -14,7 +14,9 @@ export const store = configureStore({
     [authApi.reducerPath]: authApi.reducer,
   },
   middleware: (getMiddleware) =>
-    getMiddleware().concat([
+    getMiddleware({
+      serializableCheck: false,
+    }).concat([
       rhinoApi.middleware,
       pyapi.middleware,
       storage.middleware,

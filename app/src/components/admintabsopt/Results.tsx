@@ -22,32 +22,6 @@ const Results = ({
     return data.length < 1 && (LoadingVehicleList || LoadingCheckPoints);
   }, [data, LoadingVehicleList, LoadingCheckPoints]);
 
-  const orderedData = useMemo(() => {
-    return [...data].sort((a, b) => {
-      // First sort by totalCps (descending)
-      if (b.totalCps !== a.totalCps) {
-        return b.totalCps - a.totalCps;
-      }
-
-      // Calculate total mileage for a
-      const mileageA =
-        a.pointToPointMileage?.checkpoints?.reduce(
-          (sum, checkpoint) => sum + checkpoint.mileage,
-          0,
-        ) ?? 0;
-
-      // Calculate total mileage for b
-      const mileageB =
-        b.pointToPointMileage?.checkpoints?.reduce(
-          (sum, checkpoint) => sum + checkpoint.mileage,
-          0,
-        ) ?? 0;
-
-      // Least mileage first
-      return mileageA - mileageB;
-    });
-  }, [data]);
-
   // const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
 
   useEffect(() => {
@@ -256,7 +230,7 @@ const Results = ({
 
               <tbody>
                 <AnimatePresence mode="popLayout">
-                  {orderedData?.map((car, index) => {
+                  {data?.map((car, index) => {
                     const totalDistance =
                       car.pointToPointMileage.checkpoints.reduce(
                         (accumulator, currentItem) =>

@@ -5,6 +5,7 @@ import {
   useGetStartPointOdometerMutation,
   useGetMovementSummaryMutation,
 } from "@/state/rhinoApi";
+import { CHECKPOINTS } from "@/data";
 import {
   calculateHistory,
   calculatePointToPointMileage,
@@ -140,6 +141,10 @@ const useDriverList = () => {
           async (item, index): Promise<DataType> => {
             const checkPointList = CheckPoints.filter(
               (checkpoint) => checkpoint.vehicle === item.asset_name,
+            ).filter((checkpoint) =>
+              (CHECKPOINTS as readonly string[]).includes(
+                checkpoint.poi_name?.toUpperCase(),
+              ),
             );
 
             let odometerData = null;
@@ -209,7 +214,7 @@ const useDriverList = () => {
             );
 
             const isTripComplete =
-              start_cp_name.length > 0 && checkPointList.length > 13;
+              start_cp_name.length > 0 && checkPointList.length + 1 > 13;
 
             return {
               id: index,
@@ -220,7 +225,7 @@ const useDriverList = () => {
               start_cp: start_cp_name,
               entrantName: item?.last_driver,
               team_name: item?.team_name,
-              totalCps: history.length,
+              totalCps: history.length > 0 ? history.length + 1 : 0,
               checkpoints: checkPoints,
               orderedCheckpoints: history,
               complete: isTripComplete,
@@ -255,8 +260,35 @@ const useDriverList = () => {
     DateData.startTime,
   ]);
 
+  const orderedData = useMemo(() => {
+    return [...driverList].sort((a, b) => {
+      // First sort by totalCps (descending)
+      if (b.totalCps !== a.totalCps) {
+        return b.totalCps - a.totalCps;
+      }
+
+      // Calculate total mileage for a
+      const mileageA =
+        a.pointToPointMileage?.checkpoints?.reduce(
+          (sum, checkpoint) => sum + checkpoint.mileage,
+          0,
+        ) ?? 0;
+
+      // Calculate total mileage for b
+      const mileageB =
+        b.pointToPointMileage?.checkpoints?.reduce(
+          (sum, checkpoint) => sum + checkpoint.mileage,
+          0,
+        ) ?? 0;
+
+      // Least mileage first
+      return mileageA - mileageB;
+    });
+  }, [driverList]);
+
   return {
-    data: driverList,
+    // data: driverList,
+    data: orderedData,
     refetch,
     LoadingVehicleList: LoadingVehicleList || loadingOdometers,
     LoadingCheckPoints,

@@ -152,7 +152,7 @@ function DesktopTableRow({
               color: rank === 1 ? "#3DDC97" : "#d6d3d1",
             }}
           >
-            {driver.orderedCheckpoints.length ?? 0}
+            {driver.totalCps ?? 0}
             <span className="text-[14px] font-semibold text-stone-600 ml-1">
               /{CHECKPOINTS.length + 1 || 0}
             </span>

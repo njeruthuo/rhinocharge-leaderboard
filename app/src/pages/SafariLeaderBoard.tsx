@@ -243,13 +243,13 @@ function SafariLeaderBoard({
   }, [data, LoadingVehicleList, LoadingCheckPoints]);
 
   // 4. Sorts dynamically whenever the active resolved dataset shifts
-  const drivers = useMemo(() => {
-    return [...data].sort((a, b) => b.totalCps - a.totalCps);
-  }, [data]);
+  const drivers = data;
 
   const isViewer = useMemo((): boolean => {
     return pathname !== "/";
   }, [pathname]);
+
+  // console.log(drivers, "driver");
 
   return (
     <div style={{ background: "#FBFBFB" }}>
