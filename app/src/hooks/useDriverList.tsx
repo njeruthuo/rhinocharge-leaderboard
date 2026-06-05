@@ -251,16 +251,8 @@ const useDriverList = () => {
     DateData.isBackup,
   ]);
 
-  const orderedData = useMemo(() => {
-    return [...driverList].sort((a, b) => {
-      if (b.totalCps !== a.totalCps) return b.totalCps - a.totalCps;
-
-      return a.mileage - b.mileage;
-    });
-  }, [driverList]);
-
   return {
-    data: orderedData,
+    data: driverList,
     refetch,
     LoadingVehicleList: LoadingVehicleList || loadingOdometers,
     LoadingCheckPoints,

@@ -1,11 +1,11 @@
 // import useMileageResults from "@/hooks/useMileageResults";
 
-import useDriverList from "@/hooks/useDriverList";
+// import useDriverList from "@/hooks/useDriverList";
 
 const MileageResults = () => {
-  const { data } = useDriverList();
+  // const { data } = useDriverList();
 
-  console.log(data, "data");
+  // console.log(data, "data");
 
   return (
     <div

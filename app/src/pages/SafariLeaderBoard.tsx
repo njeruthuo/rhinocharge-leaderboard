@@ -242,8 +242,24 @@ function SafariLeaderBoard({
     return data.length < 1 && (LoadingVehicleList || LoadingCheckPoints);
   }, [data, LoadingVehicleList, LoadingCheckPoints]);
 
-  // 4. Sorts dynamically whenever the active resolved dataset shifts
-  const drivers = data;
+  const drivers = useMemo(() => {
+    return [...data].sort((a, b) => {
+      if (b.totalCps !== a.totalCps) return b.totalCps - a.totalCps;
+
+      const biggestOdometerA = Math.max(
+        0,
+        ...(a?.orderedCheckpoints?.map((item) => item.distanceFromBase || 0) ??
+          []),
+      );
+      const biggestOdometerB = Math.max(
+        0,
+        ...(b?.orderedCheckpoints?.map((item) => item.distanceFromBase || 0) ??
+          []),
+      );
+
+      return biggestOdometerA - biggestOdometerB;
+    });
+  }, [data]);
 
   const isViewer = useMemo((): boolean => {
     return pathname !== "/";
