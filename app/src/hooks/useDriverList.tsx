@@ -174,6 +174,20 @@ const useDriverList = () => {
             );
             const start_cp_name = start_cp?.column_value || "";
 
+            const craftedStartCp = {
+              device_timezone: 3,
+              driver: "",
+              end_odo: startOdometer,
+              end_time: "5/30/2026 4:30:00 AM",
+              mileage: startOdometer,
+              poi_name: start_cp_name,
+              start_odo: startOdometer,
+              start_time: "5/30/2026 4:29:00 AM",
+              vehicle: "CAR33",
+              calculated_odometer: 0,
+              startOdometer: startOdometer,
+            };
+
             const checkPoints = checkPointList.map((checkpoint) => {
               const time = parseTime(checkpoint?.start_time)?.split(":");
               return {
@@ -194,13 +208,20 @@ const useDriverList = () => {
             );
 
             const pointToPointMileage = await calculatePointToPointMileage(
-              checkPointList,
+              [...checkPointList, craftedStartCp],
               getMovementSummaryRef.current, // ✅ stable ref, not the raw mutation
               DateData.isBackup,
               String(item.device_id),
               item.asset_name,
               start_cp_name,
             );
+
+            console.log(pointToPointMileage, "pointToPointMileage");
+            console.log(
+              [...checkPointList, craftedStartCp],
+              " new checkpointList",
+            );
+            console.log(item, "item");
 
             const cumulativeOdometer = history.reduce(
               (acc, cur) => acc + (cur?.calculated_odometer || 0),

@@ -91,7 +91,6 @@ function orderAndReturnUniqueCheckPoints(
 
   if (startCp.length > 0) {
     if (startCp.length > 1) {
-
       const findClosestCheckpoint = (
         targetHour: number,
         targetMinute: number,
@@ -155,6 +154,58 @@ function orderAndReturnUniqueCheckPoints(
   }
 
   return uniqueCheckPoints;
+}
+
+// function orderAndReturnUniqueCheckPointsForP2P(
+//   checkpointList: TripRecord[],
+//   // start_cp_name: string,
+// ) {
+//   if (!checkpointList || checkpointList.length === 0) return [];
+
+//   return [...checkpointList].sort(
+//     (a, b) =>
+//       new Date(a.start_time).getTime() - new Date(b.start_time).getTime(),
+//   );
+// }
+
+function orderAndReturnUniqueCheckPointsForP2P(
+  checkpointList: TripRecord[],
+  start_cp_name: string,
+): TripRecord[] {
+  if (!checkpointList || checkpointList.length === 0) return [];
+
+  const normalizedStartName = start_cp_name.toLowerCase().trim();
+
+  // Sort everything chronologically first
+  const sorted = [...checkpointList].sort(
+    (a, b) =>
+      new Date(a.start_time).getTime() - new Date(b.start_time).getTime(),
+  );
+
+  const isStartCp = (cp: TripRecord) =>
+    cp.poi_name?.toLowerCase().trim() === normalizedStartName;
+
+  // Trim leading duplicates of the start CP — keep only the last one (most recent before the route begins)
+  let leadStart = 0;
+  while (
+    leadStart < sorted.length - 1 &&
+    isStartCp(sorted[leadStart]) &&
+    isStartCp(sorted[leadStart + 1])
+  ) {
+    leadStart++;
+  }
+
+  // Trim trailing duplicates of the start/end CP — keep only the first one (earliest after route ends)
+  let trailEnd = sorted.length - 1;
+  while (
+    trailEnd > leadStart + 1 &&
+    isStartCp(sorted[trailEnd]) &&
+    isStartCp(sorted[trailEnd - 1])
+  ) {
+    trailEnd--;
+  }
+
+  return sorted.slice(leadStart, trailEnd + 1);
 }
 
 export function isOpen(
@@ -285,14 +336,13 @@ export async function calculatePointToPointMileage(
   assetNumber: string,
   start_cp_name: string,
 ): Promise<PointToPointType> {
-  const uniqueCheckPoints: TripRecord[] = orderAndReturnUniqueCheckPoints(
+  const uniqueCheckPoints: TripRecord[] = orderAndReturnUniqueCheckPointsForP2P(
     checkpointList,
     start_cp_name,
   );
 
   const summaryPromises = [];
 
-  // Keep track of the metadata for each segment so we can pair it with the API results later
   const segmentMetadata: {
     checkpoint1Name: string;
     checkpoint2Name: string;

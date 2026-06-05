@@ -16,6 +16,7 @@ const LoginPage = ({
     e.preventDefault();
     if (username === ADMIN_USERNAME && password === ADMIN_PASSWORD) {
       setIsAuthenticated(true);
+      localStorage.setItem("AUTHCARD", "true");
       setAuthError(null);
     } else {
       setAuthError("Invalid username or password");

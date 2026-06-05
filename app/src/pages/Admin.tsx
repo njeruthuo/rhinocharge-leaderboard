@@ -32,7 +32,10 @@ export default function AdminPage({
   LoadingVehicleList,
 }: DriverTypeProps) {
   const navigate = useNavigate();
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState(
+    () => localStorage.getItem("AUTHCARD") === "true",
+  );
+
   const [selections, setSelections] = useState<Record<number, string>>({});
   const [currentTab, setCurrentTab] = useState<TabType>(TabOptionList.LIVEDATA);
 
@@ -106,7 +109,28 @@ export default function AdminPage({
       }
     } else {
       if (!exportTable) {
-        flatRows = data.flatMap((item) => {
+        const orderedData = [...data].sort((a, b) => {
+          if (
+            b.pointToPointMileage.checkpoints.length !==
+            a.pointToPointMileage.checkpoints.length
+          )
+            return (
+              b.pointToPointMileage.checkpoints.length -
+              a.pointToPointMileage.checkpoints.length
+            );
+
+          const totalDistanceA = a.pointToPointMileage.checkpoints.reduce(
+            (accumulator, currentItem) => accumulator + currentItem.mileage,
+            0,
+          );
+          const totalDistanceB = b.pointToPointMileage.checkpoints.reduce(
+            (accumulator, currentItem) => accumulator + currentItem.mileage,
+            0,
+          );
+
+          return totalDistanceA - totalDistanceB;
+        });
+        flatRows = orderedData.flatMap((item) => {
           // Access the nested mileage object structure safely
           const mileageGroup = item.pointToPointMileage;
 
@@ -256,7 +280,10 @@ export default function AdminPage({
               <div className="flex place-items-center space-x-8">
                 <span
                   className="hover:cursor-pointer ml-auto"
-                  onClick={() => navigate("/")}
+                  onClick={() => {
+                    localStorage.removeItem("AUTHCARD");
+                    navigate("/");
+                  }}
                 >
                   <img src={home} alt="" />
                 </span>

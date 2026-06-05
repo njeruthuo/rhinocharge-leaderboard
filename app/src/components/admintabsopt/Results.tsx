@@ -34,13 +34,20 @@ const Results = ({
 
   const orderedData = useMemo(() => {
     return [...data].sort((a, b) => {
-      if (b.totalCps !== a.totalCps) return b.totalCps - a.totalCps;
+      if (
+        b.pointToPointMileage.checkpoints.length !==
+        a.pointToPointMileage.checkpoints.length
+      )
+        return (
+          b.pointToPointMileage.checkpoints.length -
+          a.pointToPointMileage.checkpoints.length
+        );
 
       const totalDistanceA = a.pointToPointMileage.checkpoints.reduce(
         (accumulator, currentItem) => accumulator + currentItem.mileage,
         0,
       );
-      const totalDistanceB = a.pointToPointMileage.checkpoints.reduce(
+      const totalDistanceB = b.pointToPointMileage.checkpoints.reduce(
         (accumulator, currentItem) => accumulator + currentItem.mileage,
         0,
       );
@@ -233,7 +240,7 @@ const Results = ({
                             }}
                           >
                             {car.orderedCheckpoints.length > 1
-                              ? car.orderedCheckpoints.length - 1
+                              ? car.pointToPointMileage.checkpoints.length
                               : 0}
                           </span>
                         </td>
