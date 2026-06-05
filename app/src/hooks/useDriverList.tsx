@@ -199,7 +199,7 @@ const useDriverList = () => {
               DateData.isBackup,
               String(item.device_id),
               item.asset_name,
-              start_cp_name
+              start_cp_name,
             );
 
             const cumulativeOdometer = history.reduce(
@@ -255,18 +255,7 @@ const useDriverList = () => {
     return [...driverList].sort((a, b) => {
       if (b.totalCps !== a.totalCps) return b.totalCps - a.totalCps;
 
-      const mileageA =
-        a.pointToPointMileage?.checkpoints?.reduce(
-          (sum, cp) => sum + cp.mileage,
-          0,
-        ) ?? 0;
-      const mileageB =
-        b.pointToPointMileage?.checkpoints?.reduce(
-          (sum, cp) => sum + cp.mileage,
-          0,
-        ) ?? 0;
-
-      return mileageA - mileageB;
+      return a.mileage - b.mileage;
     });
   }, [driverList]);
 

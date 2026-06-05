@@ -249,8 +249,6 @@ function SafariLeaderBoard({
     return pathname !== "/";
   }, [pathname]);
 
-  // console.log(drivers, "driver");
-
   return (
     <div style={{ background: "#FBFBFB" }}>
       <div
